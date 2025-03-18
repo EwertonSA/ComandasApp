@@ -14,5 +14,15 @@ export const mesasService={
             perPage:perPage,
             total:count
         }
+    },
+    finByIdWithClientes: async(id:string)=>{
+        const mesasClientes=await Mesas.findByPk(id, {
+            attributes:['id','numero','capacidade'],
+            include:{
+                association:'clientes',
+                attributes:['id','nome','telefone',['mesa_id','mesaId']]
+            }
+        })
+        return mesasClientes
     }
 }

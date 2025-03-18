@@ -7,7 +7,7 @@ import PedidosProdutos from "./pedidosProdutos";
 import Produtos from "./Produtos";
 
 // Relação Mesa - Clientes (1:N)
-Mesas.hasMany(Clientes, { foreignKey: 'mesaId' });
+Mesas.hasMany(Clientes, {as:'clientes', foreignKey: 'mesaId' });
 Clientes.belongsTo(Mesas, { foreignKey: 'mesaId' });
 
 // Relação Mesa - Comandas (1:N)
@@ -15,7 +15,7 @@ Mesas.hasMany(Comandas, { foreignKey: 'mesaId' });
 Comandas.belongsTo(Mesas, { foreignKey: 'mesaId' });
 
 // Relação Cliente - Comandas (1:N)
-Clientes.hasMany(Comandas, { foreignKey: 'clienteId' });
+Clientes.hasOne(Comandas, {as:'comandas', foreignKey: 'clienteId' });
 Comandas.belongsTo(Clientes, { foreignKey: 'clienteId' });
 
 // Relação Comanda - Pedidos (1:N)
