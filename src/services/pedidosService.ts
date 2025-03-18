@@ -1,4 +1,5 @@
 import { Pedidos } from "../models"
+import { PedidoAttributes } from "../models/Pedidos"
 
 export const pedidosService={
    findAllPaginated:async(page:number,perPage:number)=>{
@@ -15,5 +16,9 @@ export const pedidosService={
         count
     }
    },
+   create:async(attributes:PedidoAttributes)=>{
+    const pedido= await Pedidos.create(attributes)
+    return pedido
+   }
    
 }

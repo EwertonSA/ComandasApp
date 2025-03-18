@@ -1,4 +1,5 @@
 import { Produtos } from "../models"
+import { ProdutoAttributes } from "../models/Produtos"
 
 export const produtoService={
     finadAllPaginated:async(page:number,perPage:number)=>{
@@ -14,5 +15,9 @@ export const produtoService={
             perPage,
             total:count
         }
+    },
+    create:async(attributes:ProdutoAttributes)=>{
+        const produto=await Produtos.create(attributes)
+        return produto
     }
 }

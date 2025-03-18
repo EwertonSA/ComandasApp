@@ -13,5 +13,18 @@ export const pedidosController={
             return res.status(400).json({message:error.message})
         }
     }
+   },
+   save:async(req:Request,res:Response)=>{
+    const {comandaId,total,status}=req.body
+    try {
+        const pedido=await pedidosService.create({
+            comandaId,total,status
+        })
+        return res.status(200).json(pedido)
+    } catch (error) {
+        if(error instanceof Error){
+            return res.status(400).json({message:error.message})
+        }
+    }
    }
 }

@@ -14,5 +14,18 @@ export const productController={
                 return res.status(400).json({message:error.message})
             }
         }
+    },
+    save:async(req:Request,res:Response)=>{
+        const {nome,descricao,preco,categoria}=req.body
+        try {
+            const produto=await produtoService.create({
+                nome,descricao,preco,categoria
+            })
+            return res.status(200).json(produto)
+        } catch (error) {
+            if(error instanceof Error){
+                return res.status(400).json({message:error.message})
+            }
+        }
     }
 }
