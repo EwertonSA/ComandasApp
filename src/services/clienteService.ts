@@ -1,4 +1,5 @@
 import { Clientes } from "../models"
+import { ClienteCreationAttributes } from "../models/Cliente"
 
 export const clienteService={
     findAllPaginated:async(page:number,perPage:number)=>{
@@ -24,4 +25,9 @@ export const clienteService={
             }
         })
         return clienteComanda
-}}
+},
+create:async(attributes:ClienteCreationAttributes)=>{
+    const cliente= await Clientes.create(attributes)
+    return cliente
+}
+}

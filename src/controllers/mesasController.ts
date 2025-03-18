@@ -27,5 +27,18 @@ export const mesasController={
             return res.status(400).json({message:error.message})
         }
        } 
+    },
+    save:async(req:Request,res:Response)=>{
+        const {numero,capacidade}=req.body
+        try {
+            const mesa= await mesasService.create({
+                numero,capacidade
+            })
+            return res.status(200).json(mesa)
+        } catch (error) {
+            if(error instanceof Error){
+                return res.status(400).json({message:error.message})
+            }
+        }
     }
 }

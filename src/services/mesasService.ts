@@ -1,4 +1,5 @@
 import { Mesas } from "../models"
+import { MesasCreationAttributes } from "../models/Mesas"
 
 export const mesasService={
     findAllPaginated: async(page:number,perPage:number)=>{
@@ -24,5 +25,9 @@ export const mesasService={
             }
         })
         return mesasClientes
+    },
+    create:async(attributes:MesasCreationAttributes)=>{
+        const mesas= await Mesas.create(attributes)
+        return mesas
     }
 }

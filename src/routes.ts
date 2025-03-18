@@ -6,9 +6,11 @@ import { comandaController } from './controllers/comandaController'
 import { productController } from './controllers/productController'
 const router= express.Router()
 router.get('/mesas',mesasController.index)
+router.post('/mesas',mesasController.save)
 router.get('/mesas/:id',mesasController.show)
 
 router.get('/clientes',clientesController.index)
+router.post('/clientes',clientesController.registro)
 router.get('/clientes/:id',clientesController.show)
 
 router.get('/comandas/:id',comandaController.show)
