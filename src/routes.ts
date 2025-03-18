@@ -13,6 +13,7 @@ router.get('/clientes',clientesController.index)
 router.post('/clientes',clientesController.registro)
 router.get('/clientes/:id',clientesController.show)
 
+router.post('/comandas',comandaController.save)
 router.get('/comandas/:id',comandaController.show)
 
 router.get('/pedidos',pedidosController.index)

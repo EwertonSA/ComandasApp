@@ -1,4 +1,5 @@
 import { Comandas } from "../models"
+import { ComandaAttributes } from "../models/Comandas"
 
 export const comandasService={
     ComandaPedido:async(id:string)=>{
@@ -10,5 +11,9 @@ export const comandasService={
             }
         })
         return comandaPedido
+    },
+    create:async(attibutes:ComandaAttributes)=>{
+        const comanda=await Comandas.create(attibutes)
+        return comanda
     }
 }
