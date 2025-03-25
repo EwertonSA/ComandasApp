@@ -19,12 +19,13 @@ router.post('/comandas',comandaController.save)
 router.get('/comandas/:id',comandaController.show)
 
 router.get('/pedidos',pedidosController.index)
+router.get('/pedidos/:id',pedidosController.show)
 router.post('/pedidos',pedidosController.save)
 
 router.get('/produtos',productController.index)
 router.post('/produtos',productController.save)
 
-router.post('/pedidosProdutos',pedidosProdutosController.save)
+router.post('/pedidosProdutos', pedidosProdutosController.save);
 
-router.post('/pamentos',pagamentoController.save)
+router.post('/pagamentos',pagamentoController.save)
 export default router

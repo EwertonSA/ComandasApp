@@ -1,6 +1,11 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('pedidos_produtos', {
+      id: {
+        type: Sequelize.DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+      },
       pedido_id: {
         type: Sequelize.DataTypes.INTEGER,
         references: {

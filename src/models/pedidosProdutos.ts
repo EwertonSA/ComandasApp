@@ -1,38 +1,77 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import { sequelize } from "../database";
+import Pedidos from "./Pedidos";
+import Produtos, { ProdutoInstance } from "./Produtos";
 
-export interface PedidoProduto{
-    pedido_id:number,
-    produto_id:number,
-    quantidade:number
+export interface PedidoProduto {
+  id: number;
+  pedidoId: number;
+  produtoId: number;
+  quantidade: number;
 }
-export interface PedidoProdutoAttributes extends Optional<PedidoProduto, 'quantidade'>{}
-export interface PedidoProdutoInstance extends Model<PedidoProduto,PedidoProdutoAttributes>,PedidoProduto{}
+export interface PedidoProdutoAttributes extends Optional<PedidoProduto, 'id'>{}
+export interface PedidoProdutoInstance
+  extends Model<PedidoProduto, PedidoProdutoAttributes>,
+    PedidoProduto {
+  produto?: ProdutoInstance; // Adicionando o relacionamento
+}
 
-const PedidosProdutos = sequelize.define<PedidoProdutoInstance>('pedidos_produtos', {
-  pedido_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    primaryKey:true,
-    references: {
-      model: 'pedidos',
-      key: 'id'
+    
+const PedidosProdutos = sequelize.define<PedidoProdutoInstance>(
+  "pedidos_produtos",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
     },
-    onDelete: 'CASCADE'
-  },
-  produto_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    primaryKey:true,
-    references: {
-      model: 'produtos',
-      key: 'id'
+    pedidoId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Pedidos,
+        key: "id",
+      },
+      onDelete: "CASCADE",
     },
-    onDelete: 'CASCADE'
-  },
-  quantidade: {
-    type: DataTypes.INTEGER,
-    allowNull: false
+    produtoId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Produtos,
+        key: "id",
+      },
+      onDelete: "CASCADE",
+    },
+    quantidade: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
   }
-})
-export default PedidosProdutos
+);
+
+PedidosProdutos.afterCreate(async (pedidoProduto) => {
+  await atualizarTotalPedido(pedidoProduto.pedidoId);
+});
+
+PedidosProdutos.afterUpdate(async (pedidoProduto) => {
+  await atualizarTotalPedido(pedidoProduto.pedidoId);
+});
+
+PedidosProdutos.afterDestroy(async (pedidoProduto) => {
+  await atualizarTotalPedido(pedidoProduto.pedidoId);
+});
+
+async function atualizarTotalPedido(pedidoId: number) {
+  const pedidoProdutos = await PedidosProdutos.findAll({
+    where: { pedidoId },
+    include: [{ model: Produtos, as: "produto", attributes: ["preco"] }],
+  });
+
+  const total = pedidoProdutos.reduce((acc, item) => {
+    return acc + (item.produto?.preco || 0) * item.quantidade;
+  }, 0);
+
+  await Pedidos.update({ total }, { where: { id: pedidoId } });
+}
+export default PedidosProdutos;

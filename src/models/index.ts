@@ -23,16 +23,21 @@ Comandas.hasMany(Pedidos, { foreignKey: 'comandaId' });
 Pedidos.belongsTo(Comandas, { foreignKey: 'comandaId' });
 
 // Relação Pedido - Produtos (N:M) através da tabela intermediária PedidoProdutos
-Pedidos.belongsToMany(Produtos, { through: PedidosProdutos, foreignKey: 'pedidoId' });
-Produtos.belongsToMany(Pedidos, { through: PedidosProdutos, foreignKey: 'produtoId' });
+Pedidos.belongsToMany(Produtos, {
+    through: PedidosProdutos,
+    as:'produtos', // Especificando a tabela intermediária
+    foreignKey: 'pedidoId', // Chave estrangeira para Pedidos
+  
+  });
+Produtos.belongsToMany(Pedidos, { through: PedidosProdutos,as:'pedidos', foreignKey: 'produtoId' });
 
 // Relação PedidoProdutos - Pedido (1:N)
-PedidosProdutos.belongsTo(Pedidos, { foreignKey: 'pedidoId' });
-Pedidos.hasMany(PedidosProdutos, { foreignKey: 'pedidoId' });
+PedidosProdutos.belongsTo(Pedidos, { foreignKey: 'pedidoId', as:'pedido'});
+Pedidos.hasMany(PedidosProdutos, { foreignKey: 'pedidoId', as:'pedidosProdutos'});
 
 // Relação PedidoProdutos - Produto (1:N)
-PedidosProdutos.belongsTo(Produtos, { foreignKey: 'produtoId' });
-Produtos.hasMany(PedidosProdutos, { foreignKey: 'produtoId' });
+PedidosProdutos.belongsTo(Produtos, { foreignKey: 'produtoId', as:'produto' });
+Produtos.hasMany(PedidosProdutos, { foreignKey: 'produtoId',as:'produtos' });
 
 // Relação Pedido - Pagamento (1:1)
 Pedidos.hasOne(Pagamentos, { foreignKey: 'pedidoId' });

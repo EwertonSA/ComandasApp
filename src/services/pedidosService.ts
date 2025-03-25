@@ -1,4 +1,4 @@
-import { Pedidos } from "../models"
+import { Pedidos, PedidosProdutos, Produtos } from "../models"
 import { PedidoAttributes } from "../models/Pedidos"
 
 export const pedidosService={
@@ -16,6 +16,28 @@ export const pedidosService={
         count
     }
    },
+   pedidoProduto: async (id: string) => {
+    const pedido = await Pedidos.findByPk(id, {
+      attributes: ["comandaId", "total", "status"],
+      include: [
+        {
+          model: PedidosProdutos,
+          as: "pedidosProdutos", // Deve ser o mesmo alias definido na associação!
+          attributes: ["id", "pedidoId", "produtoId", "quantidade"],
+          include: [
+            {
+              model: Produtos, // Inclui os detalhes do produto também
+              as: "produto",
+              attributes: ["nome", "preco"], // Pegue apenas os atributos necessários
+            },
+          ],
+        },
+      ],
+    });
+  
+    return pedido;
+  },
+  
    create:async(attributes:PedidoAttributes)=>{
     const pedido= await Pedidos.create(attributes)
     return pedido
