@@ -25,6 +25,29 @@ export const comandaController={
                 return res.status(400).json({message:error.message})
             }
         }
+    },
+    update:async(req:Request,res:Response)=>{
+        const {id}=req.params
+        const {mesaId,clienteId}=req.body
+        try {
+            await comandasService.update(id,{mesaId,clienteId})
+            return res.status(204).send
+        } catch (error) {
+            if(error instanceof Error){
+                return res.status(400).json({message:error.message})
+            }
+        }
+    },
+    delete:async(req:Request,res:Response)=>{
+        const {id}=req.params
+        try {
+           await comandasService.delete(id) 
+            return res.status(204).send()
+        } catch (error) {
+            if(error instanceof Error){
+                return res.status(400).json({message:error.message})
+            }
+        }
     }
 
 }

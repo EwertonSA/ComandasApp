@@ -22,6 +22,8 @@ router.delete('/clientes/:id/:mesaId',clientesController.delete)
 
 router.post('/comandas',comandaController.save)
 router.get('/comandas/:id',comandaController.show)
+router.put('/comandas/:id',comandaController.update)
+router.delete('/comandas/:id',comandaController.delete)
 
 router.get('/pedidos',pedidosController.index)
 router.get('/pedidos/:id',pedidosController.show)

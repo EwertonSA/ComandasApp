@@ -15,5 +15,17 @@ export const comandasService={
     create:async(attibutes:ComandaAttributes)=>{
         const comanda=await Comandas.create(attibutes)
         return comanda
+    },
+    update:async(id:string,attributes:{mesaId:number,clienteId:number})=>{
+        const [affected,updated]= await Comandas.update(attributes,{
+            where:{id},
+            returning:true
+
+        })
+        return updated[0]
+    },
+    delete:async(id:string)=>{
+        const deleted=await Comandas.destroy({where:{id}})
+        return deleted
     }
 }
