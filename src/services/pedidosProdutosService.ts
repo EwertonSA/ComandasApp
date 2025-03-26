@@ -4,5 +4,5 @@ export const pedidosProdutosService={
     create:async(attributes:PedidoProdutoAttributes)=>{
         const pedidosProdutos= await PedidosProdutos.create(attributes)
         return pedidosProdutos
-    },
+    }
 }

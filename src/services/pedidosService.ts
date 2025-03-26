@@ -41,6 +41,14 @@ export const pedidosService={
    create:async(attributes:PedidoAttributes)=>{
     const pedido= await Pedidos.create(attributes)
     return pedido
-   }
+   },
+   update:async(id:string,attibutes:{comandaId:number,total:number,status:string})=>{
+    const updated=await Pedidos.update(attibutes,{where:{id}})
+    return updated
+},
+delete:async(id:string)=>{
+  const deleted=await Pedidos.destroy({where:{id}})
+  return deleted
+}
    
 }

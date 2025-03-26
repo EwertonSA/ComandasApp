@@ -27,7 +27,9 @@ router.delete('/comandas/:id',comandaController.delete)
 
 router.get('/pedidos',pedidosController.index)
 router.get('/pedidos/:id',pedidosController.show)
+router.put('/pedidos/:id',pedidosController.update)
 router.post('/pedidos',pedidosController.save)
+router.delete('/pedidos/:id',pedidosController.delete)
 
 router.get('/produtos',productController.index)
 router.post('/produtos',productController.save)

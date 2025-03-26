@@ -39,5 +39,27 @@ export const pedidosController={
             return res.status(400).json({message:error.message})
         }
     }
+   },update:async(req:Request,res:Response)=>{
+    const {id}=req.params
+    const {comandaId,total,status}=req.body
+    try {
+        await pedidosService.update(id,{comandaId,total,status})
+        return res.status(204).send()
+    } catch (error) {
+        if(error instanceof Error){
+            return res.status(400).json({message:error.message})
+        }
+    }
+   },
+   delete:async(req:Request,res:Response)=>{
+    const {id}=req.params
+    try {
+        await pedidosService.delete(id)
+        return res.status(204).send()
+    } catch (error) {
+        if(error instanceof Error){
+            return res.status(400).json({message:error.message})
+        }
+    }
    }
 }
