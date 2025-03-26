@@ -29,5 +29,16 @@ export const mesasService={
     create:async(attributes:MesasCreationAttributes)=>{
         const mesas= await Mesas.create(attributes)
         return mesas
+    },
+    update:async(id:string,attributes:{numero:number,capacidade:number})=>{
+        const [affected,updatedMesas]= await Mesas.update(attributes,{
+            where:{id},
+            returning:true
+        })
+        return updatedMesas
+    },
+    delete:async(id:string)=>{
+        const deleted=await Mesas.destroy({where:{id}})
+        return deleted
     }
 }

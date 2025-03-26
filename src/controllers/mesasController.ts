@@ -40,5 +40,30 @@ export const mesasController={
                 return res.status(400).json({message:error.message})
             }
         }
+    },
+    update:async(req:Request,res:Response)=>{
+        const {id}=req.params
+        const {numero,capacidade}=req.body
+        try {
+            const updated=await mesasService.update(id,{
+                numero,capacidade}
+            )
+            return res.status(204).send()
+        } catch (error) {
+            if(error instanceof Error){
+                return res.status(400).json({message:error.message})
+            } 
+        }
+    },
+    delete:async(req:Request,res:Response)=>{
+        const {id}=req.params
+        try {
+           await mesasService.delete(id)
+            return res.status(204).send()
+        } catch (error) {
+            if(error instanceof Error){
+                return res.status(400).json({message:error.message})
+            } 
+        }
     }
 }

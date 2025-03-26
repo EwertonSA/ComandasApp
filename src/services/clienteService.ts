@@ -35,6 +35,7 @@ const [affectedRows,updatedRows]=await Clientes.update(attributes,{
     where:{id},
     returning:true
 })
+return updatedRows[0]
 },
 deleteCliente:async(id:string,mesaId:number)=>{
    const del= await Clientes.destroy({where:{id,mesaId}})

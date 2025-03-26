@@ -10,7 +10,9 @@ import { clienteService } from './services/clienteService'
 const router= express.Router()
 router.get('/mesas',mesasController.index)
 router.post('/mesas',mesasController.save)
+router.put('/mesas/:id',mesasController.update)
 router.get('/mesas/:id',mesasController.show)
+router.delete('/mesas/:id',mesasController.delete)
 
 router.get('/clientes',clientesController.index)
 router.post('/clientes',clientesController.registro)
