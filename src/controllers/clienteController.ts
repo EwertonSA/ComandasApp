@@ -42,5 +42,30 @@ if (isNaN(mesaIdNumber)) {
                 return res.status(400).json({message:error.message})
             } 
         }
+    },
+    update:async(req:Request,res:Response)=>{
+        const id=req.params.id
+        const {nome,telefone,mesaId}=req.body
+        try {
+            const update= await clienteService.updateCliente(id,{
+                nome,telefone,mesaId
+            })
+            return res.status(201).json(update)
+        } catch (error) {
+            if(error instanceof Error){
+                return res.status(400).json({message:error.message})
+            } 
+        } 
+    },
+    delete:async(req:Request,res:Response)=>{
+       const {id,mesaId}=req.params
+       try {
+        await clienteService.deleteCliente(id,Number(mesaId))
+        return res.status(204).send()
+       } catch (error) {
+        if(error instanceof Error){
+            return res.status(400).json({message:error.message})
+        } 
+       }
     }
 }

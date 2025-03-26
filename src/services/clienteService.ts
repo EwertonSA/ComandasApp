@@ -29,5 +29,15 @@ export const clienteService={
 create:async(attributes:ClienteCreationAttributes)=>{
     const cliente= await Clientes.create(attributes)
     return cliente
+},
+updateCliente:async(id:string,attributes:{nome:string,telefone:string,mesaId:number})=>{
+const [affectedRows,updatedRows]=await Clientes.update(attributes,{
+    where:{id},
+    returning:true
+})
+},
+deleteCliente:async(id:string,mesaId:number)=>{
+   const del= await Clientes.destroy({where:{id,mesaId}})
+   return del
 }
 }

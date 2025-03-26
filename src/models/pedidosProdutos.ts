@@ -13,7 +13,7 @@ export interface PedidoProdutoAttributes extends Optional<PedidoProduto, 'id'>{}
 export interface PedidoProdutoInstance
   extends Model<PedidoProduto, PedidoProdutoAttributes>,
     PedidoProduto {
-  produto?: ProdutoInstance; // Adicionando o relacionamento
+  produto?: ProdutoInstance; 
 }
 
     
