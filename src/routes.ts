@@ -39,7 +39,9 @@ router.get('/produtos/:id',productController.show)
 router.put('/produtos/:id', productController.update)
 router.delete('/produtos/:id',productController.delete)
 
+router.get('/pedidosProdutos',pedidosProdutosController.index)
 router.post('/pedidosProdutos', pedidosProdutosController.save);
+router.delete('/pedidosProdutos/:id',pedidosProdutosController.delete)
 
 router.post('/pagamentos',pagamentoController.save)
 export default router
