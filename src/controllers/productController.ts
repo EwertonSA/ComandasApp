@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { getPaginationParams } from "../helpers/getPaginationParams";
 import { produtoService } from "../services/produtosService";
+import { Produtos } from "../models";
 
 export const productController={
     index:async(req:Request,res:Response)=>{
@@ -27,6 +28,17 @@ export const productController={
                 return res.status(400).json({message:error.message})
             }
         }
+    },
+    show:async(req:Request,res:Response)=>{
+       const {id}=req.params
+       try {
+        const produto=await produtoService.show(id)
+        return res.json(produto)
+       } catch (error) {
+        if(error instanceof Error){
+            return res.status(400).json({message:error.message})
+        }
+       }
     },
     update:async(req:Request,res:Response)=>{
         const {id}=req.params

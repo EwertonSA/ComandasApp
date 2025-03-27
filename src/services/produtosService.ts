@@ -20,6 +20,12 @@ export const produtoService={
         const produto=await Produtos.create(attributes)
         return produto
     },
+    show:async(id:string)=>{
+        const produto=await Produtos.findByPk(id,{
+            attributes:['nome','descricao','preco','categoria'],
+        })
+        return produto
+    },
     update:async(id:string,attributes:{nome:string,descricao:string,preco:number,categoria:string})=>{
         const updated=await Produtos.update(attributes,{where:{id},returning:true})
         return updated

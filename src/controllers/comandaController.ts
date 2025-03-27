@@ -1,7 +1,19 @@
 import { Request, Response } from "express";
 import { comandasService } from "../services/comandasService";
+import { getPaginationParams } from "../helpers/getPaginationParams";
 
 export const comandaController={
+    index:async(req:Request,res:Response)=>{
+        const [page,perPage]=getPaginationParams(req.query)
+        try {
+            const paginated=await comandasService.findAllPaginated(page,perPage)
+            return res.json(paginated)
+        } catch (error) {
+            if(error instanceof Error){
+                return res.status(400).json({message:error.message})
+            }   
+        }
+    },
     show:async(req:Request,res:Response)=>{
         const {id}=req.params
         try {

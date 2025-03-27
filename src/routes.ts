@@ -6,8 +6,9 @@ import { comandaController } from './controllers/comandaController'
 import { productController } from './controllers/productController'
 import { pedidosProdutosController } from './controllers/pedidosProdutosController'
 import { pagamentoController } from './controllers/pagamentoController'
-import { clienteService } from './services/clienteService'
+
 const router= express.Router()
+
 router.get('/mesas',mesasController.index)
 router.post('/mesas',mesasController.save)
 router.put('/mesas/:id',mesasController.update)
@@ -20,6 +21,7 @@ router.put('/clientes/:id',clientesController.update)
 router.get('/clientes/:id',clientesController.show)
 router.delete('/clientes/:id/:mesaId',clientesController.delete)
 
+router.get('/comandas',comandaController.index)
 router.post('/comandas',comandaController.save)
 router.get('/comandas/:id',comandaController.show)
 router.put('/comandas/:id',comandaController.update)
@@ -32,8 +34,9 @@ router.post('/pedidos',pedidosController.save)
 router.delete('/pedidos/:id',pedidosController.delete)
 
 router.get('/produtos',productController.index)
-router.put('/produtos/:id', productController.update)
 router.post('/produtos',productController.save)
+router.get('/produtos/:id',productController.show)
+router.put('/produtos/:id', productController.update)
 router.delete('/produtos/:id',productController.delete)
 
 router.post('/pedidosProdutos', pedidosProdutosController.save);
