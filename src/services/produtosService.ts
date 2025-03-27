@@ -19,5 +19,13 @@ export const produtoService={
     create:async(attributes:ProdutoAttributes)=>{
         const produto=await Produtos.create(attributes)
         return produto
+    },
+    update:async(id:string,attributes:{nome:string,descricao:string,preco:number,categoria:string})=>{
+        const updated=await Produtos.update(attributes,{where:{id},returning:true})
+        return updated
+    },
+    delete:async(id:string)=>{
+        const deleted=await Produtos.destroy({where:{id}})
+        return deleted
     }
 }

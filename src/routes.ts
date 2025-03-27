@@ -32,7 +32,9 @@ router.post('/pedidos',pedidosController.save)
 router.delete('/pedidos/:id',pedidosController.delete)
 
 router.get('/produtos',productController.index)
+router.put('/produtos/:id', productController.update)
 router.post('/produtos',productController.save)
+router.delete('/produtos/:id',productController.delete)
 
 router.post('/pedidosProdutos', pedidosProdutosController.save);
 
