@@ -17,35 +17,58 @@ export const pagamentoService={
             total:count
         }
     },
-    create: async ({ pedidoId, valor, formaPagamento, status }: { 
-        pedidoId: number; 
-        valor: number; 
-        formaPagamento: string; 
-        status: string;
-      }) => {
-        const pedido = await Pedidos.findOne({
-          where: { id: pedidoId },
-          attributes: ["id", "comandaId", "total"],
-        });
+  
+
+    criarPagamento:async (pedidoId: number, valor: number, formaPagamento: string, status: string) => {
+      const pedido = await Pedidos.findOne({
+        where: { id: pedidoId },
+        attributes: ["total", "status"],
+      });
     
-        if (!pedido) {
-          throw new Error("Pedido não encontrado.");
-        }
+      if (!pedido) {
+        throw new Error("Pedido não encontrado.");
+      }
     
-        if (!pedido.total || pedido.total <= 0) {
-          throw new Error("O pedido não possui valor suficiente para pagamento.");
-        }
+      const totalPedido = Number(pedido.total);
     
-        // Criar o pagamento com os campos obrigatórios
-        const pagamento = await Pagamentos.create({
-          pedidoId,
-          valor,
-          formaPagamento,
-          status,
-        });
+      const pagamentosExistentes = await Pagamentos.findAll({
+        where: { pedidoId },
+        attributes: ["valor"],
+      });
     
-        return pagamento;
-      },
+      const totalPago = pagamentosExistentes.reduce(
+        (sum, pagamento) => sum + Number(pagamento.valor),
+        0
+      );
+    
+      const totalRestante = totalPedido - totalPago;
+    
+      if (totalRestante <= 0) {
+        throw new Error("Este pedido já foi totalmente pago.");
+      }
+    
+      const valorDigitado = Number(valor);
+    
+      if (valorDigitado > totalRestante) {
+        throw new Error(`O valor inserido ultrapassa o total restante de R$ ${totalRestante.toFixed(2)}`);
+      }
+    
+  
+      const pagamento = await Pagamentos.create({
+        pedidoId,
+        valor: valorDigitado,
+        formaPagamento,
+        status,
+      });
+    
+    
+      if (valorDigitado === totalRestante) {
+        await Pedidos.update({ status: "pago" }, { where: { id: pedidoId } });
+      }
+    
+      return pagamento;
+    },
+    
     
     show:async(id:string)=>{
         const pagamento= await Pagamentos.findByPk(id,{
@@ -56,6 +79,18 @@ export const pagamentoService={
             }
         })
         return pagamento
+    },
+    update:async(id:string, attributes:{pedidoId:number,valor:number,formaPagamento:string,status:string})=>{
+    
+      const [affected,updated]=await Pagamentos.update(attributes,{
+        where:{id},
+        returning:true
+      })
+      return updated
+    },
+    delete:async(id:string)=>{
+      const deleted=await Pagamentos.destroy({where:{id}})
+      return deleted
     }
 
 }

@@ -1,5 +1,5 @@
 import { ResourceOptions } from "adminjs";
-import { Pedidos } from "../../models";
+import { Pagamentos, Pedidos } from "../../models";
 
 const PagamentosResourceOptions:ResourceOptions={
     navigation:"Comanda",
@@ -14,15 +14,58 @@ const PagamentosResourceOptions:ResourceOptions={
         if (request.payload?.pedidoId) {
           const pedido = await Pedidos.findOne({
             where: { id: request.payload.pedidoId },
-            attributes: ["total"],
+            attributes: ["total", "status"],
           });
-
-          if (pedido) {
-            request.payload.valor = pedido.total; // Define automaticamente o valor
+    
+          if (!pedido) {
+            throw new Error("Pedido não encontrado.");
           }
+    
+          const totalPedido = Number(pedido.total);
+    
+          const pagamentosExistentes = await Pagamentos.findAll({
+            where: { pedidoId: request.payload.pedidoId },
+            attributes: ["valor"],
+          });
+    
+          const totalPago = pagamentosExistentes.reduce(
+            (sum, pagamento) => sum + Number(pagamento.valor),
+            0
+          );
+    
+          const totalRestante = totalPedido - totalPago;
+    
+          console.log(`Total do pedido: ${totalPedido}`);
+          console.log(`Total já pago: ${totalPago}`);
+          console.log(`Total restante: ${totalRestante}`);
+    
+          if (totalRestante <= 0) {
+            throw new Error("Este pedido já foi totalmente pago.");
+          }
+    
+          const valorDigitado = Number(request.payload.valor);
+    
+          if (valorDigitado > totalRestante) {
+            throw new Error(
+              `O valor inserido ultrapassa o total restante de R$ ${totalRestante.toFixed(2)}`
+            );
+          }
+    
+          
+          if (valorDigitado === totalRestante) {
+            await Pedidos.update(
+              { status: "pago" },
+              { where: { id: request.payload.pedidoId } }
+            );
+            console.log("Pedido atualizado para 'pago'.");
+          }
+    
+          return request;
         }
         return request;
       },
-    },
+    }
+    
+    
 }}
 export default PagamentosResourceOptions
