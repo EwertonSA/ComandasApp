@@ -1,4 +1,4 @@
-import { Clientes } from "../models"
+import { Clientes, Mesas } from "../models"
 import { ClienteCreationAttributes } from "../models/Cliente"
 
 export const clienteService={
@@ -26,10 +26,30 @@ export const clienteService={
         })
         return clienteComanda
 },
-create:async(attributes:ClienteCreationAttributes)=>{
-    const cliente= await Clientes.create(attributes)
-    return cliente
+create: async (attributes: ClienteCreationAttributes) => {
+    const { mesaId } = attributes;
+
+   
+    const mesa = await Mesas.findOne({ where: { id: mesaId } });
+
+   
+    if (!mesa) {
+        throw new Error("Mesa não encontrada");
+    }
+
+   
+    const clientesNaMesa = await Clientes.count({ where: { mesaId } });
+
+  
+    if (clientesNaMesa >= mesa.capacidade) {
+        throw new Error(`A mesa já atingiu sua capacidade máxima (${mesa.capacidade} pessoas).`);
+    }
+
+    const cliente = await Clientes.create(attributes);
+    return cliente;
 },
+
+
 updateCliente:async(id:string,attributes:{nome:string,telefone:string,mesaId:number})=>{
 const [affectedRows,updatedRows]=await Clientes.update(attributes,{
     where:{id},

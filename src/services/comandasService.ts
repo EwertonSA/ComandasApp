@@ -1,4 +1,4 @@
-import { Comandas } from "../models"
+import { Clientes, Comandas } from "../models"
 import { ComandaAttributes } from "../models/Comandas"
 
 export const comandasService={
@@ -27,7 +27,19 @@ findAllPaginated:async(page:number,perPage:number)=>{
         })
         return comandaPedido
     },
-    create:async(attibutes:ComandaAttributes)=>{
+    create:async(attibutes:{mesaId:number,clienteId:number})=>{
+        const {mesaId,clienteId}=attibutes
+        const comandaExiste=await Comandas.findOne({where:{clienteId}})
+        if(comandaExiste){
+            throw new Error("Esse cliente já possui comanda aberta.")
+        }
+        const cliente=await Clientes.findByPk(clienteId)
+        if(!cliente){
+            throw new Error("O cliente não existe!")
+        }
+        if(cliente.mesaId !== mesaId){
+            throw new Error("Esse cliente não pertence a essa mesa")
+        }
         const comanda=await Comandas.create(attibutes)
         return comanda
     },
