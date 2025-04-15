@@ -1,3 +1,4 @@
+
 import { Pedidos, PedidosProdutos, Produtos } from "../models"
 import { PedidoAttributes } from "../models/Pedidos"
 
@@ -16,6 +17,7 @@ export const pedidosService={
         count
     }
    },
+  
    pedidoProduto: async (id: string) => {
     const pedido = await Pedidos.findByPk(id, {
       attributes: ["comandaId", "total", "status"],

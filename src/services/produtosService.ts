@@ -1,3 +1,4 @@
+import { Op } from "sequelize"
 import { Produtos } from "../models"
 import { ProdutoAttributes } from "../models/Produtos"
 
@@ -16,6 +17,24 @@ export const produtoService={
             total:count
         }
     },
+    search:async(nome:string,page:number,perPAge:number)=>{
+        const offset=(page-1)*perPAge
+        const {rows,count}=await Produtos.findAndCountAll({
+          attributes:['id','nome','descricao','preco','categoria'],
+          where:{
+            nome:{
+              [Op.iLike]:`%${nome}%`
+            }
+          },
+          limit:perPAge,
+          offset
+        })
+        return{
+          produtos:rows,
+          page,perPAge,
+          total:count
+        }
+       },
     create:async(attributes:ProdutoAttributes)=>{
         const produto=await Produtos.create(attributes)
         return produto

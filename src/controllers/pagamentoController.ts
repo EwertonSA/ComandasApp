@@ -15,10 +15,10 @@ export const pagamentoController={
         }
     },
   create:async (req: Request, res: Response) => {
-      const { pedidoId, valor, formaPagamento, status } = req.body;
+      const { comandaId, valor, formaPagamento, status } = req.body;
     
       try {
-        const pagamento = await pagamentoService.criarPagamento(pedidoId, valor, formaPagamento, status);
+        const pagamento = await pagamentoService.criarPagamento(comandaId, valor, formaPagamento, status);
         return res.status(201).json(pagamento);
       } catch (error) {
         if (error instanceof Error) {
@@ -42,9 +42,9 @@ export const pagamentoController={
     },
     update:async(req:Request,res:Response)=>{
         const {id}=req.params
-        const {pedidoId,valor,formaPagamento,status}=req.body
+        const {comandaId,valor,formaPagamento,status}=req.body
         try {
-            const update=await pagamentoService.update(id,{pedidoId,valor,formaPagamento,status})
+            const update=await pagamentoService.update(id,{comandaId,valor,formaPagamento,status})
             return res.json(update)
         } catch (error) {
             if(error instanceof Error){

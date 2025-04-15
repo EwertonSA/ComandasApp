@@ -37,7 +37,10 @@ findAllPaginated:async(page:number,perPage:number)=>{
         if(!cliente){
             throw new Error("O cliente não existe!")
         }
-        if(cliente.mesaId !== mesaId){
+        console.log("ℹ️ Tipo de cliente.mesaId:", typeof cliente.mesaId, cliente.mesaId);
+console.log("ℹ️ Tipo de mesaId recebido:", typeof mesaId, mesaId);
+
+        if(cliente.mesaId !== Number(mesaId)){
             throw new Error("Esse cliente não pertence a essa mesa")
         }
         const comanda=await Comandas.create(attibutes)

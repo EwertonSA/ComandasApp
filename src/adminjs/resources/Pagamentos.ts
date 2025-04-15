@@ -3,10 +3,10 @@ import { Pagamentos, Pedidos } from "../../models";
 
 const PagamentosResourceOptions:ResourceOptions={
     navigation:"Comanda",
-    showProperties:['id','pedidoId','valor','formaPagamento','status'],
-    editProperties:['pedidoId','valor','formaPagamento','status'],
-    listProperties:['id','pedidoId','valor','formaPagamento','status'],
-    filterProperties:['id','pedidoId','valor','formaPagamento','status'],
+    showProperties:['id','comandaId','valor','formaPagamento','status'],
+    editProperties:['comandaId','valor','formaPagamento','status'],
+    listProperties:['id','comandaId','valor','formaPagamento','status'],
+    filterProperties:['id','comandaId','valor','formaPagamento','status'],
     
   actions: {
     new: {
@@ -24,7 +24,7 @@ const PagamentosResourceOptions:ResourceOptions={
           const totalPedido = Number(pedido.total);
     
           const pagamentosExistentes = await Pagamentos.findAll({
-            where: { pedidoId: request.payload.pedidoId },
+            where: { comandaId: request.payload.pedidoId },
             attributes: ["valor"],
           });
     

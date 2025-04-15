@@ -16,6 +16,21 @@ export const productController={
             }
         }
     },
+    findByName:async(req:Request,res:Response)=>{
+        const {nome}=req.query
+        const [page,perPAge]=getPaginationParams(req.query)
+        try {
+            if(typeof nome !== 'string') throw new Error('Must be of type string')
+            const product=await produtoService.search(nome,page,perPAge)
+        return res.json(product)
+       
+        } catch (error) {
+            
+                if(error instanceof Error){
+                    return res.status(400).json({message:error.message})
+                }
+            }
+    },
     save:async(req:Request,res:Response)=>{
         const {nome,descricao,preco,categoria}=req.body
         try {

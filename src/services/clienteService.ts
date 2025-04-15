@@ -10,7 +10,7 @@ export const clienteService={
                     offset:offset
                 })
                 return {
-                    mesas:rows,
+                    clientes:rows,
                     page:page,
                     perPage:perPage,
                     total:count
@@ -22,7 +22,7 @@ export const clienteService={
             include:{
                 association:'comandas',
                 attributes:['id',['mesa_id','mesaId'],['cliente_id','clienteId']]
-            }
+            }   
         })
         return clienteComanda
 },

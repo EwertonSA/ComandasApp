@@ -2,10 +2,10 @@ module.exports = {
     up: async (queryInterface, Sequelize) => {
       await queryInterface.createTable('pagamentos', {
         id: { type: Sequelize.DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-        pedido_id: {
+        comanda_id: {
           type: Sequelize.DataTypes.INTEGER,
           references: {
-            model: 'pedidos', // Tabela referenciada
+            model: 'comandas', // Tabela referenciada
             key: 'id'
           },
           onDelete: 'CASCADE',

@@ -19,20 +19,20 @@ export const pagamentoService={
     },
   
 
-    criarPagamento:async (pedidoId: number, valor: number, formaPagamento: string, status: string) => {
-      const pedido = await Pedidos.findOne({
-        where: { id: pedidoId },
+    criarPagamento: async (comandaId: number, valor: number, formaPagamento: string, status: string) => {
+      const pedido = await Pedidos.findAll({
+        where: { comandaId },
         attributes: ["total", "status"],
       });
     
-      if (!pedido) {
+      if (pedido.length === 0) {
         throw new Error("Pedido não encontrado.");
       }
     
-      const totalPedido = Number(pedido.total);
+      const totalPedido = pedido.reduce((sum, pedido) => sum + Number(pedido.total), 0);
     
       const pagamentosExistentes = await Pagamentos.findAll({
-        where: { pedidoId },
+        where: { comandaId },
         attributes: ["valor"],
       });
     
@@ -53,26 +53,28 @@ export const pagamentoService={
         throw new Error(`O valor inserido ultrapassa o total restante de R$ ${totalRestante.toFixed(2)}`);
       }
     
-  
       const pagamento = await Pagamentos.create({
-        pedidoId,
+        comandaId,
         valor: valorDigitado,
         formaPagamento,
         status,
       });
     
-    
-      if (valorDigitado === totalRestante) {
-        await Pedidos.update({ status: "pago" }, { where: { id: pedidoId } });
+      if (Math.abs(valorDigitado - totalRestante) < 0.01) {
+        await Pedidos.update({ status: "pago" }, { where: { comandaId } });
       }
     
-      return pagamento;
+      return {
+        pagamento,
+        totalPedido,
+        totalRestante,
+      };
     },
     
     
     show:async(id:string)=>{
         const pagamento= await Pagamentos.findByPk(id,{
-            attributes:['id','pedidoId','produtoId','quantidade'],
+            attributes:['id','comandaId','produtoId','quantidade'],
             include:{
                 association:'pedidos',
                 attributes:['id','comandaId','total','status']
@@ -80,7 +82,7 @@ export const pagamentoService={
         })
         return pagamento
     },
-    update:async(id:string, attributes:{pedidoId:number,valor:number,formaPagamento:string,status:string})=>{
+    update:async(id:string, attributes:{comandaId:number,valor:number,formaPagamento:string,status:string})=>{
     
       const [affected,updated]=await Pagamentos.update(attributes,{
         where:{id},

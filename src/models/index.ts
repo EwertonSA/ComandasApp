@@ -39,9 +39,9 @@ Pedidos.hasMany(PedidosProdutos, { foreignKey: 'pedidoId', as:'pedidosProdutos'}
 PedidosProdutos.belongsTo(Produtos, { foreignKey: 'produtoId', as:'produto' });
 Produtos.hasMany(PedidosProdutos, { foreignKey: 'produtoId',as:'produtos' });
 
-// Relação Pedido - Pagamento (1:1)
-Pedidos.hasOne(Pagamentos, { foreignKey: 'pedidoId' });
-Pagamentos.belongsTo(Pedidos, { foreignKey: 'pedidoId' });
+// Relação comanda - Pagamento (1:1)
+Comandas.hasOne(Pagamentos, { foreignKey: 'comandaId' });
+Pagamentos.belongsTo(Comandas, { foreignKey: 'comandaId' });
 
 // Exporte os modelos para que eles possam ser usados em outros arquivos
 export {

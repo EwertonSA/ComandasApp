@@ -3,7 +3,7 @@ import { sequelize } from "../database";
 
 export interface Pagamento{
     id:number,
-    pedidoId:number,
+    comandaId:number,
     valor:number,
     formaPagamento:string,
     status:string
@@ -16,10 +16,10 @@ const Pagamentos=sequelize.define<PagamentoInstance>('pagamentos',{
         autoIncrement: true,
         primaryKey: true,
     },
-    pedidoId: {
+    comandaId: {
         type:DataTypes.INTEGER,
         references: {
-          model: 'pedidos',
+          model: 'comandas',
           key: 'id'
         },
         onDelete: 'CASCADE',
