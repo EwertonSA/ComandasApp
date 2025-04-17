@@ -28,10 +28,10 @@ export const pedidosController={
    },
  
    save:async(req:Request,res:Response)=>{
-    const {comandaId,total,status}=req.body
+    const {comandaId,total}=req.body
     try {
         const pedido=await pedidosService.create({
-            comandaId,total,status
+            comandaId,total, status: "pendente",
         })
         return res.status(200).json(pedido)
     } catch (error) {

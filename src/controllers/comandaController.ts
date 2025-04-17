@@ -14,6 +14,7 @@ export const comandaController={
             }   
         }
     },
+
     show:async(req:Request,res:Response)=>{
         const {id}=req.params
         try {
@@ -24,6 +25,17 @@ export const comandaController={
                 return res.status(400).json({message:error.message})
             }
         }
+    },
+    showPayed:async(req:Request,res:Response)=>{
+        try {
+            const payed=await comandasService.comandaAtiva()
+            return res.json(payed)    
+        } catch (error) {
+            if(error instanceof Error){
+                return res.status(400).json({message:error.message})
+            }
+        }
+        
     },
     save:async(req:Request,res:Response)=>{
         const{mesaId,clienteId}=req.body

@@ -4,7 +4,8 @@ import { sequelize } from "../database";
 export interface Comanda{
     id:number,
     mesaId:number,
-    clienteId:number
+    clienteId:number,
+    status:string
 }
 export interface ComandaAttributes extends Optional<Comanda, "id">{}
 export interface ComandaInstance extends Model<Comanda,ComandaAttributes>,Comanda{}
@@ -32,6 +33,11 @@ export const Comandas= sequelize.define<ComandaInstance>('comandas',{
         },
         onDelete: "CASCADE",
       },
+      status: {
+        type: DataTypes.ENUM("pendente", "parcial", "pago"),
+        allowNull: false,
+        defaultValue: "pendente",
+      },
     },
     {
       tableName: "comandas", // Nome real da tabela no banco
@@ -39,5 +45,5 @@ export const Comandas= sequelize.define<ComandaInstance>('comandas',{
     }
   );
   
-  export default Comanda;
+  export default Comandas;
   

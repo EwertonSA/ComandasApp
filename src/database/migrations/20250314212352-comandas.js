@@ -12,6 +12,7 @@ module.exports = {
         onDelete: 'CASCADE',
         allowNull: false
       },
+      
       cliente_id: {
         type: Sequelize.DataTypes.INTEGER,
         references: {
@@ -20,6 +21,11 @@ module.exports = {
         },
         onDelete: 'CASCADE',
         allowNull: false
+      },
+      status:{
+        type:Sequelize.DataTypes.ENUM('pendente','parcial','pago'),
+        allowNull:false,
+        defaultValue:"pendente"
       },
       created_at: { type: Sequelize.DataTypes.DATE },
       updated_at: { type: Sequelize.DataTypes.DATE }

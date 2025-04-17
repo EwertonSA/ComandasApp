@@ -22,6 +22,7 @@ router.get('/clientes/:id',clientesController.show)
 router.delete('/clientes/:id/:mesaId',clientesController.delete)
 
 router.get('/comandas',comandaController.index)
+router.get('/comandas/pagas',comandaController.showPayed)
 router.post('/comandas',comandaController.save)
 router.get('/comandas/:id',comandaController.show)
 router.put('/comandas/:id',comandaController.update)

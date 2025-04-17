@@ -1,3 +1,4 @@
+import { Op } from "sequelize"
 import { Clientes, Comandas } from "../models"
 import { ComandaAttributes } from "../models/Comandas"
 
@@ -19,13 +20,30 @@ findAllPaginated:async(page:number,perPage:number)=>{
 
     ComandaPedido:async(id:string)=>{
         const comandaPedido=await Comandas.findByPk(id,{
-            attributes:['id', ['mesa_id','mesaId'],['cliente_id','clienteId']],
+            attributes:['id', ['mesa_id','mesaId'],['cliente_id','clienteId'],'status'],
             include:{
                 association:'pedidos',
                 attributes:['id',['comanda_id','comandaId'],'total','status']
             }
         })
         return comandaPedido
+    },
+    comandaAtiva:async()=>{
+        try {
+            const res=await Comandas.findAll({
+                where:{
+                    status: {
+                        [Op.iLike]: 'pago'
+                      }
+                
+                },
+            
+            })
+            return res     
+        } catch (error) {
+            throw new Error("Erro ao buscar comandas ativas");
+        }
+       
     },
     create:async(attibutes:{mesaId:number,clienteId:number})=>{
         const {mesaId,clienteId}=attibutes
@@ -37,13 +55,13 @@ findAllPaginated:async(page:number,perPage:number)=>{
         if(!cliente){
             throw new Error("O cliente não existe!")
         }
-        console.log("ℹ️ Tipo de cliente.mesaId:", typeof cliente.mesaId, cliente.mesaId);
-console.log("ℹ️ Tipo de mesaId recebido:", typeof mesaId, mesaId);
 
         if(cliente.mesaId !== Number(mesaId)){
             throw new Error("Esse cliente não pertence a essa mesa")
         }
-        const comanda=await Comandas.create(attibutes)
+        const comanda=await Comandas.create({
+            mesaId,clienteId,status:'pendente'
+        })
         return comanda
     },
     update:async(id:string,attributes:{mesaId:number,clienteId:number})=>{
