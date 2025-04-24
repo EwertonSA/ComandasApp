@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import { Clientes, Comandas, Pagamentos, Pedidos } from "../models";
 
 export const pagamentoService = {
@@ -107,6 +108,23 @@ export const pagamentoService = {
     return deleted;
   },
 };
+totalPagamentos:async()=>{
+  const today=new Date()
+  const startDay=new Date(today.setHours(0,0,0,0));
+  const endDay=new Date(today.setHours(24,59,59,999))
+
+  try {
+    const res=await Pagamentos.sum('valor'.{
+      where:{
+        data_pagamento:{
+          [Op.between]
+        }
+      }
+    })
+  } catch (error) {
+    
+  }
+}
 
 // Função auxiliar que calcula o status da comanda com base nos pagamentos
 const atualizarStatusComanda = async (comandaId: number) => {
