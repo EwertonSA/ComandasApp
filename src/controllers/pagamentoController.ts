@@ -62,5 +62,15 @@ export const pagamentoController={
             return res.status(400).json({message:error.message})
         }
     }
+    },
+    total:async(req:Request,res:Response)=>{
+try {
+    const total=await pagamentoService.totalPagamentos()
+    return res.json(total)
+} catch (error) {
+    if(error instanceof Error){
+        return res.status(400).json({message:error.message})
+    }
+}
     }
 }

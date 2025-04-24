@@ -6,7 +6,9 @@ export interface Pagamento{
     comandaId:number,
     valor:number,
     formaPagamento:string,
-    status:string
+    status:string,
+    createdAt?:Date,
+    updatedAt?:Date
 }
 export interface PagamentoAttributes extends Optional<Pagamento,'id'>{}
 export interface PagamentoInstance extends Model<Pagamento,PagamentoAttributes>,Pagamento{}
@@ -34,6 +36,12 @@ const Pagamentos=sequelize.define<PagamentoInstance>('pagamentos',{
       },
       status:{
         type:DataTypes.STRING,allowNull:false
+      },
+      createdAt:{
+        type:DataTypes.DATE
+      },
+      updatedAt:{
+        type:DataTypes.DATE
       }
 })
 export default Pagamentos

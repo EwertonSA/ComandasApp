@@ -56,7 +56,7 @@ export const pagamentoService = {
       comandaId,
       valor: valorDigitado,
       formaPagamento,
-      status: "concluído", // ou "registrado" — status do pagamento em si
+      status: "concluído" // ou "registrado" — status do pagamento em si
     });
 
     // Atualiza o status da comanda com base nos pagamentos
@@ -107,24 +107,31 @@ export const pagamentoService = {
 
     return deleted;
   },
-};
-totalPagamentos:async()=>{
-  const today=new Date()
-  const startDay=new Date(today.setHours(0,0,0,0));
-  const endDay=new Date(today.setHours(24,59,59,999))
+
+
+
+totalPagamentos: async () => {
+  const now = new Date();
+  const startDay = new Date(now.setHours(0, 0, 0, 0));
+  const endDay = new Date(new Date().setHours(23, 59, 59, 999));
 
   try {
-    const res=await Pagamentos.sum('valor'.{
-      where:{
-        data_pagamento:{
-          [Op.between]
+    const total = await Pagamentos.sum('valor', {
+      where: {
+        createdAt: {
+          [Op.between]: [startDay, endDay]
         }
       }
-    })
+    });
+
+    return total ?? 0; // se não houver pagamentos, retorna 0
   } catch (error) {
-    
+    console.error('Erro ao somar pagamentos:', error);
+    throw error;
   }
-}
+
+
+}}
 
 // Função auxiliar que calcula o status da comanda com base nos pagamentos
 const atualizarStatusComanda = async (comandaId: number) => {
