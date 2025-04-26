@@ -5,6 +5,7 @@ import Pagamentos from "./Pagamentos";
 import Pedidos from "./Pedidos";
 import PedidosProdutos from "./pedidosProdutos";
 import Produtos from "./Produtos";
+import { UserModel } from "./User";
 
 // Relação Mesa - Clientes (1:N)
 Mesas.hasMany(Clientes, {as:'clientes', foreignKey: 'mesaId' });
@@ -51,5 +52,6 @@ export {
     Pagamentos,
     Pedidos,
     PedidosProdutos,
-    Produtos
+    Produtos,
+    UserModel
 };
