@@ -3,12 +3,13 @@ import { Clientes } from "../../models/Cliente";
 import { ClienteResourceOptions } from "./Cliente";
 import { Mesas } from "../../models/Mesas";
 import { MesasResourceOptions } from "./Mesas";
-import { Comandas, Pagamentos, Pedidos, PedidosProdutos, Produtos } from "../../models";
+import { Comandas, Pagamentos, Pedidos, PedidosProdutos, Produtos, UserModel } from "../../models";
 import ComandasResourceOptions from "./Comandas";
 import PedidosResourceOptions from "./Pedidos";
 import ProdutosResourceOption from "./Produtos";
 import PedidosProdutosResourceOptions from "./PedidosProdutos";
 import PagamentosResourceOptions from "./Pagamentos";
+import { UserResourceOptions } from "./users";
 
 export const adminJsResources: ResourceWithOptions[]=[{
     resource:Clientes,
@@ -33,5 +34,9 @@ export const adminJsResources: ResourceWithOptions[]=[{
 },{
     resource:Pagamentos,
     options:PagamentosResourceOptions
+},
+{
+    resource:UserModel,
+    options:UserResourceOptions
 }
 ]
