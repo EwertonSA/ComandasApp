@@ -1,68 +1,92 @@
-
-import { DataTypes, Model, Optional } from "sequelize";
+import { DataTypes, Model, Optional, ModelStatic } from "sequelize";
 import { sequelize } from "../database";
-import bcrypt from 'bcrypt'
+import bcrypt from "bcrypt";
 
-export interface User{
-    id:number,
-    name?:string,
-    phone?:string,
-    email:string,
-    password?:string,
-    
-    role:'user'|'cliente'
+// Definição dos tipos do usuário
+export interface User {
+  id: number;
+  name?: string;
+  phone?: string;
+  email: string;
+  password?: string;
+  role: "user" | "cliente";
 }
-export interface UserCreationAttributes extends Optional<User,'id'>{}
 
-export interface UserInstance extends Model<User, UserCreationAttributes>,User{}
+// Tipo para criação de usuário (sem o 'id')
+export interface UserCreationAttributes extends Optional<User, "id"> {}
 
-export const UserModel=sequelize.define<UserInstance,User>('users',{
-    id:{
-        allowNull:false,
-        autoIncrement:true,
-        primaryKey:true,
-        type:DataTypes.INTEGER
+// Tipagem para a instância do usuário, incluindo o método checkPassword
+export interface UserInstance
+  extends Model<User, UserCreationAttributes>, // Model base com tipagem de atributos e criação
+    User {
+  checkPassword(
+    password: string,
+    callbackfn: (err: Error | undefined, isSame: boolean) => void
+  ): void;
+}
 
+// Definição do modelo do Sequelize
+export const UserModel = sequelize.define<UserInstance, User>(
+  "users",
+  {
+    id: {
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+      type: DataTypes.INTEGER,
     },
-    name:{
-        allowNull:true,
-        type:DataTypes.STRING
+    name: {
+      allowNull: true,
+      type: DataTypes.STRING,
     },
-    phone:{
-        allowNull:true,
-        type:DataTypes.STRING
+    phone: {
+      allowNull: true,
+      type: DataTypes.STRING,
     },
-    email:{
-        allowNull:false,
-        unique:true,
-        type:DataTypes.STRING,
-        validate:{
-            isEmail:true
-        }
+    email: {
+      allowNull: false,
+      unique: true,
+      type: DataTypes.STRING,
+      validate: {
+        isEmail: true,
+      },
     },
-    password:{
-        allowNull:true,
-        type:DataTypes.STRING
+    password: {
+      allowNull: true,
+      type: DataTypes.STRING,
     },
-    role:{
-        allowNull:false,
-        type:DataTypes.STRING,
-        validate:{
-            isIn:[['user','cliente']]
-        }
-    }
-},
-
-{
-    hooks:{
-        beforeSave: async (user, options) => {
-            if (user.isNewRecord || user.changed('password')) {
-                if (user.password) {
-                  user.password = await bcrypt.hash(user.password.toString(), 10);
-                }
-              }
-              
+    role: {
+      allowNull: false,
+      type: DataTypes.STRING,
+      validate: {
+        isIn: [["user", "cliente"]],
+      },
+    },
+  },
+  {
+    hooks: {
+      beforeSave: async (user, options) => {
+        if (user.isNewRecord || user.changed("password")) {
+          if (user.password) {
+            user.password = await bcrypt.hash(user.password.toString(), 10);
           }
-    }
+        }
+      },
+    },
   }
-)
+) as ModelStatic<UserInstance> & { prototype: UserInstance & UserInstance };
+
+// Adicionando o método checkPassword corretamente ao protótipo
+UserModel.prototype.checkPassword = function (
+  this: UserInstance,
+  password: string,
+  callbackfn: (err: Error | undefined, isSame: boolean) => void
+) {
+  bcrypt.compare(password, this.password!, (err, isSame) => {
+    if (err) {
+      callbackfn(err, false);
+    } else {
+      callbackfn(undefined, isSame);
+    }
+  });
+};

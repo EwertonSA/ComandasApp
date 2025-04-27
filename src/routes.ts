@@ -6,8 +6,11 @@ import { comandaController } from './controllers/comandaController'
 import { productController } from './controllers/productController'
 import { pedidosProdutosController } from './controllers/pedidosProdutosController'
 import { pagamentoController } from './controllers/pagamentoController'
+import { authController } from './controllers/authController'
 
 const router= express.Router()
+router.post('/auth/register',authController.register)
+router.post('/auth/login',authController.login)
 
 router.get('/mesas',mesasController.index)
 router.post('/mesas',mesasController.save)
