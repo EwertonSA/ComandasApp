@@ -8,7 +8,7 @@ export interface User {
   name?: string;
   phone?: string;
   email: string;
-  password?: string;
+  password: string;
   role: "user" | "cliente";
 }
 
@@ -82,6 +82,11 @@ UserModel.prototype.checkPassword = function (
   password: string,
   callbackfn: (err: Error | undefined, isSame: boolean) => void
 ) {
+  if(!this.password){
+    return callbackfn(new Error("Senha não cadastrada"),false)
+  }
+  console.log('Senha digitada:', password);
+  console.log('Senha salva no banco (hash):', this.password);
   bcrypt.compare(password, this.password!, (err, isSame) => {
     if (err) {
       callbackfn(err, false);

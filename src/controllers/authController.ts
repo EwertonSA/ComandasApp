@@ -21,25 +21,25 @@ export const authController={
         }
     },
     login:async(req:Request,res:Response)=>{
-        const {name,phone,email,password}=req.body
+        const{email,password}=req.body
         try {
-            const user=await userService.findByEmail(email)
-            if(!user) return res.status(404).json({message:"Email não encontrado"})
-                user.checkPassword(password,(err,isSame)=>{
-            if(err) return res.status(400).json({message:err.message})
-                if(!isSame) return res.status(401).json({message:"Senha incorreta"})
-                   const payload={id:user.id,name:phone}
-                    const token= jwtService.signToken(payload,'1d')
-                    return res.json({authenticated:true,user,token})
+        const user= await userService.findByEmail(email)
+        if(!user) return res.status(404).json({message:'E-mail não registrado'})
+        user.checkPassword(password,(err,isSame)=>{
+        if(err) return res.status(400).json({message:err.message})
+        if(!isSame)return res.status(401).json({message:"Senha incorreta!"})
+        const payload={
+                   id:user.id,email:user.email     
+                }
+                const token= jwtService.signToken(payload,'7d')
+                return res.json({authenticated:true,...payload,token})
                 })
-                
-                
-    
-            
-        } catch (error) {
-            if(error instanceof Error){
-                return res.status(400).json({message:error.message})
+                } catch (error) {
+                    if(error instanceof Error){
+                        return res.status(400).json({message:error.message})
+                    }
+                }
             }
-        }
-    }
+      
+      
 }
