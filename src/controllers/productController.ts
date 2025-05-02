@@ -32,10 +32,10 @@ export const productController={
             }
     },
     save:async(req:Request,res:Response)=>{
-        const {nome,descricao,preco,categoria}=req.body
+        const {nome,descricao,preco,categoria,thumbnailUrl}=req.body
         try {
             const produto=await produtoService.create({
-                nome,descricao,preco,categoria
+                nome,descricao,preco,categoria,thumbnailUrl
             })
             return res.status(200).json(produto)
         } catch (error) {
@@ -57,9 +57,9 @@ export const productController={
     },
     update:async(req:Request,res:Response)=>{
         const {id}=req.params
-        const {nome,descricao,preco,categoria}=req.body
+        const {nome,descricao,preco,categoria,thumbnailUrl}=req.body
         try {
-            const updated=await produtoService.update(id,{nome,descricao,preco,categoria})
+            const updated=await produtoService.update(id,{nome,descricao,preco,categoria,thumbnailUrl})
             return res.status(204).send()
         } catch (error) {
             if(error instanceof Error){

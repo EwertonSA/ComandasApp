@@ -7,6 +7,7 @@ module.exports = {
       descricao: { type: Sequelize.DataTypes.STRING, allowNull: false },
       preco: { type: Sequelize.DataTypes.DECIMAL(10, 2), allowNull: false },
       categoria: { type: Sequelize.DataTypes.STRING, allowNull: false },
+      thumbnail_url:{type:Sequelize.DataTypes.STRING},
       created_at: { type: Sequelize.DataTypes.DATE },
       updated_at: { type: Sequelize.DataTypes.DATE }
     });

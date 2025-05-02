@@ -20,7 +20,7 @@ export const produtoService={
     search:async(nome:string,page:number,perPAge:number)=>{
         const offset=(page-1)*perPAge
         const {rows,count}=await Produtos.findAndCountAll({
-          attributes:['id','nome','descricao','preco','categoria'],
+          attributes:['id','nome','descricao','preco','categoria',['thumbnail_url', 'thumbnailUrl']],
           where:{
             nome:{
               [Op.iLike]:`%${nome}%`
@@ -41,11 +41,11 @@ export const produtoService={
     },
     show:async(id:string)=>{
         const produto=await Produtos.findByPk(id,{
-            attributes:['nome','descricao','preco','categoria'],
+            attributes:['nome','descricao','preco','categoria',['thumbnail_url', 'thumbnailUrl']],
         })
         return produto
     },
-    update:async(id:string,attributes:{nome:string,descricao:string,preco:number,categoria:string})=>{
+    update:async(id:string,attributes:{nome:string,descricao:string,preco:number,categoria:string,thumbnailUrl:string})=>{
         const updated=await Produtos.update(attributes,{where:{id},returning:true})
         return updated
     },

@@ -11,7 +11,7 @@ export const authController={
                 throw new Error("Email já cadastrado.")
             }
             const user=await userService.create({
-                name,phone,email,password,role:"cliente"
+                name,phone,email,password,role:"user"
             })
             return res.status(201).json(user)
         } catch (error) {

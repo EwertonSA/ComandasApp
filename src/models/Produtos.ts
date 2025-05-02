@@ -7,6 +7,7 @@ export interface Produto{
     descricao:string,
     preco:number,
     categoria:string
+    thumbnailUrl: string
 }
 export interface ProdutoAttributes extends Optional<Produto, 'id'>{}
 export interface ProdutoInstance extends Model<Produto,ProdutoAttributes>,Produto{}
@@ -29,6 +30,9 @@ const Produtos= sequelize.define<ProdutoInstance>('produtos',{
     },
     categoria:{
         type:DataTypes.STRING, allowNull: false
-    }
+    },
+    thumbnailUrl: {
+        type: DataTypes.STRING
+      },
 })
 export default Produtos
