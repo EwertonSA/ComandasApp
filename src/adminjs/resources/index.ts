@@ -6,7 +6,7 @@ import { MesasResourceOptions } from "./Mesas";
 import { Comandas, Pagamentos, Pedidos, PedidosProdutos, Produtos, UserModel } from "../../models";
 import ComandasResourceOptions from "./Comandas";
 import PedidosResourceOptions from "./Pedidos";
-import ProdutosResourceOption from "./Produtos";
+import ProdutosResourceOption, { thumbnailResourceFeatures } from "./Produtos";
 import PedidosProdutosResourceOptions from "./PedidosProdutos";
 import PagamentosResourceOptions from "./Pagamentos";
 import { UserResourceOptions } from "./users";
@@ -27,7 +27,8 @@ export const adminJsResources: ResourceWithOptions[]=[{
 },
 {
     resource:Produtos,
-    options:ProdutosResourceOption
+    options:ProdutosResourceOption,
+    features:thumbnailResourceFeatures
 },{
     resource:PedidosProdutos,
     options:PedidosProdutosResourceOptions
