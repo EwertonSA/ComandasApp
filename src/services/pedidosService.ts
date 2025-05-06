@@ -30,7 +30,7 @@ export const pedidosService={
             {
               model: Produtos, // Inclui os detalhes do produto também
               as: "produto",
-              attributes: ["nome", "preco"], // Pegue apenas os atributos necessários
+              attributes: ["nome", "preco",['thumbnail_url','thumbnailUrl']], // Pegue apenas os atributos necessários
             },
           ],
         },

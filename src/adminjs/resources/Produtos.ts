@@ -21,7 +21,7 @@ export const thumbnailResourceFeatures: FeatureType[]=[
             key:'thumbnailUrl',
             file:'uploadThumbnail'
         },
-        uploadPath:(record,filename)=>`thumbnailUrl/produtos-${record.get('produtoId')}/${filename}`
+        uploadPath:(record,filename)=>`thumbnailUrl/produtos-${record.get('id')}/${filename}`
     })
 ]
 export default  ProdutosResourceOption
