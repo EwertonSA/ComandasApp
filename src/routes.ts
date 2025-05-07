@@ -13,6 +13,7 @@ import ensureAuth from './middlewares/auth'
 const router= express.Router()
 router.post('/auth/register',authController.register)
 router.post('/auth/login',authController.login)
+router.post("/auth/autoLogin",authController.autoLogin)
 
 router.get('/mesas',mesasController.index)
 router.post('/mesas',mesasController.save)
@@ -42,6 +43,8 @@ router.delete('/pedidos/:id',ensureAuth,pedidosController.delete)
 
 router.get('/produtos',ensureAuth,productController.index)
 router.post('/produtos',ensureAuth,productController.save)
+router.get('/produtos/:categoria',ensureAuth,productController.getAllGroupedByCategory)
+
 router.get('/produtos/:id',ensureAuth,productController.show)
 router.put('/produtos/:id',ensureAuth, productController.update)
 router.delete('/produtos/:id',ensureAuth,productController.delete)

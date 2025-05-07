@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { getPaginationParams } from "../helpers/getPaginationParams";
 import { produtoService } from "../services/produtosService";
 import { Produtos } from "../models";
+import { Op } from "sequelize";
 
 export const productController={
     index:async(req:Request,res:Response)=>{
@@ -77,5 +78,28 @@ export const productController={
                 return res.status(400).json({message:error.message})
             }
         }
+    },
+    getAllGroupedByCategory: async (req: Request, res: Response) => {
+        try {
+          const categorias = ["Entradas", "Pratos", "Bebidas", "Sobremesas"];
+          const resultado: any = {};
+      
+          for (const categoria of categorias) {
+            const produtos = await Produtos.findAll({
+              where: {
+                categoria: {
+                  [Op.iLike]: categoria
+                }
+              }
+            });
+            resultado[categoria] = produtos;
+          }
+      
+          return res.json(resultado);
+        } catch (error) {
+          console.error(error);
+          return res.status(500).json({ message: "Erro ao buscar produtos" });
+        }
+      }
+      
     }
-}
