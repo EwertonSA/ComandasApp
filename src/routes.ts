@@ -43,9 +43,11 @@ router.delete('/pedidos/:id',ensureAuth,pedidosController.delete)
 
 router.get('/produtos',ensureAuth,productController.index)
 router.post('/produtos',ensureAuth,productController.save)
-router.get('/produtos/:categoria',ensureAuth,productController.getAllGroupedByCategory)
+router.get('/produtos/categoria/:categoria',ensureAuth,productController.getAllGroupedByCategory)
+router.get('/produtos/:id',ensureAuth,productController.getById)
 
-router.get('/produtos/:id',ensureAuth,productController.show)
+
+
 router.put('/produtos/:id',ensureAuth, productController.update)
 router.delete('/produtos/:id',ensureAuth,productController.delete)
 

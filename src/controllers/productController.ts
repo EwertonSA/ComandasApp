@@ -45,17 +45,7 @@ export const productController={
             }
         }
     },
-    show:async(req:Request,res:Response)=>{
-       const {id}=req.params
-       try {
-        const produto=await produtoService.show(id)
-        return res.json(produto)
-       } catch (error) {
-        if(error instanceof Error){
-            return res.status(400).json({message:error.message})
-        }
-       }
-    },
+ 
     update:async(req:Request,res:Response)=>{
         const {id}=req.params
         const {nome,descricao,preco,categoria,thumbnailUrl}=req.body
@@ -100,6 +90,18 @@ export const productController={
           console.error(error);
           return res.status(500).json({ message: "Erro ao buscar produtos" });
         }
-      }
+      } ,  getById:async(req:Request,res:Response)=>{
+        console.log('Entrou em getById');
+       const {id}=req.params
+       try {
+        const produto=await produtoService.show(id)
+        console.log(JSON.stringify(produto, null, 2)) 
+        return res.json(produto)
+       } catch (error) {
+        if(error instanceof Error){
+            return res.status(400).json({message:error.message})
+        }
+       }
+    },
       
     }
