@@ -21,7 +21,7 @@ export const mesasService={
             attributes:['id','numero','capacidade'],
             include:{
                 association:'clientes',
-                attributes:['id','nome','telefone',['mesa_id','mesaId']]
+                attributes:['id','nome',['mesa_id','mesaId']]
             }
         })
         return mesasClientes

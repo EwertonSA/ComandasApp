@@ -34,7 +34,7 @@ if (isNaN(mesaIdNumber)) {
 }
         try {
             const cliente= await clienteService.create({
-                nome,telefone,mesaId:mesaIdNumber
+                nome,mesaId:mesaIdNumber
             })
             return res.status(201).json(cliente)
         } catch (error) {
@@ -48,7 +48,7 @@ if (isNaN(mesaIdNumber)) {
         const {nome,telefone,mesaId}=req.body
         try {
             const update= await clienteService.updateCliente(id,{
-                nome,telefone,mesaId
+                nome,mesaId
             })
             return res.status(201).json(update)
         } catch (error) {

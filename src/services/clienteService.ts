@@ -18,7 +18,7 @@ export const clienteService={
     },
     clienteComanda:async(id:string)=>{
         const clienteComanda= await Clientes.findByPk(id,{
-            attributes:['id','nome','telefone',['mesa_id','mesaId']],
+            attributes:['id','nome',['mesa_id','mesaId']],
             include:{
                 association:'comandas',
                 attributes:['id',['mesa_id','mesaId'],['cliente_id','clienteId']]
@@ -50,7 +50,7 @@ create: async (attributes: ClienteCreationAttributes) => {
 },
 
 
-updateCliente:async(id:string,attributes:{nome:string,telefone:string,mesaId:number})=>{
+updateCliente:async(id:string,attributes:{nome:string,mesaId:number})=>{
 const [affectedRows,updatedRows]=await Clientes.update(attributes,{
     where:{id},
     returning:true

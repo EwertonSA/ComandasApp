@@ -68,6 +68,7 @@ export const UserModel = sequelize.define<UserInstance, User>(
       beforeSave: async (user, options) => {
         if (user.isNewRecord || user.changed("password")) {
           if (user.password) {
+            console.log('Hashing password...');
             user.password = await bcrypt.hash(user.password.toString(), 10);
           }
         }
@@ -88,10 +89,13 @@ UserModel.prototype.checkPassword = function (
   console.log('Senha digitada:', password);
   console.log('Senha salva no banco (hash):', this.password);
   bcrypt.compare(password, this.password!, (err, isSame) => {
+   
     if (err) {
       callbackfn(err, false);
+      console.log('Erro ao comparar as senhas:', err); // Log de erro adicional
     } else {
       callbackfn(undefined, isSame);
+      console.log('Resultado da comparação (isSame):', isSame);
     }
   });
 };

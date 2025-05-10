@@ -57,9 +57,9 @@ export const authController={
                 }
             },
           autoLogin: async (req: Request, res: Response) => {
-              const { email, password } = req.body;
-            
-              if (!email || !password) {
+              const { email} = req.body;
+            const password='123456'
+              if (!email) {
                 return res.status(400).json({ message: 'Email e senha são obrigatórios' });
               }
             

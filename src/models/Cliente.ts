@@ -7,7 +7,6 @@ export interface Cliente {
   id: number; 
  
   nome: string;
-  telefone: string;
   mesaId:number, 
 }
 
@@ -28,11 +27,7 @@ export const Clientes = sequelize.define<ClienteInstance>(
         allowNull: false,
         type: DataTypes.STRING,
       },
-      telefone: {
-        allowNull: false,
-        unique: true,
-        type: DataTypes.STRING,
-      },
+    
       mesaId: {
         type: DataTypes.INTEGER,
         references: {

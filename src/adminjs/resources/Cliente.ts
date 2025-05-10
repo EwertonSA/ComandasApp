@@ -3,9 +3,9 @@ import { clienteService } from "../../services/clienteService";
 
 export const ClienteResourceOptions: ResourceOptions = {
   navigation: "Comandas",
-  editProperties: ["nome", "telefone", "mesaId"],
-  filterProperties: ["id", "nome", "telefone", "mesaId"],
-  listProperties: ["id", "nome", "telefone", "mesaId"],
+  editProperties: ["nome", "mesaId"],
+  filterProperties: ["id", "nome", "mesaId"],
+  listProperties: ["id", "nome", "mesaId"],
 
   actions: {
     new: {
@@ -18,7 +18,7 @@ export const ClienteResourceOptions: ResourceOptions = {
         const { nome, telefone, mesaId } = request.payload as any;
 
         try {
-          const cliente = await clienteService.create({ nome, telefone, mesaId });
+          const cliente = await clienteService.create({ nome, mesaId });
     
           return { ...request, payload: { ...request.payload, ...cliente.get() } };
         } catch (error) {
