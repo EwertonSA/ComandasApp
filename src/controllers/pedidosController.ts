@@ -4,6 +4,17 @@ import { pedidosService } from "../services/pedidosService";
 import { PedidosProdutos } from "../models";
 
 export const pedidosController={
+     index2:async(req:Request,res:Response)=>{
+    const [page,perPage]=getPaginationParams(req.query)
+    try {
+        const paginatedPedidos= await pedidosService.getPedidos(page,perPage)
+        return res.json(paginatedPedidos)
+    } catch (error) {
+        if(error instanceof Error){
+            return res.status(400).json({message:error.message})
+        }
+    }
+   },
    index:async(req:Request,res:Response)=>{
     const [page,perPage]=getPaginationParams(req.query)
     try {

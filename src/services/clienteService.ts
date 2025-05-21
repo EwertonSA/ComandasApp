@@ -1,21 +1,31 @@
-import { Clientes, Mesas } from "../models"
+import { Clientes, Comandas, Mesas } from "../models"
 import { ClienteCreationAttributes } from "../models/Cliente"
 
 export const clienteService={
-    findAllPaginated:async(page:number,perPage:number)=>{
-        const offset=(page - 1)*perPage
-                const {rows,count}= await Clientes.findAndCountAll({
-                    order:[['id','ASC']],
-                    limit:perPage,
-                    offset:offset
-                })
-                return {
-                    clientes:rows,
-                    page:page,
-                    perPage:perPage,
-                    total:count
-                }
-    },
+findAllPaginated: async (page: number, perPage: number) => {
+  const offset = (page - 1) * perPage;
+
+  const { rows, count } = await Clientes.findAndCountAll({
+    order: [['id', 'ASC']],
+    limit: perPage,
+    offset: offset,
+    include: [
+      {
+        model: Comandas,
+        as:'comandas',
+        attributes: ['id'], // só queremos o ID da comanda
+      },
+    ],
+  });
+
+  return {
+    clientes: rows,
+    page: page,
+    perPage: perPage,
+    total: count,
+  };
+},
+
     clienteComanda:async(id:string)=>{
         const clienteComanda= await Clientes.findByPk(id,{
             attributes:['id','nome',['mesa_id','mesaId']],

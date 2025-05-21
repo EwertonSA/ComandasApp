@@ -17,8 +17,8 @@ export const produtoService={
             total:count
         }
     },
-    search:async(nome:string,page:number,perPAge:number)=>{
-        const offset=(page-1)*perPAge
+    search:async(nome:string,page:number,perPage:number)=>{
+        const offset=(page-1)*perPage
         const {rows,count}=await Produtos.findAndCountAll({
           attributes:['id','nome','descricao','preco','categoria',['thumbnail_url', 'thumbnailUrl']],
           where:{
@@ -26,12 +26,12 @@ export const produtoService={
               [Op.iLike]:`%${nome}%`
             }
           },
-          limit:perPAge,
+          limit:perPage,
           offset
         })
         return{
           produtos:rows,
-          page,perPAge,
+          page,perPage,
           total:count
         }
        },

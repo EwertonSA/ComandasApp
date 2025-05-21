@@ -3,21 +3,46 @@ import { Pedidos, PedidosProdutos, Produtos } from "../models"
 import { PedidoAttributes } from "../models/Pedidos"
 
 export const pedidosService={
-   findAllPaginated:async(page:number,perPage:number)=>{
-    const offset=(page-1)*perPage
-    const {rows,count}=await  Pedidos.findAndCountAll({
-        order:[['id','ASC']],
-        limit:perPage,
-        offset:offset
-    })
-    return {
-        pedidos:rows,
-        page,
-        perPage,
-        count
-    }
-   },
-  
+   getPedidos: async (page: number, perPage: number) => {
+  const offset = (page - 1) * perPage;
+
+  const { rows, count } = await Pedidos.findAndCountAll({
+    order: [['id', 'DESC']],
+    limit: perPage,
+    offset,
+   
+  });
+
+  return {
+    pedidos: rows,
+    page,
+    perPage,
+    total: count,
+  };
+},
+ findAllPaginated: async (page: number, perPage: number) => {
+  const offset = (page - 1) * perPage;
+
+  const { rows, count } = await Pedidos.findAndCountAll({
+    order: [['id', 'DESC']],
+    limit: perPage,
+    offset,
+    include: [
+      {
+        association: 'produtos',
+        attributes: ['id', 'nome', 'preco', 'thumbnailUrl'],
+        through: { attributes: ['quantidade'] },
+      },
+    ],
+  });
+
+  return {
+    pedidos: rows,
+    page,
+    perPage,
+    total: count,
+  };
+},
    pedidoProduto: async (id: string) => {
     const pedido = await Pedidos.findByPk(id, {
       attributes: ["comandaId", "total", "status"],
