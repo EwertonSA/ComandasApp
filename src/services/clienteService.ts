@@ -1,30 +1,36 @@
+import { Op } from "sequelize";
 import { Clientes, Comandas, Mesas } from "../models"
 import { ClienteCreationAttributes } from "../models/Cliente"
 
 export const clienteService={
-findAllPaginated: async (page: number, perPage: number) => {
+findAllPaginated: async (page: number, perPage: number, status?: string) => {
   const offset = (page - 1) * perPage;
+  const normalizedStatus = status?.toLowerCase().trim();
 
-  const { rows, count } = await Clientes.findAndCountAll({
-    order: [['id', 'ASC']],
+  const whereComanda = normalizedStatus ? { status: normalizedStatus } : {};
+
+  const { count, rows } = await Clientes.findAndCountAll({
+    offset,
     limit: perPage,
-    offset: offset,
     include: [
       {
         model: Comandas,
-        as:'comandas',
-        attributes: ['id'], // só queremos o ID da comanda
+        as: 'comandas',
+        where: whereComanda,
+        required: true,
       },
     ],
+    order: [['createdAt', 'ASC']],
   });
 
   return {
     clientes: rows,
-    page: page,
-    perPage: perPage,
+    page,
+    perPage,
     total: count,
   };
-},
+}
+,
 
     clienteComanda:async(id:string)=>{
         const clienteComanda= await Clientes.findByPk(id,{

@@ -5,8 +5,9 @@ import { clienteService } from "../services/clienteService";
 export const clientesController={
     index:async(req:Request,res:Response)=>{
         const [page,perPage]=getPaginationParams(req.query)
+       const status = req.query.status?.toString();
         try {
-            const paginatedClientes= await clienteService.findAllPaginated(page,perPage)
+            const paginatedClientes= await clienteService.findAllPaginated(page,perPage,status)
             return res.json(paginatedClientes)
         } catch (error) {
             if(error instanceof Error){
