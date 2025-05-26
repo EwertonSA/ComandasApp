@@ -3,25 +3,27 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev --transpile-only --ignore-watch node_modules src/server"
+    "dev": "ts-node-dev --transpile-only --ignore-watch node_modules src/server",
+    "build":"tsc",
+    "start":"node .dist/server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@adminjs/express": "~4.0.1",
-    "@adminjs/sequelize": "~2.1.0",
-    "@adminjs/upload": "~2.0.1",
-    "adminjs": "~5.5.1",
+    "@adminjs/express": "^5.1.0",
+    "@adminjs/sequelize": "^3.0.0",
+    "@adminjs/upload": "^3.0.1",
+    "adminjs": "^6.8.7",
     "aos": "^2.3.4",
     "bcrypt": "^5.0.1",
     "cors": "^2.8.5",
-    "express": "~4.17.2",
+    "express": "^5.1.0",
     "express-formidable": "~1.2.0",
     "jsonwebtoken": "^9.0.2",
     "pg": "~8.7.1",
-    "sequelize": "~6.13.0"
+    "sequelize": "^6.37.7"
   },
   "devDependencies": {
     "@types/aos": "^3.0.7",
