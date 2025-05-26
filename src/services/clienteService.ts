@@ -3,6 +3,24 @@ import { Clientes, Comandas, Mesas } from "../models"
 import { ClienteCreationAttributes } from "../models/Cliente"
 
 export const clienteService={
+  findPaginated: async (page: number, perPage: number) => {
+  const offset = (page - 1) * perPage;
+
+
+  const { count, rows } = await Clientes.findAndCountAll({
+    offset,
+    limit: perPage,
+    order: [['createdAt', 'ASC']],
+  });
+
+  return {
+    clientes: rows,
+    page,
+    perPage,
+    total: count,
+  };
+}
+,
 findAllPaginated: async (page: number, perPage: number, status?: string) => {
   const offset = (page - 1) * perPage;
   const normalizedStatus = status?.toLowerCase().trim();
