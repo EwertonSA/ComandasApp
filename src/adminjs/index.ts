@@ -3,17 +3,24 @@ import AdminJSExpress from "@adminjs/express";
 import AdminJSSequelize from '@adminjs/sequelize'
 import { sequelize } from '../database';
 import { adminJsResources } from './resources';
-import { DashboarOptions } from './resources/dashboard';
+import { componentLoader } from './resources/dashboard';
 import { UserModel } from '../models';
 import bcrypt from 'bcrypt';
-
+import {DashboarOptions} from './resources/dashboard';
+import { ADMINJS_COOKIE_PASSWORD } from '../config/environment';
+import session from 'express-session'
+import connectSession from 'connect-session-sequelize'
+const SequelizeStore=connectSession(session.Store)
+const store= new SequelizeStore({db:sequelize})
+store.sync()
 AdminJS.registerAdapter(AdminJSSequelize)
 
 export const adminJs= new AdminJS({
     databases:[sequelize],
     rootPath:'/admin',
     resources:adminJsResources,
-    dashboard:DashboarOptions
+    dashboard:DashboarOptions,
+    componentLoader
 
 })
 export const adminJsRouter =AdminJSExpress.buildAuthenticatedRouter(adminJs,{
@@ -27,8 +34,10 @@ if(user?.password&& user.role === 'user'){
 }
 return false
     },
-    cookiePassword:'senha'
+    cookiePassword:ADMINJS_COOKIE_PASSWORD
 },null,{
     resave:false,
-    saveUninitialized:false
+    saveUninitialized:false,
+    store:store,
+    secret:ADMINJS_COOKIE_PASSWORD
 })

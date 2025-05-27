@@ -3,3 +3,6 @@ sequelizeCli.js
 src/database/index.ts
 uploads/
 public/
+.adminjs
+dist/
+.env
