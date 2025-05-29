@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "ts-node-dev --transpile-only --ignore-watch node_modules src/server",
     "build": "tsc",
-    "start": "node dist/src/server.js"
+    "start": "node dist/src/server.js",
+     "bundle-admin": "node ./scripts/bundle-component.js"
   },
   "keywords": [],
   "author": "",
@@ -30,6 +31,7 @@
     "sequelize": "^6.37.7"
   },
   "devDependencies": {
+    "@adminjs/bundler": "^3.0.0",
     "@types/aos": "^3.0.7",
     "@types/bcrypt": "^5.0.0",
     "@types/cors": "^2.8.17",

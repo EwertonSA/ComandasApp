@@ -9,6 +9,8 @@ import { sequelize } from '../database/index.js'
 import { UserModel } from '../models/User.js'
 import AdminJS from 'adminjs'
 import AdminJSSequelize from '@adminjs/sequelize'
+import { dashboardOptions } from './resources/dashboard.js'
+import { componentLoader } from './resources/dashboard.js'
 AdminJS.registerAdapter(AdminJSSequelize)
 
 const app = express()
@@ -20,8 +22,12 @@ await store.sync()
 export const adminJs = new AdminJS({
   databases: [sequelize],
   rootPath: '/admin',
+  dashboard: dashboardOptions, 
+  componentLoader,
+
   branding: {
     companyName: 'Seu Painel Admin',
+
   }
 })
 
