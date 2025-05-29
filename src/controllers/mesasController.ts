@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { mesasService } from "../services/mesasService";
-import { getPaginationParams } from "../helpers/getPaginationParams";
+import { mesasService } from "../services/mesasService.js";
+import { getPaginationParams } from "../helpers/getPaginationParams.js";
 
 export const mesasController={
     

@@ -1,9 +1,11 @@
-import dotenv from 'dotenv'
-dotenv.config()
+import './config/load-env.js'
+
+console.log(process.env.DATABASE_URL);
+
 import express from "express"
-import { sequelize } from "./database"
-import {adminJs, adminJsRouter} from './adminjs'
-import router from "./routes"
+import { sequelize } from  "./database/index.js"
+import {adminJs, adminJsRouter} from './adminjs/index.js'
+import router from "./routes.js"
 import cors from 'cors'
 const app= express()
 app.use(cors())

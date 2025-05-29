@@ -1,6 +1,6 @@
 import { Op } from "sequelize"
-import { Produtos } from "../models"
-import { ProdutoAttributes } from "../models/Produtos"
+import Produtos  from "../models/Produtos.js"
+import { ProdutoAttributes } from "../models/Produtos.js"
 
 export const produtoService={
     finadAllPaginated:async(page:number,perPage:number)=>{

@@ -1,6 +1,18 @@
 import AdminJS, { ComponentLoader, PageHandler } from "adminjs";
-import { Clientes, Comandas, Mesas, Pagamentos, Pedidos, PedidosProdutos, Produtos } from "../../models";
+
 import path from "path";
+import { Mesas } from "../../models/Mesas.js";
+import { Clientes } from "../../models/Cliente.js";
+import { Comandas } from "../../models/Comandas.js";
+import Pedidos  from "../../models/Pedidos.js";
+import Produtos  from "../../models/Produtos.js";
+import  PedidosProdutos  from "../../models/pedidosProdutos.js";
+import Pagamentos from "../../models/Pagamentos.js";
+
+
+
+
+
 export const componentLoader = new ComponentLoader();
 componentLoader.add('Dashboard', path.join(process.cwd(), 'src', 'adminjs', 'component', 'dashboard.tsx'));
 

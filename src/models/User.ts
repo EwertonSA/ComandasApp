@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional, ModelStatic } from "sequelize";
-import { sequelize } from "../database";
+import { sequelize } from  "../database/index.js";
 import bcrypt from "bcrypt";
 
 // Definição dos tipos do usuário

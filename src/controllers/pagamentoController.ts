@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { pagamentoService } from "../services/pagementosService";
-import { getPaginationParams } from "../helpers/getPaginationParams";
+import { pagamentoService } from "../services/pagementosService.js";
+import { getPaginationParams } from "../helpers/getPaginationParams.js";
 
 export const pagamentoController={
     index:async(req:Request,res:Response)=>{

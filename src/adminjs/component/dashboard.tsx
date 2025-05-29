@@ -9,7 +9,7 @@ fetchDashData()
     },[])
     async function fetchDashData(){
         const res=await api.getDashboard()
-        setResource(res.data)
+        setResource(res.data as {[key:string]:number})
     }
     return(
        <section style={{padding:'1.5rem'}}>

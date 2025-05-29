@@ -1,5 +1,5 @@
 import { ResourceOptions } from "adminjs";
-import { clienteService } from "../../services/clienteService";
+import { clienteService } from "../../services/clienteService.js";
 
 export const ClienteResourceOptions: ResourceOptions = {
   navigation: "Comandas",

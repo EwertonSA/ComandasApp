@@ -1,7 +1,7 @@
 import { DataTypes, Model, Optional } from "sequelize";
-import { sequelize } from "../database";
-import Pedidos from "./Pedidos";
-import Produtos, { ProdutoInstance } from "./Produtos";
+import { sequelize } from "../database/index.js";
+import Pedidos from "./Pedidos.js";
+import Produtos, { ProdutoInstance } from "./Produtos.js";
 
 export interface PedidoProduto {
   id: number;

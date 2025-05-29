@@ -1,5 +1,5 @@
 import { ResourceOptions } from "adminjs";
-import { comandasService } from "../../services/comandasService";
+import { comandasService } from "../../services/comandasService.js";
 
 const ComandasResourceOptions:ResourceOptions={
 navigation:'Comandas',

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { getPaginationParams } from "../helpers/getPaginationParams";
-import { clienteService } from "../services/clienteService";
+import { getPaginationParams } from "../helpers/getPaginationParams.js";
+import { clienteService } from "../services/clienteService.js";
 
 export const clientesController={
         index1:async(req:Request,res:Response)=>{

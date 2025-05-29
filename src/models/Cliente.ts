@@ -1,7 +1,7 @@
 
 
 import { Model, DataTypes, Optional } from 'sequelize';
-import { sequelize } from '../database';
+import { sequelize } from '../database/index.js';
 
 export interface Cliente {
   id: number; 

@@ -1,4 +1,6 @@
-import { Pedidos, PedidosProdutos, Produtos } from "../models";
+import  PedidosProdutos  from "../models/pedidosProdutos.js";
+import Produtos from "../models/Produtos.js"
+import Pedidos from "../models/Pedidos.js"
 
 export async function atualizarTotalPedido(pedidoId: number) {
     const pedidoProdutos = await PedidosProdutos.findAll({

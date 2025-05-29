@@ -1,4 +1,4 @@
-import PedidosProdutos, { PedidoProdutoAttributes } from "../models/pedidosProdutos";
+import PedidosProdutos, { PedidoProdutoAttributes } from "../models/pedidosProdutos.js";
 
 export const pedidosProdutosService={
     findAllPaginated:async(page:number,perPage:number)=>{

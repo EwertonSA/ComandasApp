@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { getPaginationParams } from "../helpers/getPaginationParams";
-import { pedidosService } from "../services/pedidosService";
-import { PedidosProdutos } from "../models";
+import { getPaginationParams } from "../helpers/getPaginationParams.js";
+import { pedidosService } from "../services/pedidosService.js";
+
 
 export const pedidosController={
      index2:async(req:Request,res:Response)=>{

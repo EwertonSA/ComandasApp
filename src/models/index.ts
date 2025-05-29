@@ -1,11 +1,11 @@
-import {  Clientes } from "./Cliente";
-import { Comandas } from "./Comandas";
-import { Mesas } from "./Mesas";
-import Pagamentos from "./Pagamentos";
-import Pedidos from "./Pedidos";
-import PedidosProdutos from "./pedidosProdutos";
-import Produtos from "./Produtos";
-import { UserModel } from "./User";
+import {  Clientes } from "./Cliente.js";
+import { Comandas } from "./Comandas.js";
+import { Mesas } from "./Mesas.js";
+import Pagamentos from "./Pagamentos.js";
+import Pedidos from "./Pedidos.js";
+import PedidosProdutos from "./pedidosProdutos.js";
+import Produtos from "./Produtos.js";
+import { UserModel } from "./User.js";
 
 // Relação Mesa - Clientes (1:N)
 Mesas.hasMany(Clientes, {as:'clientes', foreignKey: 'mesaId' });

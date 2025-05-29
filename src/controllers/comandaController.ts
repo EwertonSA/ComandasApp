@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { comandasService } from "../services/comandasService";
-import { getPaginationParams } from "../helpers/getPaginationParams";
+import { comandasService } from "../services/comandasService.js";
+import { getPaginationParams } from "../helpers/getPaginationParams.js";
 
 export const comandaController={
     index:async(req:Request,res:Response)=>{

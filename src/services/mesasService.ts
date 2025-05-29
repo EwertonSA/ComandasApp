@@ -1,5 +1,5 @@
-import { Mesas } from "../models"
-import { MesasCreationAttributes } from "../models/Mesas"
+import { Mesas } from "../models/Mesas.js"
+import { MesasCreationAttributes } from "../models/Mesas.js"
 
 export const mesasService={
     findAllPaginated: async(page:number,perPage:number)=>{

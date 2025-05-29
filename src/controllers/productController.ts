@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
-import { getPaginationParams } from "../helpers/getPaginationParams";
-import { produtoService } from "../services/produtosService";
-import { Produtos } from "../models";
+import { getPaginationParams } from "../helpers/getPaginationParams.js";
+import { produtoService } from "../services/produtosService.js";
+
 import { Op } from "sequelize";
+import Produtos from "../models/Produtos.js";
 
 export const productController={
     index:async(req:Request,res:Response)=>{

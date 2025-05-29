@@ -1,5 +1,5 @@
 import jwt, { SignOptions } from 'jsonwebtoken'
-import { JWT_KEY } from '../config/environment'
+import { JWT_KEY } from '../config/environment.js'
 
 const secret=JWT_KEY
 export const jwtService={

@@ -1,43 +1,46 @@
-import AdminJS from 'adminjs';
-import AdminJSExpress from "@adminjs/express";
-import AdminJSSequelize from '@adminjs/sequelize'
-import { sequelize } from '../database';
-import { adminJsResources } from './resources';
-import { componentLoader } from './resources/dashboard';
-import { UserModel } from '../models';
-import bcrypt from 'bcrypt';
-import {DashboarOptions} from './resources/dashboard';
-import { ADMINJS_COOKIE_PASSWORD } from '../config/environment';
+
+import express from 'express'
 import session from 'express-session'
-import connectSession from 'connect-session-sequelize'
-const SequelizeStore=connectSession(session.Store)
-const store= new SequelizeStore({db:sequelize})
-store.sync()
+
+import SequelizeStoreFactory from 'connect-session-sequelize'
+
+import bcrypt from 'bcrypt'
+import { sequelize } from '../database/index.js'
+import { UserModel } from '../models/User.js'
+import AdminJS from 'adminjs'
+import AdminJSSequelize from '@adminjs/sequelize'
 AdminJS.registerAdapter(AdminJSSequelize)
 
-export const adminJs= new AdminJS({
-    databases:[sequelize],
-    rootPath:'/admin',
-    resources:adminJsResources,
-    dashboard:DashboarOptions,
-    componentLoader
+const app = express()
+const SequelizeStore = SequelizeStoreFactory(session.Store)
 
+const store = new SequelizeStore({ db: sequelize })
+await store.sync()
+
+export const adminJs = new AdminJS({
+  databases: [sequelize],
+  rootPath: '/admin',
+  branding: {
+    companyName: 'Seu Painel Admin',
+  }
 })
-export const adminJsRouter =AdminJSExpress.buildAuthenticatedRouter(adminJs,{
-    authenticate:async(email,password)=>{
-const user= await UserModel.findOne({where:{email}})
-if(user?.password&& user.role === 'user'){
-    const matched=await bcrypt.compare(password,user.password)
-    if(matched){
-        return user
+
+// ⚠️ Importação dinâmica de buildAuthenticatedRouter
+const { buildAuthenticatedRouter } = await import('@adminjs/express')
+
+export const adminJsRouter = buildAuthenticatedRouter(adminJs, {
+  authenticate: async (email, password) => {
+    const user = await UserModel.findOne({ where: { email } })
+    if (user && user.role === 'user') {
+      const matched = await bcrypt.compare(password, user.password)
+      if (matched) return user
     }
-}
-return false
-    },
-    cookiePassword:ADMINJS_COOKIE_PASSWORD
-},null,{
-    resave:false,
-    saveUninitialized:false,
-    store:store,
-    secret:ADMINJS_COOKIE_PASSWORD
+    return false
+  },
+  cookiePassword: 'sua-senha-secreta'
+}, null, {
+  store,
+  resave: false,
+  saveUninitialized: false,
+  secret: 'sua-senha-secreta'
 })

@@ -1,5 +1,8 @@
 import { Op } from "sequelize";
-import { Clientes, Comandas, Pagamentos, Pedidos } from "../models";
+import Pagamentos  from "../models/Pagamentos.js";
+import  Pedidos  from "../models/Pedidos.js";
+import { Comandas } from "../models/Comandas.js";
+
 
 export const pagamentoService = {
   findAllPaginated: async (page: number, perPage: number) => {

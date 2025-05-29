@@ -1,13 +1,13 @@
 import express from 'express'
-import { mesasController } from './controllers/mesasController'
-import { clientesController } from './controllers/clienteController'
-import { pedidosController } from './controllers/pedidosController'
-import { comandaController } from './controllers/comandaController'
-import { productController } from './controllers/productController'
-import { pedidosProdutosController } from './controllers/pedidosProdutosController'
-import { pagamentoController } from './controllers/pagamentoController'
-import { authController } from './controllers/authController'
-import ensureAuth from './middlewares/auth'
+import { mesasController } from './controllers/mesasController.js'
+import { clientesController } from './controllers/clienteController.js'
+import { pedidosController } from './controllers/pedidosController.js'
+import { comandaController } from './controllers/comandaController.js'
+import { productController } from './controllers/productController.js'
+import { pedidosProdutosController } from './controllers/pedidosProdutosController.js'
+import { pagamentoController } from './controllers/pagamentoController.js'
+import { authController } from './controllers/authController.js'
+import ensureAuth from './middlewares/auth.js'
 
 
 const router= express.Router()

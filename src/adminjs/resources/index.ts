@@ -1,15 +1,21 @@
 import { ResourceWithOptions } from "adminjs";
-import { Clientes } from "../../models/Cliente";
-import { ClienteResourceOptions } from "./Cliente";
-import { Mesas } from "../../models/Mesas";
-import { MesasResourceOptions } from "./Mesas";
-import { Comandas, Pagamentos, Pedidos, PedidosProdutos, Produtos, UserModel } from "../../models";
-import ComandasResourceOptions from "./Comandas";
-import PedidosResourceOptions from "./Pedidos";
-import ProdutosResourceOption, { thumbnailResourceFeatures } from "./Produtos";
-import PedidosProdutosResourceOptions from "./PedidosProdutos";
-import PagamentosResourceOptions from "./Pagamentos";
-import { UserResourceOptions } from "./users";
+import { Clientes } from "../../models/Cliente.js";
+import { ClienteResourceOptions } from "./Cliente.js";
+import { Mesas } from "../../models/Mesas.js";
+import { MesasResourceOptions } from "./Mesas.js";
+import { Comandas} from "../../models/Comandas.js"
+
+import ComandasResourceOptions from "./Comandas.js";
+import PedidosResourceOptions from "./Pedidos.js";
+import ProdutosResourceOption, { thumbnailResourceFeatures } from "./Produtos.js";
+import PedidosProdutosResourceOptions from "./PedidosProdutos.js";
+import PagamentosResourceOptions from "./Pagamentos.js";
+import { UserResourceOptions } from "./users.js";
+import Pedidos from "../../models/Pedidos.js";
+import Produtos from "../../models/Produtos.js";
+import PedidosProdutos from "../../models/pedidosProdutos.js";
+import Pagamentos from "../../models/Pagamentos.js";
+import { UserModel } from "../../models/User.js";
 
 export const adminJsResources: ResourceWithOptions[]=[{
     resource:Clientes,

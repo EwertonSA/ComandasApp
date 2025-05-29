@@ -1,5 +1,6 @@
 import { ResourceOptions } from "adminjs";
-import { Pagamentos, Pedidos } from "../../models";
+import  Pedidos  from "../../models/Pedidos.js";
+import Pagamentos from "../../models/Pagamentos.js";
 
 const PagamentosResourceOptions:ResourceOptions={
     navigation:"Comanda",

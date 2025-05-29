@@ -1,6 +1,8 @@
 
-import { Pedidos, PedidosProdutos, Produtos } from "../models"
-import { PedidoAttributes } from "../models/Pedidos"
+
+import  PedidosProdutos from "../models/pedidosProdutos.js";
+import Pedidos, { PedidoAttributes } from "../models/Pedidos.js"
+import  Produtos  from "../models/Produtos.js";
 
 export const pedidosService={
    getPedidos: async (page: number, perPage: number) => {

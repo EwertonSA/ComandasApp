@@ -1,6 +1,6 @@
-import * as env from 'env-var'
+import  env from 'env-var'
 
-export const DATASE_URL= env.get("DATABASE_URL").required().asString()
+export const DATABASE_URL= env.get("DATABASE_URL").required().asString()
 
 export const ADMINJS_COOKIE_PASSWORD= env.get('ADMINJS_COOKIE_PASSWORD').required().asString()
 

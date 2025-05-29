@@ -1,6 +1,7 @@
 import { Op } from "sequelize"
-import { Clientes, Comandas } from "../models"
-import { ComandaAttributes } from "../models/Comandas"
+import { Clientes} from "../models/Cliente.js"
+import  Comandas  from "../models/Comandas.js"
+
 
 export const comandasService={
 findAllPaginated:async(page:number,perPage:number)=>{

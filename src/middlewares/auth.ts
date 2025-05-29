@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express"
-import { jwtService } from "../services/jwtService"
-import { userService } from "../services/userService"
+import { jwtService } from "../services/jwtService.js"
+import { userService } from "../services/userService.js"
 import { JwtPayload } from "jsonwebtoken"
-import { UserInstance } from "../models/User"
+import { UserInstance } from "../models/User.js"
 
 export interface AuthenticatedRequest extends Request{
     user?:UserInstance|null
