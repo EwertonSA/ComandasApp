@@ -1,7 +1,7 @@
 import { Op } from "sequelize";
-import { Clientes } from "../models/Cliente.js"
-import Comandas from "../models/Comandas.js"
-import {Mesas} from "../models/Mesas.js"
+import { Clientes } from "../models/index.js"
+import {Comandas} from "../models/index.js"
+import {Mesas} from "../models/index.js"
 import { ClienteCreationAttributes } from "../models/Cliente.js"
 
 export const clienteService={
@@ -55,10 +55,11 @@ findAllPaginated: async (page: number, perPage: number, status?: string) => {
     clienteComanda:async(id:string)=>{
         const clienteComanda= await Clientes.findByPk(id,{
             attributes:['id','nome',['mesa_id','mesaId']],
-            include:{
-                association:'comandas',
-                attributes:['id',['mesa_id','mesaId'],['cliente_id','clienteId']]
-            }   
+                    include: {
+  model: Comandas,
+  as: 'comandas',
+  attributes: ['id', ['mesa_id', 'mesaId'], ['cliente_id', 'clienteId']],
+}
         })
         return clienteComanda
 },

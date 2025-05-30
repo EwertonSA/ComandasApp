@@ -7,7 +7,7 @@ export const clientesController={
         const [page,perPage]=getPaginationParams(req.query)
 
         try {
-            const paginatedClientes= await clienteService.findAllPaginated(page,perPage)
+            const paginatedClientes= await clienteService.findPaginated(page,perPage)
             return res.json(paginatedClientes)
         } catch (error) {
             if(error instanceof Error){
