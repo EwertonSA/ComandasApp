@@ -30,6 +30,7 @@ export const adminJs = new AdminJS({
     companyName: 'Seu Painel Admin',
      theme: {
     colors: {
+      background:"#151515",
       primary100: '#ff0043',
       primary80: '#ff1a57',
       primary60: '#ff3369',
@@ -43,6 +44,8 @@ export const adminJs = new AdminJS({
       filterBg: '#333333',
       accent: '#151515',
       hoverBg: '#151515',
+       text: '#ffffff',
+       
     }
   }
   }
