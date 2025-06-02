@@ -20,19 +20,19 @@ export default function Dashboard() {
 
       <section>
         <h2>Resumo</h2>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <table >
           <thead>
             <tr>
-              <th style={{ textAlign: 'left', padding: '8px', color: '#fff' }}>Recurso</th>
-              <th style={{ textAlign: 'left', padding: '8px', color: '#fff' }}>Quantidade</th>
+              <th >Recurso</th>
+              <th>Quantidade</th>
             </tr>
           </thead>
           <tbody>
             {resource &&
               Object.entries(resource).map(([key, count]) => (
                 <tr key={key}>
-                  <td style={{ padding: '8px', color: '#fff' }}>{key}</td>
-                  <td style={{ padding: '8px', color: '#fff' }}>{count}</td>
+                  <td >{key}</td>
+                  <td >{count}</td>
                 </tr>
               ))}
           </tbody>
