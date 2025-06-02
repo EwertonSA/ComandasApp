@@ -1,7 +1,13 @@
 node_modules/
 
 uploads/
-public/
+/public/*
+!/public/admin/
+/public/admin/*
+!/public/admin/frontend/
+/public/admin/frontend/*
+!/public/admin/frontend/assets/
+/public/admin/frontend/assets/*
 .adminjs
 dist/
 .env
