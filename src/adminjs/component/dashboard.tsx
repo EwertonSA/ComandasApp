@@ -19,9 +19,9 @@ fetchDashData()
         <H2>Resumo</H2>
         <Table>
             <TableHead>
-                <TableRow style={{backgroundColor:'blue'}}>
-                    <TableCell style={{backgroundColor:'white !important'}}></TableCell>
-                    <TableCell style={{backgroundColor:'white '}}></TableCell>
+                <TableRow>
+                    <TableCell ></TableCell>
+                    <TableCell></TableCell>
                 </TableRow>
             </TableHead>
             <TableBody>
@@ -29,8 +29,8 @@ fetchDashData()
                 resource?
                 Object.entries(resource).map(([resource,count])=>(
                     <TableRow key={resource}>
-                        <TableCell  style={{color:'white !important'}} >{resource}</TableCell>
-                        <TableCell style={{color:'white !important'}} >{count}</TableCell>
+                        <TableCell   >{resource}</TableCell>
+                        <TableCell  >{count}</TableCell>
                     </TableRow>
                 )):
                 <></>
