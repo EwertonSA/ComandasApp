@@ -1,6 +1,5 @@
 node_modules/
-sequelizeCli.js
-src/database/index.ts
+
 uploads/
 public/
 .adminjs

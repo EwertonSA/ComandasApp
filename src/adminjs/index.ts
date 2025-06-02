@@ -11,6 +11,7 @@ import AdminJS from 'adminjs'
 import AdminJSSequelize from '@adminjs/sequelize'
 import { dashboardOptions } from './resources/dashboard.js'
 import { componentLoader } from './resources/dashboard.js'
+import { ADMINJS_COOKIE_PASSWORD, DATABASE_URL, JWT_KEY } from '../config/environment.js'
 AdminJS.registerAdapter(AdminJSSequelize)
 
 const app = express()
@@ -43,10 +44,10 @@ export const adminJsRouter = buildAuthenticatedRouter(adminJs, {
     }
     return false
   },
-  cookiePassword: 'sua-senha-secreta'
+  cookiePassword:ADMINJS_COOKIE_PASSWORD
 }, null, {
   store,
   resave: false,
   saveUninitialized: false,
-  secret: 'sua-senha-secreta'
+  secret: JWT_KEY
 })
