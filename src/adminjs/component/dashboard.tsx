@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { ApiClient } from 'adminjs'
-
+import "../../../custon-theme.css"
 export default function Dashboard() {
   const [resource, setResource] = useState<{ [key: string]: number }>({})
   const api = new ApiClient()
