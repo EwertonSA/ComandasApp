@@ -15,7 +15,7 @@ fetchDashData()
        <section style={{padding:'1.5rem'}}>
         <H1>Seja Bem vindo(a)</H1>
       
-       <section style={{backgroundColor:'black'}}>
+       <section >
         <H2>Resumo</H2>
         <Table>
             <TableHead>
