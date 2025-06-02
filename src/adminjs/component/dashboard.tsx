@@ -20,8 +20,8 @@ fetchDashData()
         <Table>
             <TableHead>
                 <TableRow style={{backgroundColor:'blue'}}>
-                    <TableCell style={{backgroundColor:'white'}}></TableCell>
-                    <TableCell style={{backgroundColor:'white'}}></TableCell>
+                    <TableCell style={{backgroundColor:'white !important'}}></TableCell>
+                    <TableCell style={{backgroundColor:'white '}}></TableCell>
                 </TableRow>
             </TableHead>
             <TableBody>
