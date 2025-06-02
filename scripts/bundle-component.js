@@ -8,9 +8,7 @@ import {componentLoader} from '../dist/src/adminjs/resources/dashboard.js';
 
 // ⚙️ Executa o bundle
 const run = async () => {
-   console.log('📦 Iniciando bundling...')
-  console.log('📁 Registrando componentes:', componentLoader.getComponents())
-  console.log('🔧 Gerando bundle de componentes do AdminJS...')
+  
   await bundle({
     componentLoader,
     destinationDir:'public/admin/frontend/assets' // caminho padrão usado pelo AdminJS

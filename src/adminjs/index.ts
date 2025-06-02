@@ -34,7 +34,8 @@ export const adminJs = new AdminJS({
   
        text: '#ffffff',
        
-    }
+    },
+    
   }
   }
 })

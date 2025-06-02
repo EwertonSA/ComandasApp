@@ -1,4 +1,5 @@
 import { ApiClient } from 'adminjs'
+import "../../../public/admin/frontend/assets/custom-theme.css"
 import {H1, H2, Table, TableBody, TableCell, TableHead, TableRow} from '@adminjs/design-system'
 import React ,{useEffect, useState} from 'react'
 export default function Dashboard(){
@@ -29,8 +30,8 @@ fetchDashData()
                 resource?
                 Object.entries(resource).map(([resource,count])=>(
                     <TableRow key={resource}>
-                        <TableCell   >{resource}</TableCell>
-                        <TableCell  >{count}</TableCell>
+                        <TableCell  className="adminjs_TableCell" >{resource}</TableCell>
+                        <TableCell className="adminjs_TableCell" >{count}</TableCell>
                     </TableRow>
                 )):
                 <></>
