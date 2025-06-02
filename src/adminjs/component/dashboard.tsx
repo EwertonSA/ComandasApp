@@ -29,8 +29,8 @@ fetchDashData()
                 resource?
                 Object.entries(resource).map(([resource,count])=>(
                     <TableRow key={resource}>
-                        <TableCell  style={{color:"white"}} >{resource}</TableCell>
-                        <TableCell style={{color:"white"}} >{count}</TableCell>
+                        <TableCell  style={{color:'white'}} >{resource}</TableCell>
+                        <TableCell style={{color:'white'}} >{count}</TableCell>
                     </TableRow>
                 )):
                 <></>
