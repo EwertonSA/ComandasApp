@@ -30,9 +30,9 @@ export const adminJs = new AdminJS({
     companyName: 'Seu Painel Admin',
      theme: {
     colors: {
-      background:"#151515",
+      background:'#ffffff',
   
-       text: '#ffffff',
+       text: "#151515",
        
     },
     
