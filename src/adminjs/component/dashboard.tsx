@@ -16,7 +16,7 @@ export default function Dashboard() {
 
   return (
     <section style={{padding:'1.5rem'}}>
-        <H1>Seja Bem vindo(a)</H1>
+        <H1 style={{color:'white'}}>Seja Bem vindo(a)</H1>
       
        <section style={{backgroundColor:'black'}}>
         <H2>Resumo</H2>
