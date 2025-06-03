@@ -28,7 +28,15 @@ export const adminJs = new AdminJS({
 
   branding: {
     companyName: 'Seu Painel Admin',
-
+     theme: {
+    colors: {
+      background: '#ffffff',
+      text: '#151515',
+      border: '#cccccc',
+      tableHeader: '#f4f4f4',
+    },
+    
+  }
   }
 })
 
