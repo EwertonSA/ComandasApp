@@ -18,13 +18,13 @@ export default function Dashboard() {
     <section style={{padding:'1.5rem'}}>
         <H1 style={{color:'#151515'}}>Seja Bem vindo(a)</H1>
       
-       <section style={{backgroundColor:'black'}}>
+       <section style={{backgroundColor:'white'}}>
         <H2>Resumo</H2>
         <Table>
             <TableHead>
                 <TableRow style={{backgroundColor:'blue'}}>
-                    <TableCell style={{backgroundColor:'white'}}></TableCell>
-                    <TableCell style={{backgroundColor:'white'}}></TableCell>
+                    <TableCell style={{backgroundColor:'black'}}></TableCell>
+                    <TableCell style={{backgroundColor:'black'}}></TableCell>
                 </TableRow>
             </TableHead>
             <TableBody>
@@ -32,8 +32,8 @@ export default function Dashboard() {
                 resource?
                 Object.entries(resource).map(([resource,count])=>(
                     <TableRow key={resource}>
-                        <TableCell  style={{color:'white'}} >{resource}</TableCell>
-                        <TableCell style={{color:'white'}} >{count}</TableCell>
+                        <TableCell  style={{color:'black'}} >{resource}</TableCell>
+                        <TableCell style={{color:'black'}} >{count}</TableCell>
                     </TableRow>
                 )):
                 <></>
