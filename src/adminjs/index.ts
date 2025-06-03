@@ -53,15 +53,10 @@ export const adminJsRouter = buildAuthenticatedRouter(adminJs, {
     return false
   },
   cookiePassword:ADMINJS_COOKIE_PASSWORD
-}, null, {
-  store,
-  resave: false,
-  saveUninitialized: false,
-  secret: JWT_KEY,
-   cookie: {
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-    secure: process.env.NODE_ENV === 'production',
-    httpOnly: true,
-    maxAge: 60 * 60 * 1000
-  }
+}, null,{
+  resave:false
+, 
+saveUninitialized:false,
+store:store,
+secret:ADMINJS_COOKIE_PASSWORD
 })
