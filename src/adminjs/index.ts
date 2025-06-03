@@ -48,6 +48,7 @@ export const adminJsRouter = buildAuthenticatedRouter(adminJs, {
     const user = await UserModel.findOne({ where: { email } })
     if (user && user.role === 'user') {
       const matched = await bcrypt.compare(password, user.password)
+       console.log('Login OK:', user.email)
       if (matched) return user
     }
     return false
@@ -57,5 +58,12 @@ export const adminJsRouter = buildAuthenticatedRouter(adminJs, {
   store,
   resave: false,
   saveUninitialized: false,
-  secret: JWT_KEY
+  secret: JWT_KEY,
+  cookie: {
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+  secure: process.env.NODE_ENV === 'production',
+  httpOnly: true,
+  maxAge: 60 * 60 * 1000,
+}
+
 })
