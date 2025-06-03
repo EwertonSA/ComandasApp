@@ -31,8 +31,8 @@ export default function Dashboard() {
             {resource &&
               Object.entries(resource).map(([key, count]) => (
                 <tr key={key}>
-                  <td >{key}</td>
-                  <td >{count}</td>
+                  <td style={{color:'#ffffff'}} >{key}</td>
+                  <td  style={{color:'#ffffff'}} >{count}</td>
                 </tr>
               ))}
           </tbody>
