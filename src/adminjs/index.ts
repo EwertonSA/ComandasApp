@@ -65,6 +65,6 @@ export const adminJsRouter = buildAuthenticatedRouter(adminJs, {
   resave:false
 , 
 saveUninitialized:false,
-store:store,
+store:store,  
 secret:ADMINJS_COOKIE_PASSWORD
 })
