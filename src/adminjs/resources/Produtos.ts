@@ -17,26 +17,22 @@ const ProdutosResourceOption: ResourceOptions = {
   listProperties: ["id", "categoria", "nome", "descricao", "preco"]
 };
 
-export const thumbnailResourceFeatures: FeatureType[] = [
+export const thumbnailResourceFeatures = [
   uploadFeature({
     provider: {
       local: {
-        // Salva em 'public/uploads' para organização
         bucket: uploadDir,
-        opts: {}
-      }
+      },
     },
     properties: {
-      key: "thumbnailUrl",    // campo que guarda o caminho no banco
-      file: "uploadThumbnail" // campo virtual para upload
+      key: 'thumbnailUrl',       // campo no banco que vai armazenar o caminho da imagem
+      file: 'uploadThumbnail',   // campo temporário usado no painel para upload
     },
-    uploadPath: (record: BaseRecord, filename: string) => {
-      // Se id ainda não existir (criação), usa timestamp para evitar erro
-      const id = record.get("id") || `${Date.now()}`;
-      // Organiza arquivos em pasta por produto
-      return `produtos/produto-${id}/${filename}`;
-    }
-  })
-];
+    uploadPath: (record:any, filename:any) => {
+      const id = record?.id || Date.now()
+      return `produtos/produto-${id}/${filename}`
+    },
+  }),
+]
 
 export default ProdutosResourceOption;
