@@ -29,23 +29,24 @@ findAllPaginated:async(page:number,perPage:number)=>{
         })
         return comandaPedido
     },
-    comandaAtiva:async()=>{
-        try {
-            const res=await Comandas.findAll({
-                where:{
-                    status: {
-                        [Op.iLike]: 'pago'
-                      }
-                
-                },
-            
-            })
-            return res     
-        } catch (error) {
-            throw new Error("Erro ao buscar comandas ativas");
+
+
+comandaAtiva: async () => {
+  try {
+    const res = await Comandas.findAll({
+      where: {
+        status: {
+          [Op.ne]: 'pago'
         }
-       
-    },
+      }
+    });
+    return res;
+  } catch (error) {
+    console.error('Erro real ao buscar comandas ativas:', error);
+    throw new Error("Erro ao buscar comandas ativas");
+  }
+},
+
     create:async(attibutes:{mesaId:number,clienteId:number})=>{
         const {mesaId,clienteId}=attibutes
         const comandaExiste=await Comandas.findOne({where:{clienteId}})

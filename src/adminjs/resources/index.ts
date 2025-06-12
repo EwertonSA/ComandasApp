@@ -17,6 +17,7 @@ import PedidosProdutos from "../../models/pedidosProdutos.js";
 import Pagamentos from "../../models/Pagamentos.js";
 import { UserModel } from "../../models/User.js";
 
+
 export const adminJsResources: ResourceWithOptions[]=[{
     resource:Clientes,
     options: ClienteResourceOptions
