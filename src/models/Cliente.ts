@@ -10,7 +10,7 @@ export interface Cliente {
   mesaId:number, 
 }
 
-export interface ClienteCreationAttributes extends Optional<Cliente, 'id'> {}
+  export interface ClienteCreationAttributes extends Optional<Cliente, 'id'> {}
 
 export interface ClienteInstance extends Model<Cliente, ClienteCreationAttributes>, Cliente {}
 

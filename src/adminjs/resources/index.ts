@@ -23,7 +23,7 @@ export const adminJsResources: ResourceWithOptions[]=[{
     options: ClienteResourceOptions
 },{
     resource:Mesas,
-    options:MesasResourceOptions
+    options:MesasResourceOptions    
 },{
     resource:Comandas,
     options:ComandasResourceOptions

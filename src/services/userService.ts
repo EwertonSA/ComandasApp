@@ -15,5 +15,25 @@ findByEmail:(email:string)=>{
 create:async(attributes:UserCreationAttributes)=>{
     const user=await UserModel.create(attributes)
     return user
+},
+findByFacebookId:async(instagramId:string)=>{
+    const user=await UserModel.findOne({
+        attributes:['id','name','phone','email','password','instagramId'],
+        where:{
+          instagramId
+        }
+    
+    })
+        return user
+},
+findByLinkedinId:async(linkedinId:string)=>{
+    const user=await UserModel.findOne({
+        attributes:['id','name','phone','email','password','instagramId','linkedinId'],
+        where:{
+            linkedinId
+        }
+    })
+    return user
 }
+
 }

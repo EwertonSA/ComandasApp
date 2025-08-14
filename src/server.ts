@@ -1,4 +1,5 @@
 import './config/load-env.js'
+console.log("REDIRECT ATUAL:", process.env.GOOGLE_REDIRECT_URI);
 
 console.log(process.env.DATABASE_URL);
 
@@ -7,8 +8,25 @@ import { sequelize } from  "./database/index.js"
 import {adminJs, adminJsRouter} from './adminjs/index.js'
 import router from "./routes.js"
 import cors from 'cors'
+import session from 'express-session';
+import { JWT_KEY } from './config/environment.js';
+import cookieParser from "cookie-parser";
 const app= express()
-app.use(cors())
+app.use(session({
+  secret:JWT_KEY, // ou outra chave segura
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: true,
+    sameSite: 'none',
+    maxAge: 3600000
+  }
+}));
+app.use(cors({
+  origin: 'http://localhost:3000',  // endereço do seu frontend
+  credentials: true
+}));
+app.use(cookieParser())
 app.use(express.static('public'))
 app.use(adminJs.options.rootPath,adminJsRouter)
 app.use(express.json())

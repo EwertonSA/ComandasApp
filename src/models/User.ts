@@ -10,6 +10,8 @@ export interface User {
   email: string;
   password: string;
   role: "user" | "cliente";
+  instagramId?:string
+  linkedinId?:string
 }
 
 // Tipo para criação de usuário (sem o 'id')
@@ -62,6 +64,16 @@ export const UserModel = sequelize.define<UserInstance, User>(
         isIn: [["user", "cliente"]],
       },
     },
+    instagramId:{
+      allowNull:true,
+      type:DataTypes.STRING,
+       field: 'instagramId',
+    },
+    linkedinId:{
+      allowNull:true,
+      type:DataTypes.STRING,
+      field:'linkedinId'
+    }
   },
   {
     hooks: {

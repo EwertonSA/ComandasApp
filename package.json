@@ -4,7 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "ts-node-dev --transpile-only --ignore-watch node_modules src/server",
+    "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": " node dist/src/server.js",
     "bundle-admin": "node ./scripts/bundle-component.js"
@@ -22,6 +22,7 @@
     "aos": "^2.3.4",
     "bcrypt": "^5.0.1",
     "connect-session-sequelize": "^7.1.7",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "env-var": "^7.5.0",
@@ -35,6 +36,7 @@
     "@adminjs/bundler": "^3.0.0",
     "@types/aos": "^3.0.7",
     "@types/bcrypt": "^5.0.0",
+    "@types/cookie-parser": "^1.4.9",
     "@types/cors": "^2.8.17",
     "@types/express": "~4.17.13",
     "@types/express-session": "^1.18.1",
@@ -42,6 +44,7 @@
     "@types/node": "~17.0.10",
     "sequelize-cli": "~6.4.1",
     "ts-node-dev": "~1.1.8",
+    "tsx": "^4.20.4",
     "typescript": "^5.9.0-dev.20250529"
   }
 }

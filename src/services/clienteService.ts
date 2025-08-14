@@ -14,7 +14,7 @@ export const clienteService={
     limit: perPage,
     order: [['createdAt', 'ASC']],
   });
-
+  
   return {
     clientes: rows,
     page,

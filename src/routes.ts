@@ -7,13 +7,23 @@ import { productController } from './controllers/productController.js'
 import { pedidosProdutosController } from './controllers/pedidosProdutosController.js'
 import { pagamentoController } from './controllers/pagamentoController.js'
 import { authController } from './controllers/authController.js'
+
+
+
+import { OauthController } from './controllers/OauthController.js'
 import ensureAuth from './middlewares/auth.js'
+
 
 
 const router= express.Router()
 router.post('/api/auth/register',authController.register)
 router.post('/api/auth/login',authController.login)
 router.post("/api/auth/autoLogin",authController.autoLogin)
+
+router.get('/api/auth/instagram/callback',OauthController.facebookCallback)
+router.get('/api/auth/linkedin/callback/',OauthController.linkedInCallBack)
+router.get('/api/auth/google/callback',OauthController.googleAuthcallback)
+router.get('/api/auth/google',OauthController.googleLogin)
 
 router.get('/api/mesas',mesasController.index)
 router.post('/api/mesas',mesasController.save)

@@ -13,3 +13,4 @@ uploads/
 .adminjs
 dist/
 .env
+pages/
