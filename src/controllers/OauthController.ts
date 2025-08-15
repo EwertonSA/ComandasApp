@@ -29,7 +29,7 @@ export const OauthController={
 
 
   
-res.redirect('http://esadev.com.br/employeeApp')
+res.redirect('https://esadev.com.br/employeeApp')
   } catch (error) {
   console.error('Erro na autenticação:', error);
   return res.status(500).json({ message: 'Erro ao autenticar com Facebook' });
