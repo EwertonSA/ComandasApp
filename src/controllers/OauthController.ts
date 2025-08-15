@@ -23,7 +23,7 @@ export const OauthController={
   httpOnly: true,
   secure: true, // true só em produção (HTTPS)
   maxAge: 3600000,
-  sameSite: 'none',
+  sameSite: 'lax',
   path: '/',
 });
 
@@ -47,7 +47,7 @@ linkedInCallBack: async (req:Request, res:Response) => {
     req.session.linkedinState = newState;
 
     const redirectUri = encodeURIComponent(
-      "http://localhost:3001/api/auth/linkedin/callback/"
+      "https://esadev.com.br/api/auth/linkedin/callback/"
     );
 
     const linkedinUrl =
@@ -76,14 +76,14 @@ linkedInCallBack: async (req:Request, res:Response) => {
     // cookie com JWT
     res.cookie("token", jwt, {
       httpOnly: true,
-      secure: false,
+      secure: true,
       maxAge: 3600000,
       sameSite: "lax",
       path: "/",
     });
 
     // redireciona para app
-    res.redirect("http://localhost:3000/employeeApp");
+    res.redirect("https://esadev.com.br/employeeApp");
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Erro ao autenticar com LinkedIn" });
@@ -158,14 +158,14 @@ googleAuthcallback:async (req: Request, res: Response) => {
     // 4. Salvar cookie HTTP-only
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false, // true em produção com HTTPS
+      secure: true, // true em produção com HTTPS
       maxAge: 3600000,
       sameSite: "lax",
       path: "/",
     });
 
     // 5. Redirecionar para o app
-    res.redirect("http://localhost:3000/employeeApp");
+    res.redirect("https://esadev.com.br/employeeApp");
 
   } catch (err) {
     console.error("Erro no callback do Google:", err);
