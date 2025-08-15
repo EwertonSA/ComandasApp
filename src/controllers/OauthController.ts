@@ -18,7 +18,7 @@ export const OauthController={
     const { user, jwt } = await authenticateFacebookUser(code)
 
     // Define cookie HTTP-only (se quiser)
-  res.cookie('token', jwt, {
+  res.cookie('comandas-token', jwt, {
 
   httpOnly: true,
   secure: true, // true só em produção (HTTPS)
@@ -74,7 +74,7 @@ linkedInCallBack: async (req:Request, res:Response) => {
     const { user, jwt } = await authenticateLinkedinUser(code);
 
     // cookie com JWT
-    res.cookie("token", jwt, {
+    res.cookie("comandas-token", jwt, {
       httpOnly: true,
       secure: true,
       maxAge: 3600000,
@@ -156,7 +156,7 @@ googleAuthcallback:async (req: Request, res: Response) => {
     );
 
     // 4. Salvar cookie HTTP-only
-    res.cookie("token", token, {
+    res.cookie("comandas-token", token, {
       httpOnly: true,
       secure: true, // true em produção com HTTPS
       maxAge: 3600000,

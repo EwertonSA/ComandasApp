@@ -35,7 +35,6 @@ export async function authenticateFacebookUser(code: string) {
     const tokenData = await exchangeCodeForToken(code);
      console.log('Code recebido:', code);
     const fbUser = await getFacebookUser(tokenData.access_token);
- console.log('token recebido:', tokenData);
     let user = await userService.findByFacebookId(fbUser.id);
  console.log('fbuser recebido:', fbUser);
     if (!user) {
