@@ -9,6 +9,7 @@ import { JWT_KEY } from '../config/environment.js';
 export const OauthController={
   
   facebookCallback:async(req: Request, res: Response)=> {
+     console.log('Query recebida:', req.query);
   try {
     const code = req.query.code as string
     if (!code) {
