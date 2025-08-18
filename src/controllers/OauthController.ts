@@ -8,54 +8,41 @@ import { JWT_KEY } from '../config/environment.js';
 
 export const OauthController={
   
-facebookCallback: async (req:Request, res:Response) => {
+facebookCallback: async (req: Request, res: Response) => {
   try {
     console.log('Callback recebido!');
     console.log('req.query:', req.query);
 
-   const rawCode = req.query.code;
+    const rawCode = req.query.code;
+    let code: string;
 
-let code: string;
-
-if (typeof rawCode === 'string') {
-  code = rawCode;
-} else if (Array.isArray(rawCode) && rawCode.length > 0 && typeof rawCode[0] === 'string') {
-  code = rawCode[0];
-} else {
-  return res.status(400).json({ message: 'Código de autorização ausente ou inválido' });
-}
-
-console.log('Code extraído:', code);
-    if (!code) {
-      console.log('Nenhum code encontrado!');
-      return res.status(400).json({ message: 'Código de autorização ausente' });
+    if (typeof rawCode === 'string') {
+      code = rawCode;
+    } else if (Array.isArray(rawCode) && rawCode.length > 0 && typeof rawCode[0] === 'string') {
+      code = rawCode[0];
+    } else {
+      return res.status(400).json({ message: 'Código de autorização ausente ou inválido' });
     }
 
-    const tokenData = await exchangeCodeForToken(code);
-    console.log('Token recebido:', tokenData);
+    console.log('Code extraído:', code);
 
-    const fbUser = await getFacebookUser(tokenData.access_token);
-    console.log('fbUser:', fbUser);
-  const { user, jwt } = await authenticateFacebookUser(code)
+    const { user, jwt } = await authenticateFacebookUser(code);
 
-    // Define cookie HTTP-only (se quiser)
-  res.cookie('comandas-token', jwt, {
+    res.cookie('comandas-token', jwt, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 3600000,
+      sameSite: 'lax',
+      path: '/',
+    });
 
-  httpOnly: true,
-  secure: true, // true só em produção (HTTPS)
-  maxAge: 3600000,
-  sameSite: 'lax',
-  path: '/',
-});
-  res.status(200).json({ message: 'Callback funcionando', fbUser, tokenData });
-
- return res.redirect('https://esadev.com.br/employeeApp');
-  
+    return res.redirect('https://esadev.com.br/employeeApp');
   } catch (error) {
     console.error('Erro no callback do Facebook:', error);
-    res.status(500).json({ message: 'Erro ao autenticar com Facebook', error });
+    res.redirect('https://esadev.com.br/login?error=facebook');
   }
 },
+
 linkedInCallBack: async (req:Request, res:Response) => {
   function generateState(length = 16) {
   return crypto.randomBytes(length).toString("hex");
