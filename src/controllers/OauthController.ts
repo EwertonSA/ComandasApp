@@ -57,7 +57,7 @@ linkedInCallBack: async (req:Request, res:Response) => {
     const redirectUri = encodeURIComponent(
       "https://esadev.com.br/api/auth/linkedin/callback/"
     );
-console.log('uri:',redirectUri)
+
     const linkedinUrl =
       `https://www.linkedin.com/oauth/v2/authorization?` +
       `response_type=code` +

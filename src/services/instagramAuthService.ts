@@ -5,7 +5,7 @@ import qs from 'qs';
 const INSTAGRAM_CLIENT_ID = process.env.INSTAGRAM_CLIENT_ID!
 const INSTAGRAM_CLIENT_SECRET = process.env.INSTAGRAM_CLIENT_SECRET!
 const REDIRECT_URI = process.env.INSTAGRAM_REDIRECT_URI!
-
+console.log('uri',REDIRECT_URI)
 export async function exchangeCodeForToken(code: string) {
   const response = await axios.get('https://graph.facebook.com/v21.0/oauth/access_token', {
     params: {
