@@ -9,9 +9,9 @@ console.log('uri',REDIRECT_URI)
 export async function exchangeCodeForToken(code: string) {
   const response = await axios.get('https://graph.facebook.com/v21.0/oauth/access_token', {
     params: {
-      client_id: process.env.FACEBOOK_CLIENT_ID,
-      client_secret: process.env.FACEBOOK_CLIENT_SECRET,
-      redirect_uri: process.env.FACEBOOK_REDIRECT_URI,
+      client_id: INSTAGRAM_CLIENT_ID,
+      client_secret: INSTAGRAM_CLIENT_SECRET,
+      redirect_uri:REDIRECT_URI,
       code,
     },
   })

@@ -39,7 +39,7 @@ facebookCallback: async (req: Request, res: Response) => {
     return res.redirect('https://esadev.com.br/employeeApp');
   } catch (error) {
     console.error('Erro no callback do Facebook:', error);
-    res.redirect('https://esadev.com.br/login?error=facebook');
+    res.redirect('https://esadev.com.br/login/index');
   }
 },
 
