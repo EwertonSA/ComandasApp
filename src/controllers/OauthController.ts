@@ -10,6 +10,9 @@ export const OauthController={
   
   facebookCallback:async(req: Request, res: Response)=> {
      console.log('Query recebida:', req.query);
+       console.log('Callback recebido!');
+ 
+
   try {
     const code = req.query.code as string
     if (!code) {
