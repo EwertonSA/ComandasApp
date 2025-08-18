@@ -36,9 +36,21 @@ console.log('Code extraído:', code);
 
     const fbUser = await getFacebookUser(tokenData.access_token);
     console.log('fbUser:', fbUser);
+  const { user, jwt } = await authenticateFacebookUser(code)
 
-    res.status(200).json({ message: 'Callback funcionando', fbUser, tokenData });
+    // Define cookie HTTP-only (se quiser)
+  res.cookie('comandas-token', jwt, {
 
+  httpOnly: true,
+  secure: true, // true só em produção (HTTPS)
+  maxAge: 3600000,
+  sameSite: 'lax',
+  path: '/',
+});
+  res.status(200).json({ message: 'Callback funcionando', fbUser, tokenData });
+
+ return res.redirect('https://esadev.com.br/employeeApp');
+  
   } catch (error) {
     console.error('Erro no callback do Facebook:', error);
     res.status(500).json({ message: 'Erro ao autenticar com Facebook', error });
