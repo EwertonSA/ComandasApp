@@ -104,8 +104,10 @@ export const authController={
                      path: '/', 
                   }
                 )
+                  return res.status(200).json({ message: "Logout realizado com sucesso" });
               } catch (error) {
                 console.error("Erro ao realizar o logout")
+                 return res.status(500).json({ error: "Erro no logout" });
               }
             }
             
