@@ -93,6 +93,20 @@ export const authController={
                 console.error("Erro no login/cadastro:", error);
                 return res.status(500).json({ message: 'Erro interno do servidor' });
               }
+            },
+            logout:async(req:Request,res:Response)=>{
+              try {
+                res.clearCookie(
+                  'comandas-token',{
+                     httpOnly: true,
+                     secure: true,
+                     sameSite: 'lax', 
+                     path: '/', 
+                  }
+                )
+              } catch (error) {
+                console.error("Erro ao realizar o logout")
+              }
             }
             
       

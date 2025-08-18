@@ -19,6 +19,7 @@ const router= express.Router()
 router.post('/api/auth/register',authController.register)
 router.post('/api/auth/login',authController.login)
 router.post("/api/auth/autoLogin",authController.autoLogin)
+router.post('/api/auth/logout',authController.logout)
 
 router.get('/api/auth/instagram/callback',OauthController.facebookCallback)
 router.get('/api/auth/linkedin/callback/',OauthController.linkedInCallBack)
