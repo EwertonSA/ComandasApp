@@ -4,7 +4,6 @@ import { authenticateLinkedinUser, generateState } from '../services/linkedInAut
 import crypto from 'crypto'
 import axios from 'axios'
 import { jwtService } from '../services/jwtService.js';
-import { JWT_KEY } from '../config/environment.js';
 
 export const OauthController={
   
@@ -38,7 +37,7 @@ facebookCallback: async (req: Request, res: Response) => {
     return res.redirect('https://esadev.com.br/employeeApp');
   } catch (error) {
     console.log('Err:',error)
-    console.error('Erro no callback do Facebook:', error);
+    console.error('Erro detalhado:', JSON.stringify(error, null, 2));
     res.redirect('https://esadev.com.br/login/index');
   }
 },
