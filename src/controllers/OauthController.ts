@@ -4,6 +4,7 @@ import { authenticateLinkedinUser, generateState } from '../services/linkedInAut
 import crypto from 'crypto'
 import axios from 'axios'
 import { jwtService } from '../services/jwtService.js';
+import { UserModel } from '../models/User.js';
 
 export const OauthController={
   
@@ -113,7 +114,77 @@ googleLogin: async (req: Request, res: Response) => {
   res.redirect(googleUrl); // redireciona para login do Google
 }
 ,
-googleAuthcallback:async (req: Request, res: Response) => {
+googleAuthcallback: async (req: Request, res: Response) => {
+  const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
+  const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
+  const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI!;
+
+  const { code } = req.query;
+  if (!code) return res.status(400).send("Código de autorização ausente");
+
+  try {
+    // 1. Troca o code por access token
+    const tokenRes = await axios.post(
+      "https://oauth2.googleapis.com/token",
+      new URLSearchParams({
+        code: code as string,
+        client_id: CLIENT_ID,
+        client_secret: CLIENT_SECRET,
+        redirect_uri: REDIRECT_URI,
+        grant_type: "authorization_code",
+      }).toString(),
+      { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+    );
+
+    const { access_token } = tokenRes.data;
+
+    // 2. Buscar dados do usuário no Google
+    const userInfoRes = await axios.get("https://www.googleapis.com/oauth2/v2/userinfo", {
+      headers: { Authorization: `Bearer ${access_token}` },
+    });
+    const googleUser = userInfoRes.data;
+
+    // 3. Buscar usuário no banco
+    let user = await UserModel.findOne({ where: { email: googleUser.email } });
+    if (!user) {
+      user = await UserModel.create({
+        email: googleUser.email,
+        name: googleUser.name,
+    password: "", // placeholder
+    role: "user", // ou qualquer role válida
+      });
+    }
+
+    // 4. Checar se user tem 2FA habilitado
+    if (user.two_factor_secret) {
+      // retorna flag pro front exigir código 2FA
+      return res.redirect(
+        `https://esadev.com.br/login/2fa?userId=${user.id}&provider=google`
+      );
+    }
+
+    // 5. Se não precisa de 2FA → gera JWT direto
+    const token = jwtService.signToken(
+      { id: user.id, email: user.email },
+      "1h"
+    );
+
+    res.cookie("comandas-token", token, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 3600000,
+      sameSite: "lax",
+      path: "/",
+    });
+
+    return res.redirect("https://esadev.com.br/employeeApp");
+  } catch (err) {
+    console.error("Erro no callback do Google:", err);
+    res.status(500).send("Erro ao autenticar com Google");
+  }
+},
+
+googleAuthcall:async (req: Request, res: Response) => {
   const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
   const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
   const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI!;

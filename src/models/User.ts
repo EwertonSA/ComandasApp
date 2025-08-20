@@ -11,7 +11,9 @@ export interface User {
   password: string;
   role: "user" | "cliente";
   instagramId?:string
-  linkedinId?:string
+  linkedinId?:string,
+  two_factor_enabled?:boolean,
+  two_factor_secret?:string
 }
 
 // Tipo para criação de usuário (sem o 'id')
@@ -73,6 +75,15 @@ export const UserModel = sequelize.define<UserInstance, User>(
       allowNull:true,
       type:DataTypes.STRING,
       field:'linkedinId'
+    },
+    two_factor_enabled:{
+      type:DataTypes.BOOLEAN,
+      allowNull:true,
+      defaultValue:false
+    },
+    two_factor_secret:{
+      type:DataTypes.STRING,
+      allowNull:true
     }
   },
   {

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { getPaginationParams } from "../helpers/getPaginationParams.js";
 import { clienteService } from "../services/clienteService.js";
+import { userService } from "../services/userService.js";
 
 export const clientesController={
         index1:async(req:Request,res:Response)=>{
@@ -25,6 +26,17 @@ export const clientesController={
             if(error instanceof Error){
                 return res.status(400).json({message:error.message})
             }
+        }
+    },
+    showUser:async(req:Request,res:Response)=>{
+        const {id}=req.params
+        try {
+            const user=await userService.findByEmail(id)
+            return res.json(user)
+        } catch (error) {
+           if(error instanceof Error){
+            return res.status(400).json({message:error.message})
+        }  
         }
     },
     show:async(req:Request,res:Response)=>{

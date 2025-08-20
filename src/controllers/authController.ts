@@ -1,6 +1,7 @@
 import { Request, Response } from "express"
 import { userService } from "../services/userService.js"
 import { jwtService } from "../services/jwtService.js"
+import { UserModel } from "../models/User.js";
 
 export const authController={
     register: async (req: Request, res: Response) => {
@@ -36,26 +37,59 @@ export const authController={
         }
       },
       
-    login:async(req:Request,res:Response)=>{
-        const{email,password}=req.body
-        try {
-        const user= await userService.findByEmail(email)
-        if(!user) return res.status(404).json({message:'E-mail não registrado'})
-        user.checkPassword(password,(err,isSame)=>{
-        if(err) return res.status(400).json({message:err.message})
-        if(!isSame)return res.status(401).json({message:"Senha incorreta!"})
-        const payload={
-                   id:user.id,email:user.email     
-                }
-                const token= jwtService.signToken(payload,'7d')
-                return res.json({authenticated:true,...payload,token})
-                })
-                } catch (error) {
-                    if(error instanceof Error){
-                        return res.status(400).json({message:error.message})
-                    }
-                }
-            },
+  login: async (req: Request, res: Response) => {
+  const { email, password } = req.body;
+  const user = await userService.findByEmail(email);
+  if (!user) return res.status(404).json({ message: "E-mail não registrado" });
+
+  user.checkPassword(password, async (err, isSame) => {
+    if (err) return res.status(400).json({ message: err.message });
+    if (!isSame) return res.status(401).json({ message: "Senha incorreta!" });
+
+    if (!user.two_factor_enabled) {
+      const { qrCodeDataURL } = await userService.setup2fa(user.id.toString());
+      return res.json({ twoFARequired: true, qrCodeDataURL, userId: user.id });
+    }
+
+    return res.json({ twoFARequired: true, message: "Informe o código do Authenticator", userId: user.id });
+  });
+},
+
+// verify 2FA
+verify2FA: async (req: Request, res: Response) => {
+  const { token, userId } = req.body;
+
+  try {
+    // 1. Verifica o 2FA
+    const isValid = await userService.verify2fa(token, userId.toString());
+    if (!isValid) {
+      return res.status(401).json({ message: "Código 2FA inválido" });
+    }
+
+    // 2. Busca usuário
+    const user = await UserModel.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ message: "Usuário não encontrado" });
+    }
+
+    // 3. Gera JWT apenas após 2FA válido
+    const jwt = jwtService.signToken(
+      { id: user.id, email: user.email },
+      "7d"
+    );
+
+    return res.json({
+      authenticated: true,
+      token: jwt,
+      user: { id: user.id, email: user.email } // opcional
+    });
+
+  } catch (err: any) {
+    return res.status(500).json({ message: err.message });
+  }
+},
+
+
           autoLogin: async (req: Request, res: Response) => {
               const { email} = req.body;
             const password='123456'
