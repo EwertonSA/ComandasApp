@@ -155,22 +155,16 @@ googleAuthcallback: async (req: Request, res: Response) => {
       });
     }
 
-   if (user.two_factor_secret) {
-  // usuário já tem 2FA configurado → front só mostra input para digitar token
-  return res.json({
-    twoFARequired: true,
-    userId: user.id,
-    provider: "google"
-  });
-} else {
-  // usuário ainda não tem 2FA → front mostra QR + input do token
-  return res.json({
-    twoFARequired: true,
-    userId: user.id,
-    provider: "google",
-    requireSetup: true
-  });
-
+    // 4. Checar se user tem 2FA habilitado
+    if (user.two_factor_secret) {
+      // retorna flag pro front exigir código 2FA
+      return res.redirect(
+        `https://esadev.com.br/login/2fa?userId=${user.id}&provider=google`
+      );
+    }else{
+      return res.redirect(
+    `https://esadev.com.br/login/setup-2fa?userId=${user.id}&provider=google`
+  );
     }
   } catch (err) {
     console.error("Erro no callback do Google:", err);
