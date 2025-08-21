@@ -160,20 +160,17 @@ res.redirect(`https://esadev.com.br/login/user/${user.id}`);
   }
 },
 googleVerify2fa:async(req:Request,res:Response)=>{
-  const { userId, token } = req.body;
+ const { userId } = req.query;
+  if (!userId) return res.status(400).json({ message: "userId ausente" });
+
   try {
-    await userService.verify2fa(token, userId.toString());
-
-    const user = await UserModel.findByPk(userId);
-    if (!user) return res.status(404).json({ message: "Usuário não encontrado" });
-
-    const jwt = jwtService.signToken({ id: user.id, email: user.email }, "7d");
-
-    return res.json({ authenticated: true, token: jwt, user: { id: user.id, email: user.email } });
+    const qrCodeData = await userService.get2faQRCode(userId as string);
+    return res.json(qrCodeData);
   } catch (err: any) {
-    return res.status(400).json({ message: err.message });
+    console.error(err);
+    return res.status(500).json({ message: err.message });
   }
-},
+  },
 googleAuthcall:async (req: Request, res: Response) => {
   const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
   const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;

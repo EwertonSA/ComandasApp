@@ -88,6 +88,23 @@ if (!secret.otpauth_url) {
 
     return true; // retorna algo para indicar sucesso
   }
+,
+async get2faQRCode(userId: string) {
+    const user = await UserModel.findByPk(userId);
+    if (!user) throw new Error("Usuário não encontrado");
 
+    let secret = user.two_factor_secret;
+
+    if (!secret) {
+      secret = speakeasy.generateSecret({ length: 20 }).base32;
+      user.two_factor_secret = secret;
+      await user.save();
+    }
+
+    const otpauth = `otpauth://totp/MeuApp:${user.email}?secret=${secret}&issuer=MeuApp`;
+    const qrCodeDataURL = await qrcode.toDataURL(otpauth);
+
+    return { qrCodeDataURL };
+  }
 
 }
