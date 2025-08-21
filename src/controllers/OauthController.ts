@@ -161,21 +161,11 @@ googleAuthcallback: async (req: Request, res: Response) => {
       return res.redirect(
         `https://esadev.com.br/login/2fa?userId=${user.id}&provider=google`
       );
+    }else{
+      return res.redirect(
+    `https://esadev.com.br/login/setup-2fa?userId=${user.id}&provider=google`
+  );
     }
-
-    // 5. Se não precisa de 2FA → gera JWT direto
-    const token = jwtService.signToken(
-      { id: user.id, email: user.email },
-      "1h"
-    );
-
-    res.cookie("comandas-token", token, {
-      httpOnly: true,
-      secure: true,
-      maxAge: 3600000,
-      sameSite: "lax",
-      path: "/",
-    });
 
     return res.redirect("https://esadev.com.br/employeeApp");
   } catch (err) {
