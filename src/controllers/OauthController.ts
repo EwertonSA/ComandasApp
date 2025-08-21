@@ -151,8 +151,8 @@ googleAuthcallback: async (req: Request, res: Response) => {
       });
     }
 
-    const mode = user.two_factor_secret ? "verify" : "setup";
-    res.redirect(`https://esadev.com.br/login/2fa-oauth?userId=${user.id}&mode=${mode}`);
+  const mode = user.two_factor_secret ? "verify" : "setup";
+res.redirect(`https://esadev.com.br/app/login/user/2fa-oauth?userId=${user.id}&mode=${mode}`);
 
   } catch (err) {
     console.error("Erro no callback do Google:", err);
