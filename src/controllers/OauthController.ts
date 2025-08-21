@@ -166,8 +166,6 @@ googleAuthcallback: async (req: Request, res: Response) => {
     `https://esadev.com.br/login/setup-2fa?userId=${user.id}&provider=google`
   );
     }
-
-    return res.redirect("https://esadev.com.br/employeeApp");
   } catch (err) {
     console.error("Erro no callback do Google:", err);
     res.status(500).send("Erro ao autenticar com Google");
