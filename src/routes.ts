@@ -26,6 +26,7 @@ router.get('/api/auth/instagram/callback',OauthController.facebookCallback)
 router.get('/api/auth/linkedin/callback/',OauthController.linkedInCallBack)
 router.get('/api/auth/google/callback',OauthController.googleAuthcallback)
 router.get('/api/auth/google',OauthController.googleLogin)
+router.get("/api/auth/verify-2fa/setup",OauthController.googleVerify2fa)
 
 router.get('/api/mesas',mesasController.index)
 router.post('/api/mesas',mesasController.save)

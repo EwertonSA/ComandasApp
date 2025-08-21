@@ -5,6 +5,7 @@ import crypto from 'crypto'
 import axios from 'axios'
 import { jwtService } from '../services/jwtService.js';
 import { UserModel } from '../models/User.js';
+import { userService } from '../services/userService.js';
 
 export const OauthController={
   
@@ -115,22 +116,18 @@ googleLogin: async (req: Request, res: Response) => {
 }
 ,
 googleAuthcallback: async (req: Request, res: Response) => {
-  const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
-  const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
-  const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI!;
-
   const { code } = req.query;
   if (!code) return res.status(400).send("Código de autorização ausente");
 
   try {
-    // Troca o code por access token
+    // Troca code por access_token
     const tokenRes = await axios.post(
       "https://oauth2.googleapis.com/token",
       new URLSearchParams({
         code: code as string,
-        client_id: CLIENT_ID,
-        client_secret: CLIENT_SECRET,
-        redirect_uri: REDIRECT_URI,
+        client_id: process.env.GOOGLE_CLIENT_ID!,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+        redirect_uri: process.env.GOOGLE_REDIRECT_URI!,
         grant_type: "authorization_code",
       }).toString(),
       { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
@@ -138,34 +135,45 @@ googleAuthcallback: async (req: Request, res: Response) => {
 
     const { access_token } = tokenRes.data;
 
-    // Busca dados do usuário
-    const userInfoRes = await axios.get("https://www.googleapis.com/oauth2/v2/userinfo", {
-      headers: { Authorization: `Bearer ${access_token}` },
-    });
-
+    const userInfoRes = await axios.get(
+      "https://www.googleapis.com/oauth2/v2/userinfo",
+      { headers: { Authorization: `Bearer ${access_token}` } }
+    );
     const googleUser = userInfoRes.data;
 
-    // Buscar ou criar usuário
     let user = await UserModel.findOne({ where: { email: googleUser.email } });
     if (!user) {
       user = await UserModel.create({
         email: googleUser.email,
         name: googleUser.name,
-        password: "", // placeholder
+        password: "",
         role: "user",
       });
     }
 
-
-    return res.redirect(`https://esadev.com.br/login/user`);
+    const mode = user.two_factor_secret ? "verify" : "setup";
+    res.redirect(`https://esadev.com.br/login/2fa-oauth?userId=${user.id}&mode=${mode}`);
 
   } catch (err) {
     console.error("Erro no callback do Google:", err);
     return res.status(500).send("Erro ao autenticar com Google");
   }
 },
+googleVerify2fa:async(req:Request,res:Response)=>{
+  const { userId, token } = req.body;
+  try {
+    await userService.verify2fa(token, userId.toString());
 
+    const user = await UserModel.findByPk(userId);
+    if (!user) return res.status(404).json({ message: "Usuário não encontrado" });
 
+    const jwt = jwtService.signToken({ id: user.id, email: user.email }, "7d");
+
+    return res.json({ authenticated: true, token: jwt, user: { id: user.id, email: user.email } });
+  } catch (err: any) {
+    return res.status(400).json({ message: err.message });
+  }
+},
 googleAuthcall:async (req: Request, res: Response) => {
   const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
   const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
