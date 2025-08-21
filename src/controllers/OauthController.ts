@@ -154,24 +154,27 @@ googleAuthcallback:async (req: Request, res: Response) => {
     const googleUser = userInfoRes.data; // { id, email, name, picture }
 
     // 3. Criar JWT válido
-   if (googleUser.two_factor_secret) {
-  // Já tem 2FA → front pede código
-  return res.json({
-    twoFARequired: true,
-    userId: googleUser.id,
-    provider: "google"
-  });
-} else {
-  // Ainda não configurou 2FA → front mostra QR + input
-  return res.json({
-    twoFARequired: true,
-    userId: googleUser.id,
-    provider: "google",
-    requireSetup: true
-  });
-}
+    const token = jwtService.signToken(
+      {
+        id: googleUser.id,
+        email: googleUser.email,
+        name: googleUser.name,
+        picture: googleUser.picture,
+      },
+      '1h'
+    );
 
+    // 4. Salvar cookie HTTP-only
+    res.cookie("comandas-token", token, {
+      httpOnly: true,
+      secure: true, // true em produção com HTTPS
+      maxAge: 3600000,
+      sameSite: "lax",
+      path: "/",
+    });
 
+    // 5. Redirecionar para o app
+    res.redirect("https://esadev.com.br/employeeApp");
 
   } catch (err) {
     console.error("Erro no callback do Google:", err);
