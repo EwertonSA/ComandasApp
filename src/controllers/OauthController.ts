@@ -156,14 +156,8 @@ googleAuthcallback: async (req: Request, res: Response) => {
       });
     }
 
-    // Redireciona para a página de login, persistindo info de 2FA
-    const query = new URLSearchParams({
-      userId: user.id.toString(),
-      provider: "google",
-      requireSetup: (!user.two_factor_secret).toString(),
-    }).toString();
 
-    return res.redirect(`https://esadev.com.br/login?${query}`);
+    return res.redirect(`https://esadev.com.br/login/user`);
 
   } catch (err) {
     console.error("Erro no callback do Google:", err);
