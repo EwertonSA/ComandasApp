@@ -114,8 +114,65 @@ googleLogin: async (req: Request, res: Response) => {
   res.redirect(googleUrl); // redireciona para login do Google
 }
 ,
+googleAuthcallback: async (req: Request, res: Response) => {
+  const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
+  const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
+  const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI!;
 
-googleAuthcallback:async (req: Request, res: Response) => {
+  const { code } = req.query;
+  if (!code) return res.status(400).send("Código de autorização ausente");
+
+  try {
+    // Troca o code por access token
+    const tokenRes = await axios.post(
+      "https://oauth2.googleapis.com/token",
+      new URLSearchParams({
+        code: code as string,
+        client_id: CLIENT_ID,
+        client_secret: CLIENT_SECRET,
+        redirect_uri: REDIRECT_URI,
+        grant_type: "authorization_code",
+      }).toString(),
+      { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+    );
+
+    const { access_token } = tokenRes.data;
+
+    // Busca dados do usuário
+    const userInfoRes = await axios.get("https://www.googleapis.com/oauth2/v2/userinfo", {
+      headers: { Authorization: `Bearer ${access_token}` },
+    });
+
+    const googleUser = userInfoRes.data;
+
+    // Buscar ou criar usuário
+    let user = await UserModel.findOne({ where: { email: googleUser.email } });
+    if (!user) {
+      user = await UserModel.create({
+        email: googleUser.email,
+        name: googleUser.name,
+        password: "", // placeholder
+        role: "user",
+      });
+    }
+
+    // Redireciona para a página de login, persistindo info de 2FA
+    const query = new URLSearchParams({
+      userId: user.id.toString(),
+      provider: "google",
+      requireSetup: (!user.two_factor_secret).toString(),
+    }).toString();
+
+    return res.redirect(`https://esadev.com.br/login?${query}`);
+
+  } catch (err) {
+    console.error("Erro no callback do Google:", err);
+    return res.status(500).send("Erro ao autenticar com Google");
+  }
+},
+
+
+googleAuthcall:async (req: Request, res: Response) => {
   const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
   const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
   const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI!;
