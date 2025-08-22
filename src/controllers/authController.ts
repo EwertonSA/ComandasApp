@@ -39,8 +39,8 @@ export const authController={
       },
       
   login: async (req: Request, res: Response) => {
-     const { email, password,reCaptchaToken } = req.body;
-      const recaptchaResult = await validateRecaptcha(reCaptchaToken);
+     const { email, password,recaptchaToken } = req.body;
+      const recaptchaResult = await validateRecaptcha(recaptchaToken);
   if (!recaptchaResult.success) {
     return res.status(400).json({ message: "Falha na verificação do reCAPTCHA" });
   }
