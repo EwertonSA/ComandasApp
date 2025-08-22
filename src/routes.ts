@@ -19,6 +19,7 @@ const router= express.Router()
 router.post('/api/auth/register',authController.register)
 router.post('/api/auth/login',authController.login)
 router.post('/api/auth/verify',authController.verify2FA)
+router.post('/api/auth/reset2fa',authController.reset2fa)
 router.post("/api/auth/autoLogin",authController.autoLogin)
 router.post('/api/auth/logout',authController.logout)
 

@@ -94,7 +94,11 @@ verify2FA: async (req: Request, res: Response) => {
     return res.status(500).json({ message: err.message });
   }
 },
-
+reset2fa:async(req:Request,res:Response)=>{
+const {userId}=req.body
+const { qrCodeDataURL } = await userService.setup2fa(userId.toString());
+return res.json({ qrCodeDataURL, message: "Novo QR gerado" });
+},
 
           autoLogin: async (req: Request, res: Response) => {
               const { email} = req.body;
