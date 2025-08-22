@@ -2,6 +2,7 @@ import { Request, Response } from "express"
 import { userService } from "../services/userService.js"
 import { jwtService } from "../services/jwtService.js"
 import { UserModel } from "../models/User.js";
+import validateRecaptcha from "../services/recaptcha.js";
 
 export const authController={
     register: async (req: Request, res: Response) => {
@@ -38,7 +39,12 @@ export const authController={
       },
       
   login: async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+     const { email, password,token } = req.body;
+      const recaptchaResult = await validateRecaptcha(token);
+  if (!recaptchaResult.success) {
+    return res.status(400).json({ message: "Falha na verificação do reCAPTCHA" });
+  }
+ 
   const user = await userService.findByEmail(email);
   if (!user) return res.status(404).json({ message: "E-mail não registrado" });
 

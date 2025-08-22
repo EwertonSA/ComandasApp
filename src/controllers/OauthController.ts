@@ -171,70 +171,17 @@ googleVerify2fa:async(req:Request,res:Response)=>{
     return res.status(500).json({ message: err.message });
   }
   },
-googleAuthcall:async (req: Request, res: Response) => {
-  const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
-  const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
-  const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI!;
-  const JWT_KEY = process.env.JWT_KEY!;
+validateRecaptcha:async(token: string)=> {
+  const secret = process.env.RECAPTCHA_SECRET;
 
-  const { code } = req.query;
+  const res = await axios.post(
+    "https://www.google.com/recaptcha/api/siteverify",
+    new URLSearchParams({ 
+      secret:process.env.RECAPTCHA_SECRET as string,
+      response: token,
+    })
+  );
 
-  if (!code) {
-    return res.status(400).send("Código de autorização ausente");
-  }
-
-  try {
-    // 1. Trocar o code por access token
-    const tokenRes = await axios.post(
-      "https://oauth2.googleapis.com/token",
-      new URLSearchParams({
-        code: code as string,
-        client_id: CLIENT_ID,
-        client_secret: CLIENT_SECRET,
-        redirect_uri: REDIRECT_URI,
-        grant_type: "authorization_code",
-      }).toString(),
-      { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
-    );
-
-    const { access_token } = tokenRes.data;
-
-    // 2. Buscar dados do usuário
-    const userInfoRes = await axios.get(
-      "https://www.googleapis.com/oauth2/v2/userinfo",
-      {
-        headers: { Authorization: `Bearer ${access_token}` },
-      }
-    );
-
-    const googleUser = userInfoRes.data; // { id, email, name, picture }
-
-    // 3. Criar JWT válido
-    const token = jwtService.signToken(
-      {
-        id: googleUser.id,
-        email: googleUser.email,
-        name: googleUser.name,
-        picture: googleUser.picture,
-      },
-      '1h'
-    );
-
-    // 4. Salvar cookie HTTP-only
-    res.cookie("comandas-token", token, {
-      httpOnly: true,
-      secure: true, // true em produção com HTTPS
-      maxAge: 3600000,
-      sameSite: "lax",
-      path: "/",
-    });
-
-    // 5. Redirecionar para o app
-    res.redirect("https://esadev.com.br/employeeApp");
-
-  } catch (err) {
-    console.error("Erro no callback do Google:", err);
-    res.status(500).send("Erro ao autenticar com Google");
-  }
+  return res.data;
 }
 }
