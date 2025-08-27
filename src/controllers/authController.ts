@@ -96,7 +96,7 @@ verify2FA: async (req: Request, res: Response) => {
 },
 reset2fa:async(req:Request,res:Response)=>{
 const {userId}=req.body
-const { qrCodeDataURL } = await userService.setup2fa(userId.toString());
+const { qrCodeDataURL } = await userService.reset2fa(userId.toString());
 return res.json({ qrCodeDataURL, message: "Novo QR gerado" });
 },
 

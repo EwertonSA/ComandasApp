@@ -89,7 +89,30 @@ if (!secret.otpauth_url) {
     return true; // retorna algo para indicar sucesso
   }
 ,
-async get2faQRCode(userId: string) {
+reset2fa: async (id: string) => {
+  const user = await UserModel.findByPk(id);
+  if (!user) throw new Error("Usuário não encontrado");
+
+  // 🔹 Diferente do setup2fa, aqui a gente não bloqueia mesmo que já tenha 2FA
+  const secret = speakeasy.generateSecret({
+    name: `MeuPainelAdmin (${user.email})`
+  });
+
+  await UserModel.update(
+    { two_factor_secret: secret.base32, two_factor_enabled: false }, // força reset
+    { where: { id: user.id } }
+  );
+
+  if (!secret.otpauth_url) {
+    throw new Error("Falha ao gerar a URL do Authenticator");
+  }
+
+  const qrCodeDataURL = await qrcode.toDataURL(secret.otpauth_url);
+
+  return { qrCodeDataURL, secret: secret.base32 };
+}
+,
+get2faQRCode:async(userId: string) =>{
     const user = await UserModel.findByPk(userId);
     if (!user) throw new Error("Usuário não encontrado");
 
