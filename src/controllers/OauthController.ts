@@ -58,7 +58,7 @@ const stateJwt=jwtService.signTokenLinkedin({state:newState},'5m')
       `response_type=code` +
       `&client_id=${process.env.LINKEDIN_CLIENT_ID}` +
       `&redirect_uri=${redirectUri}` +
-      `&scope=r_liteprofile%20r_emailaddress` +
+      `&scope=openid%20profile%20email` +
       `&state=${encodeURIComponent(stateJwt)}` +
       `&prompt=consent%20login`; // força consent + login
 
