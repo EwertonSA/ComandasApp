@@ -89,7 +89,10 @@ linkedinCallback: async (req: Request, res: Response) => {
     const { access_token, id_token } = tokenRes.data;
 
     // 🔹 Decodifica ID Token para pegar informações do usuário
-    const decodedId = jwtService.verifyTokenLinkedin<{ email: string; name: string }>(id_token);
+ const decodedId = jwtService.verifyTokenLinkedin<{
+      email: string;
+      name: string;
+    }>(id_token);
 
     let user = await UserModel.findOne({ where: { email: decodedId.email } });
     if (!user) {
@@ -112,7 +115,8 @@ linkedinCallback: async (req: Request, res: Response) => {
       path: "/",
     });
 
-    res.redirect("https://esadev.com.br/employeeApp");
+const mode = user.two_factor_secret ? "verify" : "setup";
+res.redirect(`https://esadev.com.br/login/user/${user.id}?mode=${mode}`);
   } catch (err) {
     console.error("Erro no callback do LinkedIn:", err);
     return res.status(403).send("State inválido, expirado ou erro no LinkedIn");
