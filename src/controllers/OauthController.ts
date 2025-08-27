@@ -50,16 +50,16 @@ linkedinRedirect:async(req:Request,res:Response)=>{
 const newState=randomBytes(16).toString('hex')
 const stateJwt=jwtService.signTokenLinkedin({state:newState},'5m')
 
-  const redirectUri = encodeURIComponent(
+  const redirectUri = 
       "https://esadev.com.br/api/auth/linkedin/callback/"
-    );
+    
         const linkedinUrl =
       `https://www.linkedin.com/oauth/v2/authorization?` +
       `response_type=code` +
       `&client_id=${process.env.LINKEDIN_CLIENT_ID}` +
       `&redirect_uri=${redirectUri}` +
       `&scope=openid%20profile%20email` +
-      `&state=${encodeURIComponent(stateJwt)}` +
+      `&state=${stateJwt}` +
       `&prompt=consent%20login`; // força consent + login
 
     return res.redirect(linkedinUrl);
