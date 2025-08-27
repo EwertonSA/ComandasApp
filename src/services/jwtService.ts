@@ -11,5 +11,19 @@ export const jwtService={
       verifyToken:(token:string,callbackfn:jwt.VerifyCallback)=>{
         jwt.verify(token,secret,callbackfn)
         console.log('Token gerado:', token);
-      }
-}
+      },
+        signTokenLinkedin: (
+    payload: string | object | Buffer,
+    expiration: string
+  ): string => {
+    return jwt.sign(payload, secret, { expiresIn: expiration } as SignOptions);
+  },
+
+  // 🔹 verifica token e retorna payload
+  verifyTokenLinkedin: <T = any>(token: string): T => {
+    try {
+      return jwt.verify(token, secret) as T;
+    } catch (error) {
+      throw new Error("Token inválido ou expirado");
+    }
+}}

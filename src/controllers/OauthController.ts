@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { authenticateFacebookUser, exchangeCodeForToken, getFacebookUser } from '../services/instagramAuthService.js';
 import { authenticateLinkedinUser, generateState } from '../services/linkedInAuthService.js';
-import crypto from 'crypto'
+import crypto, { randomBytes } from 'crypto'
 import axios from 'axios'
 import { jwtService } from '../services/jwtService.js';
 import { UserModel } from '../models/User.js';
@@ -42,6 +42,50 @@ facebookCallback: async (req: Request, res: Response) => {
     console.error('Erro detalhado:', JSON.stringify(error, null, 2));
     res.redirect('https://esadev.com.br/login/index');
   }
+},
+
+
+
+linkedinRedirect:async(req:Request,res:Response)=>{
+const newState=randomBytes(16).toString('hex')
+const stateJwt=jwtService.signTokenLinkedin({state:newState},'5m')
+
+  const redirectUri = encodeURIComponent(
+      "https://esadev.com.br/api/auth/linkedin/callback/"
+    );
+        const linkedinUrl =
+      `https://www.linkedin.com/oauth/v2/authorization?` +
+      `response_type=code` +
+      `&client_id=${process.env.LINKEDIN_CLIENT_ID}` +
+      `&redirect_uri=${redirectUri}` +
+      `&scope=r_liteprofile%20r_emailaddress` +
+      `&state=${encodeURIComponent(stateJwt)}` +
+      `&prompt=consent%20login`; // força consent + login
+
+    return res.redirect(linkedinUrl);
+},
+linkedinCallback:async(req:Request,res:Response)=>{
+
+  const {code,state}=req.query as {code:string,state:string}
+if(!code || !state ) return res.status(400).send("Código state ausente")
+  try {
+    const decoded=jwtService.verifyTokenLinkedin(state) as {state:string}
+       const { user, jwt: userJwt } = await authenticateLinkedinUser(code);
+        res.cookie("comandas-token", userJwt, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 3600000,
+      sameSite: "lax",
+      path: "/",
+    });
+
+    res.redirect("https://esadev.com.br/employeeApp");
+  } catch (err) {
+    console.error("Erro no callback do LinkedIn:", err);
+    return res.status(403).send("State inválido ou expirado");
+  }
+
+
 },
 
 linkedInCallBack: async (req:Request, res:Response) => {
