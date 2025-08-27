@@ -64,14 +64,47 @@ const stateJwt=jwtService.signTokenLinkedin({state:newState},'5m')
 
     return res.redirect(linkedinUrl);
 },
-linkedinCallback:async(req:Request,res:Response)=>{
+linkedinCallback: async (req: Request, res: Response) => {
+  const { code, state } = req.query as { code: string; state: string };
+  if (!code || !state) return res.status(400).send("Código ou state ausente");
 
-  const {code,state}=req.query as {code:string,state:string}
-if(!code || !state ) return res.status(400).send("Código state ausente")
   try {
-    const decoded=jwtService.verifyTokenLinkedin(state) as {state:string}
-       const { user, jwt: userJwt } = await authenticateLinkedinUser(code);
-        res.cookie("comandas-token", userJwt, {
+    // 🔹 Verifica state JWT
+    const decoded = jwtService.verifyTokenLinkedin<{ state: string }>(state);
+    const rawState = decoded.state;
+
+    // 🔹 Troca code por tokens (access_token + id_token)
+    const tokenRes = await axios.post(
+      "https://www.linkedin.com/oauth/v2/accessToken",
+      new URLSearchParams({
+        grant_type: "authorization_code",
+        code,
+        redirect_uri: "https://esadev.com.br/api/auth/linkedin/callback/",
+        client_id: process.env.LINKEDIN_CLIENT_ID!,
+        client_secret: process.env.LINKEDIN_CLIENT_SECRET!,
+      }),
+      { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+    );
+
+    const { access_token, id_token } = tokenRes.data;
+
+    // 🔹 Decodifica ID Token para pegar informações do usuário
+    const decodedId = jwtService.verifyTokenLinkedin<{ email: string; name: string }>(id_token);
+
+    let user = await UserModel.findOne({ where: { email: decodedId.email } });
+    if (!user) {
+      user = await UserModel.create({
+        email: decodedId.email,
+        name: decodedId.name,
+        password: "",
+        role: "user",
+      });
+    }
+
+    // 🔹 Gera seu JWT para app
+    const userJwt = jwtService.signToken({ id: user.id, email: user.email }, '1h');
+
+    res.cookie("comandas-token", userJwt, {
       httpOnly: true,
       secure: true,
       maxAge: 3600000,
@@ -82,11 +115,10 @@ if(!code || !state ) return res.status(400).send("Código state ausente")
     res.redirect("https://esadev.com.br/employeeApp");
   } catch (err) {
     console.error("Erro no callback do LinkedIn:", err);
-    return res.status(403).send("State inválido ou expirado");
+    return res.status(403).send("State inválido, expirado ou erro no LinkedIn");
   }
-
-
 },
+
 
 linkedInCallBack: async (req:Request, res:Response) => {
   function generateState(length = 16) {
