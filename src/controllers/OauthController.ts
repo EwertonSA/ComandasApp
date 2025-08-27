@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import { Request, Response, urlencoded } from 'express'
 import { authenticateFacebookUser, exchangeCodeForToken, getFacebookUser } from '../services/instagramAuthService.js';
 import { authenticateLinkedinUser, generateState } from '../services/linkedInAuthService.js';
 import crypto, { randomBytes } from 'crypto'
@@ -57,9 +57,9 @@ const stateJwt=jwtService.signTokenLinkedin({state:newState},'5m')
       `https://www.linkedin.com/oauth/v2/authorization?` +
       `response_type=code` +
       `&client_id=${process.env.LINKEDIN_CLIENT_ID}` +
-      `&redirect_uri=${redirectUri}` +
+      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
       `&scope=openid%20profile%20email` +
-      `&state=${stateJwt}` +
+      `&state=${encodeURIComponent(stateJwt)}` +
       `&prompt=consent%20login`; // força consent + login
 
     return res.redirect(linkedinUrl);
@@ -70,7 +70,7 @@ linkedinCallback: async (req: Request, res: Response) => {
 
   try {
     // 🔹 Verifica state JWT
-    const decoded = jwtService.verifyTokenLinkedin<{ state: string }>(state);
+    const decoded = jwtService.verifyTokenLinkedin<{ state: string }>(decodeURIComponent(state));
     const rawState = decoded.state;
 
     // 🔹 Troca code por tokens (access_token + id_token)
