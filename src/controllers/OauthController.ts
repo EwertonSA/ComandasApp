@@ -48,7 +48,7 @@ facebookCallback: async (req: Request, res: Response) => {
 
 linkedinRedirect:async(req:Request,res:Response)=>{
 const newState=randomBytes(16).toString('hex')
-const stateJwt=jwtService.signTokenLinkedin({state:newState},'5m')
+const stateJwt=jwtService.signTokenLinkedin({state:newState},'15m')
 
   const redirectUri = 
       "https://esadev.com.br/api/auth/linkedin/callback/"
