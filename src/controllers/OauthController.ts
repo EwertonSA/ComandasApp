@@ -55,29 +55,35 @@ faceRedirect:async(req:Request,res:Response)=>{
   `client_id=${process.env.FACEBOOK_CLIENT_ID}` +
   `&redirect_uri=${redirectUri}` +
   `&scope=email,public_profile` +
-   `&state=${encodeURIComponent(encodedState)}` +
+   `&state=${encodedState}` +
   `&response_type=code`;
   return res.redirect(facebookUrl)
 },
 facebookcallback:async(req:Request,res:Response)=>{
-const {code,state}=req.query as {code:string,state:string};
-if(!code|| !state) return res.status(400).send('Código ou state ausente')
-try {
-  const decodedJwt = (base64url as any ).decode(state);
-    const decodedState = jwtService.verifyTokenOauth<{ state: string }>(decodedJwt);
-const tokenRes=await axios.get(
-'https://graph.facebook.com/v18.0/oauth/access_token',
-  {
-    params:{
-    redirect_uri: process.env.REDIRECT_URI!,
-    client_id: process.env.FACEBOOK_CLIENT_ID!,
-    client_secret: process.env.FACEBOOK_CLIENT_SECRET!,
-    code
- }} )
+  const { code, state } = req.query as { code: string; state: string };
+
+  if (!code || !state) {
+    return res.status(400).send("Código ou state ausente");
+  }
+
+  try {
+    // 1️⃣ Decodifica state enviado pelo Facebook
+    const decodedStateJwt = (base64url as any).decode(state);
+    const decodedState = jwtService.verifyTokenOauth<{ state: string }>(decodedStateJwt);
+
+    // 2️⃣ Troca code por access_token
+    const tokenRes = await axios.get("https://graph.facebook.com/v18.0/oauth/access_token", {
+      params: {
+        client_id: process.env.FACEBOOK_CLIENT_ID!,
+        redirect_uri: process.env.REDIRECT_URI!, // precisa ser igual ao do redirect
+        client_secret: process.env.FACEBOOK_CLIENT_SECRET!,
+        code,
+      },
+    });
 
     const { access_token } = tokenRes.data;
 
-    // 🔹 Busca dados do usuário
+    // 3️⃣ Busca dados do usuário (id, nome, email)
     const userRes = await axios.get("https://graph.facebook.com/me", {
       params: {
         fields: "id,name,email",
@@ -86,34 +92,40 @@ const tokenRes=await axios.get(
     });
 
     const { email, name } = userRes.data;
+
     if (!email) {
       return res.status(400).send("Facebook não retornou email");
     }
-let user=await UserModel.findOne({where:{email}})
-if(!user){
-  user=await UserModel.create({
-      email,
+
+    // 4️⃣ Cria ou busca usuário no banco
+    let user = await UserModel.findOne({ where: { email } });
+    if (!user) {
+      user = await UserModel.create({
+        email,
         name,
         password: "",
-        role:'user'
-  })
-}
-const userJwt=jwtService.signToken({id:user.id,email:user.email},'30m')
+        role: "user",
+      });
+    }
 
-   res.cookie("comandas-token", userJwt, {
+    // 5️⃣ Gera JWT para o seu app
+    const userJwt = jwtService.signToken({ id: user.id, email: user.email }, "30m");
+
+    // 6️⃣ Envia cookie seguro
+    res.cookie("comandas-token", userJwt, {
       httpOnly: true,
       secure: true,
-      maxAge: 3600000,
+      maxAge: 30 * 60 * 1000, // 30 minutos
       sameSite: "lax",
       path: "/",
     });
-      const mode = user.two_factor_secret ? "verify" : "setup";
-res.redirect(`https://esadev.com.br/login/user/${user.id}`);
-} catch (error) {
-    console.error("Erro Facebook callback:", error);
-    return res
-      .status(403)
-      .send("State inválido, expirado ou erro na troca de token");
+
+    // 7️⃣ Redireciona para frontend
+    const mode = user.two_factor_secret ? "verify" : "setup";
+    res.redirect(`https://esadev.com.br/login/user/${user.id}?mode=${mode}`);
+  } catch (error: any) {
+    console.error("Erro Facebook callback:", error.response?.data || error.message || error);
+    return res.status(403).send("State inválido, expirado ou erro na troca de token");
 }
 },
 
