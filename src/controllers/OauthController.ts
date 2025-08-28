@@ -51,7 +51,7 @@ faceRedirect:async(req:Request,res:Response)=>{
   const stateJwt= jwtService.signToken({state:newState},'5m');
   const redirectUri=encodeURIComponent("https://esadev.com.br/api/auth/instagram/callback")
   const facebookUrl=`https://www.facebook.com/v21.0/dialog/oauth?` +
-  `client_id=${process.env.NEXT_PUBLIC_FACEBOOK_CLIENT_ID}` +
+  `client_id=${process.env.FACEBOOK_CLIENT_ID}` +
   `&redirect_uri=${redirectUri}` +
   `&scope=email,public_profile` +
    `&state=${encodeURIComponent(stateJwt)}` +
@@ -64,31 +64,36 @@ if(!code|| !state) return res.status(400).send('Código ou state ausente')
 try {
     const decodedState= jwtService.verifyTokenLinkedin<{state:string}>(decodeURIComponent(state))
 const rawState=decodedState.state
-const token=await axios.post(
-   'https://www.linkedin.com/oauth/v2/accessToken',
+const tokenRes=await axios.post(
+'https://graph.facebook.com/v18.0/oauth/access_token',
    new URLSearchParams({
      grant_type: 'authorization_code',
     code,
     redirect_uri: process.env.REDIRECT_URI!,
-    client_id: process.env.LINKEDIN_CLIENT_ID!,
-    client_secret: process.env.LINKEDIN_CLIENT_SECRET!,
+    client_id: process.env.FACEBOOK_CLIENT_ID!,
+    client_secret: process.env.FACEBOOK_CLIENT_SECRET!,
  } ),
    { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
 )
-    const { access_token, id_token } = token.data;
-  const decodedId = JSON.parse(
-      Buffer.from(id_token.split('.')[1], 'base64').toString('utf-8')
-    );
+    const { access_token } = tokenRes.data;
 
-    if (!decodedId.email) {
-      return res.status(400).send("ID Token do LinkedIn sem email");
+    // 🔹 Busca dados do usuário
+    const userRes = await axios.get("https://graph.facebook.com/me", {
+      params: {
+        fields: "id,name,email",
+        access_token,
+      },
+    });
+
+    const { email, name } = userRes.data;
+    if (!email) {
+      return res.status(400).send("Facebook não retornou email");
     }
-
-let user=await UserModel.findOne({where:{email:decodedId.email}})
+let user=await UserModel.findOne({where:{email}})
 if(!user){
   user=await UserModel.create({
-      email: decodedId.email,
-        name: decodedId.name,
+      email,
+        name,
         password: "",
         role:'user'
   })
@@ -107,7 +112,7 @@ res.redirect(`https://esadev.com.br/login/user/${user.id}`);
 } catch (error) {
     return res
       .status(403)
-      .send("State inválido, expirado ou erro na troca de token LinkedIn");
+      .send("State inválido, expirado ou erro na troca de token");
 }
 },
 
