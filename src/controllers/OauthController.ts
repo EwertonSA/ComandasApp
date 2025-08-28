@@ -62,17 +62,16 @@ facebookcallback:async(req:Request,res:Response)=>{
 const {code,state}=req.query as {code:string,state:string};
 if(!code|| !state) return res.status(400).send('Código ou state ausente')
 try {
-    const decodedState= jwtService.verifyTokenLinkedin<{state:string}>(decodeURIComponent(state))
+    const decodedState= jwtService.verifyTokenOauth<{state:string}>(decodeURIComponent(state))
 const rawState=decodedState.state
 const tokenRes=await axios.get(
 'https://graph.facebook.com/v18.0/oauth/access_token',
   {
     params:{
-     grant_type: 'authorization_code',
-    code,
     redirect_uri: process.env.REDIRECT_URI!,
     client_id: process.env.FACEBOOK_CLIENT_ID!,
     client_secret: process.env.FACEBOOK_CLIENT_SECRET!,
+    code
  }} )
 
     const { access_token } = tokenRes.data;
@@ -110,6 +109,7 @@ const userJwt=jwtService.signToken({id:user.id,email:user.email},'30m')
       const mode = user.two_factor_secret ? "verify" : "setup";
 res.redirect(`https://esadev.com.br/login/user/${user.id}`);
 } catch (error) {
+    console.error("Erro Facebook callback:", error);
     return res
       .status(403)
       .send("State inválido, expirado ou erro na troca de token");
@@ -140,7 +140,7 @@ linkedinCallback: async (req: Request, res: Response) => {
 
   try {
     // 🔹 Verifica state JWT
-    const decodedState = jwtService.verifyTokenLinkedin<{ state: string }>(
+    const decodedState = jwtService.verifyTokenOauth<{ state: string }>(
       decodeURIComponent(state)
     );
     const rawState = decodedState.state;
@@ -211,7 +211,7 @@ linkedCallback: async (req: Request, res: Response) => {
 
   try {
     // 🔹 Verifica state JWT
-    const decoded = jwtService.verifyTokenLinkedin<{ state: string }>(decodeURIComponent(state));
+    const decoded = jwtService.verifyTokenOauth<{ state: string }>(decodeURIComponent(state));
     const rawState = decoded.state;
 
     // 🔹 Troca code por tokens (access_token + id_token)
@@ -230,7 +230,7 @@ linkedCallback: async (req: Request, res: Response) => {
     const { access_token, id_token } = tokenRes.data;
 
     // 🔹 Decodifica ID Token para pegar informações do usuário
- const decodedId = jwtService.verifyTokenLinkedin<{
+ const decodedId = jwtService.verifyTokenOauth<{
       email: string;
       name: string;
     }>(id_token);

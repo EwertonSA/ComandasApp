@@ -20,7 +20,7 @@ export const jwtService={
   },
 
   // 🔹 verifica token e retorna payload
-  verifyTokenLinkedin: <T = any>(token: string): T => {
+  verifyTokenOauth: <T = any>(token: string): T => {
     try {
       return jwt.verify(token, secret) as T;
     } catch (error) {
