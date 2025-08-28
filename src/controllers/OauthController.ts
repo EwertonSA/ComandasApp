@@ -332,69 +332,102 @@ linkedInCallBack: async (req:Request, res:Response) => {
     res.status(500).json({ error: "Erro ao autenticar com LinkedIn" });
   }},
   
-googleLogin: async (req: Request, res: Response) => {
-  const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
-  const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI!;
-
-  const state = crypto.randomBytes(16).toString('hex'); // gerar state aleatório
-  req.session.googleState = state;
-
-  const googleUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
-    `client_id=${CLIENT_ID}` +
-    `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
-    `&response_type=code` +
-    `&scope=openid%20email%20profile` +
-    `&state=${state}`;
-
-  res.redirect(googleUrl); // redireciona para login do Google
-}
-,
-googleAuthcallback: async (req: Request, res: Response) => {
-  const { code,state } = req.query;
-  if (!code||!state) return res.status(400).send("Código de autorização ausente");
-if (state !== req.session.googleState) {
-  return res.status(403).send("State inválido ou expirado");
-}
+// Rota de redirect para Google
+googleRedirect: async (req: Request, res: Response) => {
   try {
-    // Troca code por access_token
+    // 🔹 Gera state JWT
+    const newState = crypto.randomBytes(16).toString("hex");
+    const stateJwt = jwtService.signToken({ state: newState }, "15m");
+
+    const redirectUri = "https://esadev.com.br/api/auth/google/callback";
+
+    const googleUrl =
+      `https://accounts.google.com/o/oauth2/v2/auth?` +
+      `client_id=${process.env.GOOGLE_CLIENT_ID}` +
+      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+      `&response_type=code` +
+      `&scope=openid%20email%20profile` +
+      `&state=${encodeURIComponent(stateJwt)}`;
+
+    return res.redirect(googleUrl);
+  } catch (err) {
+    console.error("Erro no redirect do Google:", err);
+    return res.status(500).send("Erro ao iniciar login com Google");
+  }
+},
+
+// Callback do Google
+googleCallback: async (req: Request, res: Response) => {
+  const { code, state } = req.query as { code: string; state: string };
+  if (!code || !state) return res.status(400).send("Código ou state ausente");
+
+  try {
+    // 🔹 Verifica state JWT
+    const decodedState = jwtService.verifyTokenOauth<{ state: string }>(
+      decodeURIComponent(state)
+    );
+    const rawState = decodedState.state;
+
+    // 🔹 Troca code por tokens
     const tokenRes = await axios.post(
       "https://oauth2.googleapis.com/token",
       new URLSearchParams({
-        code: code as string,
+        code,
         client_id: process.env.GOOGLE_CLIENT_ID!,
         client_secret: process.env.GOOGLE_CLIENT_SECRET!,
-        redirect_uri: process.env.GOOGLE_REDIRECT_URI!,
+        redirect_uri: "https://esadev.com.br/api/auth/google/callback",
         grant_type: "authorization_code",
       }).toString(),
       { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
     );
 
-    const { access_token } = tokenRes.data;
+    const { access_token, id_token } = tokenRes.data;
 
-    const userInfoRes = await axios.get(
-      "https://www.googleapis.com/oauth2/v2/userinfo",
-      { headers: { Authorization: `Bearer ${access_token}` } }
+    // 🔹 Decodifica ID Token do Google
+    const decodedId = JSON.parse(
+      Buffer.from(id_token.split(".")[1], "base64").toString("utf-8")
     );
-    const googleUser = userInfoRes.data;
 
-    let user = await UserModel.findOne({ where: { email: googleUser.email } });
+    if (!decodedId.email) {
+      return res.status(400).send("ID Token do Google sem email");
+    }
+
+    // 🔹 Procura ou cria usuário no DB
+    let user = await UserModel.findOne({ where: { email: decodedId.email } });
     if (!user) {
       user = await UserModel.create({
-        email: googleUser.email,
-        name: googleUser.name,
+        email: decodedId.email,
+        name: decodedId.name,
         password: "",
         role: "user",
       });
     }
 
-  const mode = user.two_factor_secret ? "verify" : "setup";
-res.redirect(`https://esadev.com.br/login/user/${user.id}`);
+    // 🔹 Gera JWT próprio do app
+    const userJwt = jwtService.signToken(
+      { id: user.id, email: user.email },
+      "1h"
+    );
 
-  } catch (err) {
-    console.error("Erro no callback do Google:", err);
-    return res.status(500).send("Erro ao autenticar com Google");
+    // 🔹 Define cookie seguro
+    res.cookie("comandas-token", userJwt, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 3600000,
+      sameSite: "lax",
+      path: "/",
+    });
+
+    const mode = user.two_factor_secret ? "verify" : "setup";
+    res.redirect(`https://esadev.com.br/login/user/${user.id}?mode=${mode}`);
+  } catch (err: any) {
+    console.error("Erro no callback do Google:", err.response?.data || err.message);
+    return res
+      .status(403)
+      .send("State inválido, expirado ou erro na troca de token Google");
   }
 },
+
 googleVerify2fa:async(req:Request,res:Response)=>{
  const { userId } = req.query;
   if (!userId) return res.status(400).json({ message: "userId ausente" });

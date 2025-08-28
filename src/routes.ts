@@ -28,8 +28,8 @@ router.get('/api/auth/facebook/callback',OauthController.facebookcallback)
 
 router.get('/api/auth/linkedin/redirect/',OauthController.linkedinRedirect)
 router.get('/api/auth/linkedin/callback/',OauthController.linkedinCallback)
-router.get('/api/auth/google/callback',OauthController.googleAuthcallback)
-router.get('/api/auth/google',OauthController.googleLogin)
+router.get('/api/auth/google/callback',OauthController.googleCallback)
+router.get('/api/auth/google',OauthController.googleRedirect)
 router.get("/api/auth/verify-2fa/setup",OauthController.googleVerify2fa)
 
 router.get('/api/mesas',mesasController.index)
