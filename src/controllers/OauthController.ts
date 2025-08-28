@@ -6,7 +6,7 @@ import axios from 'axios'
 import { jwtService } from '../services/jwtService.js';
 import { UserModel } from '../models/User.js';
 import { userService } from '../services/userService.js';
-
+import base64url from "base64url";
 export const OauthController={
   
 facebookCallback: async (req: Request, res: Response) => {
@@ -48,13 +48,14 @@ facebookCallback: async (req: Request, res: Response) => {
 },
 faceRedirect:async(req:Request,res:Response)=>{
   const newState=randomBytes(16).toString('hex')
-  const stateJwt= jwtService.signToken({state:newState},'5m');
+  const stateJwt= jwtService.signToken({state:newState},'15m');
+   const encodedState = (base64url as any).encode(stateJwt);
   const redirectUri=encodeURIComponent("https://esadev.com.br/api/auth/facebook/callback")
   const facebookUrl=`https://www.facebook.com/v21.0/dialog/oauth?` +
   `client_id=${process.env.FACEBOOK_CLIENT_ID}` +
   `&redirect_uri=${redirectUri}` +
   `&scope=email,public_profile` +
-   `&state=${encodeURIComponent(stateJwt)}` +
+   `&state=${encodeURIComponent(encodedState)}` +
   `&response_type=code`;
   return res.redirect(facebookUrl)
 },
@@ -62,8 +63,8 @@ facebookcallback:async(req:Request,res:Response)=>{
 const {code,state}=req.query as {code:string,state:string};
 if(!code|| !state) return res.status(400).send('Código ou state ausente')
 try {
-    const decodedState= jwtService.verifyTokenOauth<{state:string}>(decodeURIComponent(state))
-const rawState=decodedState.state
+  const decodedJwt = (base64url as any ).decode(state);
+    const decodedState = jwtService.verifyTokenOauth<{ state: string }>(decodedJwt);
 const tokenRes=await axios.get(
 'https://graph.facebook.com/v18.0/oauth/access_token',
   {
