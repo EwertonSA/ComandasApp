@@ -64,17 +64,17 @@ if(!code|| !state) return res.status(400).send('Código ou state ausente')
 try {
     const decodedState= jwtService.verifyTokenLinkedin<{state:string}>(decodeURIComponent(state))
 const rawState=decodedState.state
-const tokenRes=await axios.post(
+const tokenRes=await axios.get(
 'https://graph.facebook.com/v18.0/oauth/access_token',
-   new URLSearchParams({
+  {
+    params:{
      grant_type: 'authorization_code',
     code,
     redirect_uri: process.env.REDIRECT_URI!,
     client_id: process.env.FACEBOOK_CLIENT_ID!,
     client_secret: process.env.FACEBOOK_CLIENT_SECRET!,
- } ),
-   { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
-)
+ }} )
+
     const { access_token } = tokenRes.data;
 
     // 🔹 Busca dados do usuário
