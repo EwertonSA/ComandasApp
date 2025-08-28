@@ -350,9 +350,11 @@ googleLogin: async (req: Request, res: Response) => {
 }
 ,
 googleAuthcallback: async (req: Request, res: Response) => {
-  const { code } = req.query;
-  if (!code) return res.status(400).send("Código de autorização ausente");
-
+  const { code,state } = req.query;
+  if (!code||!state) return res.status(400).send("Código de autorização ausente");
+if (state !== req.session.googleState) {
+  return res.status(403).send("State inválido ou expirado");
+}
   try {
     // Troca code por access_token
     const tokenRes = await axios.post(
