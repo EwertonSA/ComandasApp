@@ -23,7 +23,9 @@ router.post('/api/auth/reset2fa',authController.reset2fa)
 router.post("/api/auth/autoLogin",authController.autoLogin)
 router.post('/api/auth/logout',authController.logout)
 
+router.get('/api/auth/instagram/redirect',OauthController.faceRedirect)
 router.get('/api/auth/instagram/callback',OauthController.facebookCallback)
+
 router.get('/api/auth/linkedin/redirect/',OauthController.linkedinRedirect)
 router.get('/api/auth/linkedin/callback/',OauthController.linkedinCallback)
 router.get('/api/auth/google/callback',OauthController.googleAuthcallback)

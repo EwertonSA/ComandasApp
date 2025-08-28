@@ -46,8 +46,70 @@ facebookCallback: async (req: Request, res: Response) => {
   
   }
 },
+faceRedirect:async(req:Request,res:Response)=>{
+  const newState=randomBytes(16).toString('hex')
+  const stateJwt= jwtService.signToken({state:newState},'5m');
+  const redirectUri=encodeURIComponent(`https://esadev.com.br/api/auth/instagram/callback'`)
+  const facebookUrl=`https://www.facebook.com/v21.0/dialog/oauth?` +
+  `client_id=${process.env.NEXT_PUBLIC_FACEBOOK_CLIENT_ID}` +
+  `&redirect_uri=${redirectUri}` +
+  `&scope=email,public_profile` +
+   `&state=${encodeURIComponent(stateJwt)}` +
+  `&response_type=code`;
+  return res.redirect(facebookUrl)
+},
+facebookcallback:async(req:Request,res:Response)=>{
+const {code,state}=req.query as {code:string,state:string};
+if(!code|| !state) return res.status(400).send('Código ou state ausente')
+try {
+    const decodedState= jwtService.verifyTokenLinkedin<{state:string}>(decodeURIComponent(state))
+const rawState=decodedState.state
+const token=await axios.post(
+   'https://www.linkedin.com/oauth/v2/accessToken',
+   new URLSearchParams({
+     grant_type: 'authorization_code',
+    code,
+    redirect_uri: process.env.REDIRECT_URI!,
+    client_id: process.env.LINKEDIN_CLIENT_ID!,
+    client_secret: process.env.LINKEDIN_CLIENT_SECRET!,
+ } ),
+   { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+)
+    const { access_token, id_token } = token.data;
+  const decodedId = JSON.parse(
+      Buffer.from(id_token.split('.')[1], 'base64').toString('utf-8')
+    );
 
+    if (!decodedId.email) {
+      return res.status(400).send("ID Token do LinkedIn sem email");
+    }
 
+let user=await UserModel.findOne({where:{email:decodedId.email}})
+if(!user){
+  user=await UserModel.create({
+      email: decodedId.email,
+        name: decodedId.name,
+        password: "",
+        role:'user'
+  })
+}
+const userJwt=jwtService.signToken({id:user.id,email:user.email},'30m')
+
+   res.cookie("comandas-token", userJwt, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 3600000,
+      sameSite: "lax",
+      path: "/",
+    });
+      const mode = user.two_factor_secret ? "verify" : "setup";
+res.redirect(`https://esadev.com.br/login/user/${user.id}`);
+} catch (error) {
+    return res
+      .status(403)
+      .send("State inválido, expirado ou erro na troca de token LinkedIn");
+}
+},
 
 linkedinRedirect:async(req:Request,res:Response)=>{
 const newState=randomBytes(16).toString('hex')
