@@ -24,8 +24,8 @@ const decoded=jwtService.verifyTokenOauth<{state:string}>(decodeURIComponent(sta
     exchangeCodeforToken:async(code:string)=>{
         const tokenRes=await axios.get("https://graph.facebook.com/v18.0/oauth/access_token",{
         params:{
-            cliente_id:process.env.FACEBOOK_CLIENT_ID!,
-            client_secret:process.env.FACEBOOK_SECRET!,
+            client_id:process.env.FACEBOOK_CLIENT_ID!,
+            client_secret:process.env.FACEBOOK_CLIENT_SECRET!,
             redirect_uri:process.env.FACEBOOK_REDIRECT_URI,
             code
         }
@@ -35,8 +35,8 @@ const decoded=jwtService.verifyTokenOauth<{state:string}>(decodeURIComponent(sta
     getUserProfile:async(accessToken:string)=>{
         const userRes=await axios.get("https://graph.facebook.com/me",{
             params:{
-                fields: 'id,name,emaiil',
-                acces_token:accessToken
+                fields: 'id,name,email',
+                access_token:accessToken
             },
             
         })
@@ -57,7 +57,7 @@ const decoded=jwtService.verifyTokenOauth<{state:string}>(decodeURIComponent(sta
                 }
                 return user
             },
- genetateAppToken:async(user:any)=>{
+ generateAppToken:async(user:any)=>{
     return jwtService.signToken({id:user.id,email:user.email},'15m')
  }
 }

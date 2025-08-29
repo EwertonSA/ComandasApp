@@ -30,7 +30,7 @@ facebookCallback: async (req: Request, res: Response) => {
    const user = await facebookService.findOrCreateUser(email, name);
 
     // 🔹 5. Gerar JWT e enviar cookie
-    const userJwt = facebookService.genetateAppToken(user);
+    const userJwt = facebookService.generateAppToken(user);
 
     res.cookie("comandas-token", userJwt, {
       httpOnly: true,
