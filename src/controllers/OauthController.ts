@@ -7,44 +7,39 @@ import { jwtService } from '../services/jwtService.js';
 import { UserModel } from '../models/User.js';
 import { userService } from '../services/userService.js';
 import base64url from "base64url";
+import facebookService from '../services/facebookService.js';
 export const OauthController={
   
 facebookCallback: async (req: Request, res: Response) => {
-  try {
-    console.log('Callback recebido!');
-    console.log('req.query:', req.query);
+  const {code,state}=req.query as {code:string,state:string}
+   if (!code || !state) return res.status(400).send("Código ou state ausente");
+   try {
+    await facebookService.verifyState(state)
 
-    const rawCode = req.query.code;
-    let code: string;
+    const accessToken=await facebookService.exchangeCodeforToken(code);
+     const { email, name } = await facebookService.getUserProfile(accessToken);
 
-    if (typeof rawCode === 'string') {
-      code = rawCode;
-    } else if (Array.isArray(rawCode) && rawCode.length > 0 && typeof rawCode[0] === 'string') {
-      code = rawCode[0];
-    } else {
-      return res.status(400).json({ message: 'Código de autorização ausente ou inválido' });
-    }
+   const user = await facebookService.findOrCreateUser(email, name);
 
-    console.log('Code extraído:', code);
+    // 🔹 5. Gerar JWT e enviar cookie
+    const userJwt = facebookService.genetateAppToken(user);
 
-    const { user, jwt } = await authenticateFacebookUser(code);
-
-    res.cookie('comandas-token', jwt, {
+    res.cookie("comandas-token", userJwt, {
       httpOnly: true,
       secure: true,
-      maxAge: 3600000,
-      sameSite: 'lax',
-      path: '/',
+      maxAge: 30 * 60 * 1000,
+      sameSite: "lax",
+      path: "/",
     });
-    return res.redirect('https://esadev.com.br/employeeApp');
-  } catch (error) {
-    console.log('Err:',error)
-    console.error('Erro detalhado:', JSON.stringify(error, null, 2));
-    return res
-      .status(403)
-      .send("State inválido, expirado ou erro na troca de token LinkedIn");
-  
-  }
+
+    // 🔹 6. Redirecionar para frontend
+    const mode = user.two_factor_secret ? "verify" : "setup";
+    return res.redirect(`https://esadev.com.br/login/user/${user.id}?mode=${mode}`);
+  } catch (err: any) {
+    console.error("Erro no callback do Facebook:", err.response?.data || err.message || err);
+    return res.status(403).send("State inválido, expirado ou erro na troca de token Facebook");
+    
+   }
 },
 // Redirect para login do Facebook
 faceRedirect: async (req: Request, res: Response) => {
