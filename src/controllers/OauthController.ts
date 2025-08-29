@@ -389,8 +389,8 @@ linkedInCallBack: async (req:Request, res:Response) => {
   }},
   googleredirect:async(req:Request,res:Response)=>{
 try {
-  const linkedinUrl=await linkedinService.generateAuthUrl()
-return res.redirect(linkedinUrl)
+  const googleUrl=await googleService.generateGoogleAuthUrl()
+return res.redirect(googleUrl)
 } catch (error) {
    console.error("Erro no redirect do Google:", error);
     return res.status(500).send("Erro ao iniciar login com Google");
