@@ -8,13 +8,13 @@ const googleService={
     const stateJwt=jwtService.signToken({state:newState},'15m')
     const redirectUri=process.env.GOOGLE_REDIRECT_URI!
     return(
-         `https://accounts.google.com/o/oauth2/v2/auth?` +
+        `https://accounts.google.com/o/oauth2/v2/auth?` +
       `client_id=${process.env.GOOGLE_CLIENT_ID}` +
       `&redirect_uri=${encodeURIComponent(redirectUri)}` +
       `&response_type=code` +
       `&scope=openid%20email%20profile` +
-      `&state=${encodeURIComponent(stateJwt)}`
-
+      `&state=${encodeURIComponent(stateJwt)}` +
+      `&prompt=consent`
     )
     },
     verifyState:async(state:string)=>{
@@ -34,7 +34,7 @@ return decoded.state
       { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
     );
 
-    return tokenRes.data.access_token;
+     return { accessToken: tokenRes.data.access_token, idToken: tokenRes.data.id_token };
 
     },
     getUserProfile:async(idToken:string)=>{

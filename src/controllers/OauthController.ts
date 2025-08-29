@@ -402,8 +402,8 @@ const {code,state}=req.body as {code:string,state:string}
     return res.status(400).send("Código ou state ausente");
   try {
     await googleService.verifyState(state)
-    const accessToken=await googleService.exchangeCodeforToken(code)
-    const {email,name}=await googleService.getUserProfile(accessToken)
+    const {accessToken,idToken}=await googleService.exchangeCodeforToken(code)
+    const {email,name}=await googleService.getUserProfile(idToken)
     const user=await googleService.findOrCreateUser(email,name)
     const userJwt=await googleService.generateAppToken(user)
 
