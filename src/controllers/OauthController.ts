@@ -387,7 +387,7 @@ linkedInCallBack: async (req:Request, res:Response) => {
     console.error(err);
     res.status(500).json({ error: "Erro ao autenticar com LinkedIn" });
   }},
-  googlredirect:async(req:Request,res:Response)=>{
+  googleredirect:async(req:Request,res:Response)=>{
 try {
   const linkedinUrl=await linkedinService.generateAuthUrl()
 return res.redirect(linkedinUrl)
