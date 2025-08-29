@@ -1,7 +1,22 @@
 import { UserModel } from "../models/User.js"
 import { jwtService } from "./jwtService.js"
 import axios from 'axios'
+import crypto, { randomBytes } from 'crypto'
 const facebookService={
+generateAuthUrl:async(): Promise<string>=> {
+    const newState = crypto.randomBytes(16).toString("hex");
+    const stateJwt = jwtService.signToken({ state: newState }, "15m");
+    const redirectUri=process.env.FACEBOOK_REDIRECT_URI!
+    return (
+      `https://www.facebook.com/v21.0/dialog/oauth?` +
+      `client_id=${process.env.FACEBOOK_CLIENT_ID}` +
+      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+      `&scope=email,public_profile` +
+      `&state=${encodeURIComponent(stateJwt)}` +
+      `&response_type=code`
+    );
+  },
+
     verifyState:async(state:string)=>{
 const decoded=jwtService.verifyTokenOauth<{state:string}>(decodeURIComponent(state))
  return decoded.state  

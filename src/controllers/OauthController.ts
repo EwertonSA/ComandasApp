@@ -9,7 +9,15 @@ import { userService } from '../services/userService.js';
 import base64url from "base64url";
 import facebookService from '../services/facebookService.js';
 export const OauthController={
-  
+  faceBookRedirect :async (req: Request, res: Response) => {
+  try {
+    const facebookUrl = await facebookService.generateAuthUrl();
+    return res.redirect(facebookUrl);
+  } catch (err) {
+    console.error("Erro no redirect do Facebook:", err);
+    return res.status(500).send("Erro ao iniciar login com Facebook");
+  }
+},
 facebookCallback: async (req: Request, res: Response) => {
   const {code,state}=req.query as {code:string,state:string}
    if (!code || !state) return res.status(400).send("Código ou state ausente");
