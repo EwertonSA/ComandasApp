@@ -396,18 +396,21 @@ return res.redirect(googleUrl)
     return res.status(500).send("Erro ao iniciar login com Google");
 }
   },
-  googlecallback:async(req:Request,res:Response)=>{
-const {code,state}=req.body as {code:string,state:string}
- if (!code || !state)
-    return res.status(400).send("Código ou state ausente");
-  try {
-    await googleService.verifyState(state)
-    const {accessToken,idToken}=await googleService.exchangeCodeforToken(code)
-    const {email,name}=await googleService.getUserProfile(idToken)
-    const user=await googleService.findOrCreateUser(email,name)
-    const userJwt=await googleService.generateAppToken(user)
+googlecallback: async (req: Request, res: Response) => {
+  const { code, state } = req.query as { code: string; state: string };
+  if (!code || !state) return res.status(400).send("Código ou state ausente");
 
-  res.cookie("comandas-token", userJwt, {
+  try {
+    await googleService.verifyState(state);
+
+    const { accessToken, idToken } = await googleService.exchangeCodeforToken(code);
+    const { email, name } = await googleService.getUserProfile(idToken);
+
+    const user = await googleService.findOrCreateUser(email, name);
+
+    const userJwt = await googleService.generateAppToken(user);
+
+    res.cookie("comandas-token", userJwt, {
       httpOnly: true,
       secure: true,
       maxAge: 30 * 60 * 1000,
@@ -415,18 +418,12 @@ const {code,state}=req.body as {code:string,state:string}
       path: "/",
     });
 
-    const mode = user.two_factor_secret ? "verify" : "setup";
-    return res.redirect(
-      `https://esadev.com.br/login/user/${user.id}?mode=${mode}`
-    );
-  } catch (err:any) {
-     console.error(
-      "Erro no callback do google:",
-      err.response?.data || err.message || err
-    );
-    
-  }
-  },
+    const mode = user!.two_factor_secret ? "verify" : "setup";
+    return res.redirect(`https://esadev.com.br/login/user/${user!.id}?mode=${mode}`);
+  } catch (err: any) {
+    console.error("Erro no callback do Google:", err.response?.data || err.message || err);
+    return res.status(403).send("State inválido, expirado ou erro na troca de token Google");
+  }},
 // Rota de redirect para Google
 googleRedirect: async (req: Request, res: Response) => {
   try {

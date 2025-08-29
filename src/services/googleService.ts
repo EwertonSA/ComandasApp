@@ -28,7 +28,7 @@ return decoded.state
         code,
         client_id: process.env.GOOGLE_CLIENT_ID!,
         client_secret: process.env.GOOGLE_CLIENT_SECRET!,
-        redirect_uri: "https://esadev.com.br/api/auth/google/callback",
+        redirect_uri: process.env.GOOGLE_REDIRECT_URI!,
         grant_type: "authorization_code",
       }).toString(),
       { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
@@ -45,9 +45,11 @@ return decoded.state
     return { email, name };
     },
     findOrCreateUser:async(email:string,name:string)=>{
-    const user=await UserModel.create({
+      let user=await UserModel.findOne({where:{email}})
+      if(!user){
+   await UserModel.create({
         email,name,password:'',role:'user'
-    })
+    })}
     return user
     },
      generateAppToken:async(user:any)=>{
