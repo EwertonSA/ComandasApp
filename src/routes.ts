@@ -26,7 +26,7 @@ router.post('/api/auth/logout',authController.logout)
 router.get('/api/auth/facebook/redirect',OauthController.faceBookRedirect)
 router.get('/api/auth/facebook/callback',OauthController.facebookCallback)
 
-router.get('/api/auth/linkedin/redirect/',OauthController.linkedinRedirect)
+router.get('/api/auth/linkedin/redirect/',OauthController.linkedInRedirect)
 router.get('/api/auth/linkedin/callback/',OauthController.linkedinCallback)
 router.get('/api/auth/google/callback',OauthController.googleCallback)
 router.get('/api/auth/google',OauthController.googleRedirect)

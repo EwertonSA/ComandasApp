@@ -8,6 +8,7 @@ import { UserModel } from '../models/User.js';
 import { userService } from '../services/userService.js';
 import base64url from "base64url";
 import facebookService from '../services/facebookService.js';
+import linkedinService from '../services/linkedinService.js';
 export const OauthController={
   faceBookRedirect :async (req: Request, res: Response) => {
   try {
@@ -140,7 +141,48 @@ facebookcallback: async (req: Request, res: Response) => {
     return res.status(403).send("State inválido, expirado ou erro na troca de token Facebook");
   }
 },
+linkedInRedirect:async(req:Request,res:Response)=>{
+try {
+  const linkedinUrl=await linkedinService.generateAuthUrl()
+res.redirect(linkedinUrl)
+} catch (error) {
+   console.error("Erro no redirect do LinkedIn:", error);
+    return res.status(500).send("Erro ao iniciar login com LinkedIn");
+}
+},
+linkedInCallback:async(req:Request,res:Response)=>{
+const {code,state}=req.query as {code:string,state:string}
+  if (!code || !state)
+    return res.status(400).send("Código ou state ausente");
+  try {
+    await linkedinService.verifystate(state);
+    const access_token=await linkedinService.exchangeLinkedinCodeForCode(code)
+    const {email,name}=await linkedinService.getUserProfile(access_token)
+    const user=await linkedinService.findOrCreateUser(email,name)
+    const userJwt=await linkedinService.generateAppToken(user)
+    
+    res.cookie("comandas-token", userJwt, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 30 * 60 * 1000,
+      sameSite: "lax",
+      path: "/",
+    });
 
+    const mode = user.two_factor_secret ? "verify" : "setup";
+    return res.redirect(
+      `https://esadev.com.br/login/user/${user.id}?mode=${mode}`
+    );
+  } catch (err:any) {
+     console.error(
+      "Erro no callback do LinkedIn:",
+      err.response?.data || err.message || err
+    );
+    return res
+      .status(403)
+      .send("State inválido, expirado ou erro na troca de token LinkedIn");
+  }
+},
 
 linkedinRedirect:async(req:Request,res:Response)=>{
 const newState=randomBytes(16).toString('hex')
