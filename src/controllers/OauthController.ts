@@ -9,6 +9,7 @@ import { userService } from '../services/userService.js';
 import base64url from "base64url";
 import facebookService from '../services/facebookService.js';
 import linkedinService from '../services/linkedinService.js';
+import googleService from '../services/googleService.js';
 export const OauthController={
   faceBookRedirect :async (req: Request, res: Response) => {
   try {
@@ -386,7 +387,46 @@ linkedInCallBack: async (req:Request, res:Response) => {
     console.error(err);
     res.status(500).json({ error: "Erro ao autenticar com LinkedIn" });
   }},
-  
+  googlredirect:async(req:Request,res:Response)=>{
+try {
+  const linkedinUrl=await linkedinService.generateAuthUrl()
+return res.redirect(linkedinUrl)
+} catch (error) {
+   console.error("Erro no redirect do Google:", error);
+    return res.status(500).send("Erro ao iniciar login com Google");
+}
+  },
+  googlecallback:async(req:Request,res:Response)=>{
+const {code,state}=req.body as {code:string,state:string}
+ if (!code || !state)
+    return res.status(400).send("Código ou state ausente");
+  try {
+    await googleService.verifyState(state)
+    const accessToken=await googleService.exchangeCodeforToken(code)
+    const {email,name}=await googleService.getUserProfile(accessToken)
+    const user=await googleService.findOrCreateUser(email,name)
+    const userJwt=await googleService.generateAppToken(user)
+
+  res.cookie("comandas-token", userJwt, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 30 * 60 * 1000,
+      sameSite: "lax",
+      path: "/",
+    });
+
+    const mode = user.two_factor_secret ? "verify" : "setup";
+    return res.redirect(
+      `https://esadev.com.br/login/user/${user.id}?mode=${mode}`
+    );
+  } catch (err:any) {
+     console.error(
+      "Erro no callback do google:",
+      err.response?.data || err.message || err
+    );
+    
+  }
+  },
 // Rota de redirect para Google
 googleRedirect: async (req: Request, res: Response) => {
   try {
