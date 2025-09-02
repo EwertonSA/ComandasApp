@@ -4,9 +4,10 @@ import  Comandas  from "../models/Comandas.js"
 
 
 export const comandasService={
-findAllPaginated:async(page:number,perPage:number)=>{
+findAllPaginated:async(userId:number,page:number,perPage:number)=>{
     const offset=(page-1)*perPage
     const {rows,count}=await Comandas.findAndCountAll({
+        where:{clienteId:userId},
         order:[['id','ASC']],
         limit:perPage,
         offset
@@ -19,8 +20,9 @@ findAllPaginated:async(page:number,perPage:number)=>{
     }
 },
 
-    ComandaPedido:async(id:string)=>{
-        const comandaPedido=await Comandas.findByPk(id,{
+    ComandaPedido:async(id:string,clienteId:string)=>{
+        const comandaPedido=await Comandas.findOne({
+            where:{id,clienteId:clienteId},
             attributes:['id', ['mesa_id','mesaId'],['cliente_id','clienteId'],'status'],
             include:{
                 association:'pedidos',

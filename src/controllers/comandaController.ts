@@ -1,24 +1,34 @@
 import { Request, Response } from "express";
 import { comandasService } from "../services/comandasService.js";
 import { getPaginationParams } from "../helpers/getPaginationParams.js";
+import { AuthenticatedRequest } from "../middlewares/auth.js";
 
 export const comandaController={
-    index:async(req:Request,res:Response)=>{
-        const [page,perPage]=getPaginationParams(req.query)
-        try {
-            const paginated=await comandasService.findAllPaginated(page,perPage)
-            return res.json(paginated)
-        } catch (error) {
-            if(error instanceof Error){
-                return res.status(400).json({message:error.message})
-            }   
-        }
-    },
+  index: async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user?.id;
+    const [page, perPage] = getPaginationParams(req.query);
 
-    show:async(req:Request,res:Response)=>{
+    if (!userId) {
+        return res.status(401).json({ message: "Não autorizado" });
+    }
+
+    try {
+        const paginated = await comandasService.findAllPaginated(userId, page, perPage);
+        return res.json(paginated);
+    } catch (error) {
+        if (error instanceof Error) {
+            return res.status(400).json({ message: error.message });
+        }
+    }},
+
+    show:async(req:AuthenticatedRequest,res:Response)=>{
         const {id}=req.params
+        const clienteId=req.user?.id
+           if (!clienteId) {
+        return res.status(401).json({ message: "Não autorizado" });
+    }
         try {
-            const comandaPedido= await comandasService.ComandaPedido(id)
+            const comandaPedido= await comandasService.ComandaPedido(id,clienteId.toString())
             return res.json(comandaPedido)
         } catch (error) {
             if(error instanceof Error){
