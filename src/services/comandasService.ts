@@ -20,9 +20,8 @@ findAllPaginated:async(userId:number,page:number,perPage:number)=>{
     }
 },
 
-    ComandaPedido:async(id:string,clienteId:string)=>{
-        const comandaPedido=await Comandas.findOne({
-            where:{id,clienteId:clienteId},
+    ComandaPedido:async(id:string)=>{
+        const comandaPedido=await Comandas.findByPk(id,{
             attributes:['id', ['mesa_id','mesaId'],['cliente_id','clienteId'],'status'],
             include:{
                 association:'pedidos',

@@ -21,14 +21,10 @@ export const comandaController={
         }
     }},
 
-    show:async(req:AuthenticatedRequest,res:Response)=>{
+    show:async(req:Request,res:Response)=>{
         const {id}=req.params
-        const clienteId=req.user?.id
-           if (!clienteId) {
-        return res.status(401).json({ message: "Não autorizado" });
-    }
         try {
-            const comandaPedido= await comandasService.ComandaPedido(id,clienteId.toString())
+            const comandaPedido= await comandasService.ComandaPedido(id)
             return res.json(comandaPedido)
         } catch (error) {
             if(error instanceof Error){
