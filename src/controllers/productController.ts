@@ -6,34 +6,18 @@ import { Op } from "sequelize";
 import Produtos from "../models/Produtos.js";
 
 export const productController={
-index: async (req: Request, res: Response) => {
-    const [page, perPage] = getPaginationParams(req.query);
-    try {
-        const result = await produtoService.finadAllPaginated(page, perPage);
+    index:async(req:Request,res:Response)=>{
+        const [page,perPage]=getPaginationParams(req.query)
+        try {
+            const produtos= await produtoService.finadAllPaginated(page,perPage)
+            return res.json(produtos)
 
-        // Corrige as URLs antes de enviar
-        const produtosComUrlCorrigida = result.produtos.map(produto => {
-            const thumbnailUrl = produto.thumbnailUrl
-                ? produto.thumbnailUrl.replace(/^https?:\/\/localhost:3001\/uploads\//, '')
-                : null;
-            return {
-                ...produto,
-                thumbnailUrl,
-            };
-        });
-
-        return res.json({
-            ...result,
-            produtos: produtosComUrlCorrigida,
-        });
-
-    } catch (error) {
-        if (error instanceof Error) {
-            return res.status(400).json({ message: error.message });
+        } catch (error) {
+            if(error instanceof Error){
+                return res.status(400).json({message:error.message})
+            }
         }
-    }
-},
-
+    },
     findByName:async(req:Request,res:Response)=>{
         const {nome}=req.query
         const [page,perPAge]=getPaginationParams(req.query)
