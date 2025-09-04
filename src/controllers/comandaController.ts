@@ -62,14 +62,24 @@ showClient: async (req: Request, res: Response) => {
 
     // Decodifica e valida assinatura
     const { clienteId, comandaId } = jwtService.verifyTokenState<{ clienteId: string, comandaId: string }>(token);
-console.log('getclienteId:',clienteId, 'getcomandaId:',comandaId)
+    console.log('getclienteId:', clienteId, 'getcomandaId:', comandaId);
+
     const comandaPedido = await comandasService.ComandaPedido(comandaId);
 
+    // Verifica se a comanda pertence ao cliente
     if (!comandaPedido || comandaPedido.clienteId.toString() !== clienteId) {
       return res.status(403).json({ message: 'Acesso inválido à comanda' });
     }
-console.log({ tokenClienteId: clienteId, comandaId, comandaPedidoClienteId: comandaPedido?.clienteId });
-    return res.json(comandaPedido);
+
+    // Constrói objeto para frontend garantindo comandaId
+    const response = {
+      ...comandaPedido.toJSON(), // transforma em objeto plano
+      comandaId: comandaPedido.id,
+    };
+
+    console.log({ tokenClienteId: clienteId, comandaId, comandaPedidoClienteId: comandaPedido?.clienteId });
+
+    return res.json(response);
 
   } catch (error) {
     console.error("Erro no showClient:", error);
