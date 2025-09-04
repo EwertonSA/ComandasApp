@@ -48,7 +48,7 @@ router.put('/api/clientes/:id',ensureAuth,clientesController.update)
 router.get('/api/clientes/:id',ensureAuth,clientesController.show)
 router.delete('/api/clientes/:id/:mesaId',ensureAuth,clientesController.delete)
 
-router.get('/api/comandas',ensureAuth,comandaController.index)
+router.get('/api/comandas',ensureAuth,validateClientAccess,comandaController.index)
 router.get('/api/comandas/pagas',ensureAuth,comandaController.showPayed)
 router.post('/api/clientComanda',ensureAuth,comandaController.registerClientComanda)
 router.post('/api/comandas',ensureAuth,comandaController.save)

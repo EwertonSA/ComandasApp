@@ -134,7 +134,8 @@ res.cookie('clientes-token', sessionToken, {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
   sameSite: 'lax', // "lax" funciona para chamadas do mesmo site
-  maxAge: 1000 * 60 * 60 * 4
+  maxAge: 1000 * 60 * 60 * 4,
+   domain: process.env.NODE_ENV === 'production' ? '.esadev.com.br' : undefined,
 });
     return res.json({ valid: true });
 
