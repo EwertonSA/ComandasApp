@@ -62,7 +62,7 @@ showClient: async (req: Request, res: Response) => {
 
     // Decodifica e valida assinatura
     const { clienteId, comandaId } = jwtService.verifyTokenState<{ clienteId: string, comandaId: string }>(token);
-
+console.log('getclienteId:',clienteId, 'getcomandaId:',comandaId)
     const comandaPedido = await comandasService.ComandaPedido(comandaId);
 
     if (!comandaPedido || comandaPedido.clienteId.toString() !== clienteId) {
