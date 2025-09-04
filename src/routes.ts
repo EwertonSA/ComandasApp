@@ -12,6 +12,7 @@ import { authController } from './controllers/authController.js'
 
 import { OauthController } from './controllers/OauthController.js'
 import ensureAuth from './middlewares/auth.js'
+import validateClientAccess from './middlewares/verifyState.js'
 
 
 
@@ -22,6 +23,7 @@ router.post('/api/auth/verify',authController.verify2FA)
 router.post('/api/auth/reset2fa',authController.reset2fa)
 router.post("/api/auth/autoLogin",authController.autoLogin)
 router.post('/api/auth/logout',authController.logout)
+router.get('/api/auth/verifystate/:comandaId',authController.verifyState)
 
 router.get('/api/auth/facebook/redirect',OauthController.faceBookRedirect)
 router.get('/api/auth/facebook/callback',OauthController.facebookCallback)
@@ -48,7 +50,9 @@ router.delete('/api/clientes/:id/:mesaId',ensureAuth,clientesController.delete)
 
 router.get('/api/comandas',ensureAuth,comandaController.index)
 router.get('/api/comandas/pagas',ensureAuth,comandaController.showPayed)
+router.post('/api/clientComanda',ensureAuth,comandaController.registerClientComanda)
 router.post('/api/comandas',ensureAuth,comandaController.save)
+router.get('/api/comandasCliente',ensureAuth,comandaController.showClient)
 router.get('/api/comandas/:id',ensureAuth,comandaController.show)
 router.put('/api/comandas/:id',ensureAuth,comandaController.update)
 router.delete('/api/comandas/:id',ensureAuth,comandaController.delete)

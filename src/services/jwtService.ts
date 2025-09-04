@@ -10,8 +10,11 @@ export const jwtService={
       },
       verifyToken:(token:string,callbackfn:jwt.VerifyCallback)=>{
         jwt.verify(token,secret,callbackfn)
-        console.log('Token gerado:', token);
+      
       },
+      verifyTokenState: <T>(token: string): T => {
+  return jwt.verify(token, secret) as T;
+},
         signTokenLinkedin: (
     payload: string | object | Buffer,
     expiration: string

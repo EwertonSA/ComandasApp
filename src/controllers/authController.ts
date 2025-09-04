@@ -3,7 +3,18 @@ import { userService } from "../services/userService.js"
 import { jwtService } from "../services/jwtService.js"
 import { UserModel } from "../models/User.js";
 import validateRecaptcha from "../services/recaptcha.js";
+import { AuthenticatedRequest } from "../middlewares/auth.js";
+import Comandas from "../models/Comandas.js";
+export interface AuthenticatedRequest1 extends Request {
+  user?: { clienteId: string; email: string; role: string };
+  comanda?: InstanceType<typeof Comandas>; // agora o TS aceita req.comanda
+}
 
+interface DecodedToken {
+ comandaId: string;
+  clienteId: string;
+  nonce?: string; 
+}
 export const authController={
     register: async (req: Request, res: Response) => {
         const { name, phone, email, password, role } = req.body;
@@ -99,6 +110,39 @@ const {userId}=req.body
 const { qrCodeDataURL } = await userService.reset2fa(userId.toString());
 return res.json({ qrCodeDataURL, message: "Novo QR gerado" });
 },
+verifyState: async (req: AuthenticatedRequest1, res: Response) => {
+  const { comandaId } = req.params;
+  const { state } = req.query;  
+  const clienteId = req.user?.clienteId;
+
+  if (!state) return res.json({ valid: false });
+
+  try {
+    const decoded = jwtService.verifyTokenState<DecodedToken>(state as string);
+    const comanda = await Comandas.findByPk(comandaId);
+
+    if (!comanda || decoded.comandaId !== comandaId ) {
+      return res.json({ valid: false });
+    }
+
+const sessionToken = jwtService.signToken({
+  clienteId: decoded.clienteId,
+  comandaId: decoded.comandaId
+}, '4h'); // expira em 4h
+
+res.cookie('clientes-token', sessionToken, {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax', // "lax" funciona para chamadas do mesmo site
+  maxAge: 1000 * 60 * 60 * 4
+});
+    return res.json({ valid: true });
+
+  } catch (err) {
+    console.error("Erro ao verificar state:", err);
+    return res.json({ valid: false });
+  }
+},
 
           autoLogin: async (req: Request, res: Response) => {
               const { email} = req.body;
@@ -128,7 +172,10 @@ return res.json({ qrCodeDataURL, message: "Novo QR gerado" });
                 }
             
                 // Gera token e retorna
-                const payload = { id: user.id, email: user.email };
+                const payload = { 
+                  clienteId: user.id, 
+                  email: user.email,
+                role:user.role };
                 const token = jwtService.signToken(payload, '7d');
             
                 return res.json({ authenticated: true, ...payload, token });

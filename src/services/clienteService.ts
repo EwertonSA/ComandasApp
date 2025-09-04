@@ -3,6 +3,8 @@ import { Clientes } from "../models/index.js"
 import {Comandas} from "../models/index.js"
 import {Mesas} from "../models/index.js"
 import { ClienteCreationAttributes } from "../models/Cliente.js"
+import { randomBytes } from "crypto";
+import { jwtService } from "./jwtService.js";
 
 export const clienteService={
   findPaginated: async (page: number, perPage: number) => {
@@ -97,5 +99,9 @@ return updatedRows[0]
 deleteCliente:async(id:string,mesaId:number)=>{
    const del= await Clientes.destroy({where:{id,mesaId}})
    return del
+},
+generateClienteState:async(clienteId:string,comandaId:string)=>{
+  const nonce=randomBytes(16).toString('hex')
+  return jwtService.signToken({clienteId,comandaId,nonce},'30m')
 }
 }

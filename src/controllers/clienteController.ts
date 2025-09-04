@@ -1,7 +1,10 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { getPaginationParams } from "../helpers/getPaginationParams.js";
 import { clienteService } from "../services/clienteService.js";
 import { userService } from "../services/userService.js";
+import Comandas from "../models/Comandas.js";
+
+
 
 export const clientesController={
         index1:async(req:Request,res:Response)=>{
@@ -93,4 +96,5 @@ if (isNaN(mesaIdNumber)) {
         } 
        }
     }
+
 }

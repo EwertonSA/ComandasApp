@@ -2,6 +2,9 @@ import { Request, Response } from "express";
 import { comandasService } from "../services/comandasService.js";
 import { getPaginationParams } from "../helpers/getPaginationParams.js";
 import { AuthenticatedRequest } from "../middlewares/auth.js";
+import Comandas from "../models/Comandas.js";
+import { clienteService } from "../services/clienteService.js";
+import { jwtService } from "../services/jwtService.js";
 
 export const comandaController={
   index: async (req: AuthenticatedRequest, res: Response) => {
@@ -20,7 +23,17 @@ export const comandaController={
             return res.status(400).json({ message: error.message });
         }
     }},
-
+registerClientComanda:async(req:Request,res:Response)=>{
+try {
+    const {clienteId,mesaId}=req.body
+const comanda=await  comandasService.create({clienteId,mesaId})
+const state=await clienteService.generateClienteState(clienteId,comanda.id.toString())
+  return res.status(201).json({ id: comanda.id, state });
+} catch (error) {
+     console.error("Erro ao registrar comanda:", error);
+    return res.status(500).json({ error: "Erro interno do servidor" });
+}
+},
     show:async(req:Request,res:Response)=>{
         const {id}=req.params
         try {
@@ -32,6 +45,40 @@ export const comandaController={
             }
         }
     },
+showClient: async (req: Request, res: Response) => {
+  try {
+    // Primeiro tenta pegar do cookie
+    let token = req.cookies['clientes-token'];
+
+    // Se não tiver cookie, tenta pegar do header
+    if (!token && req.headers.authorization) {
+      const authHeader = req.headers.authorization; // "Bearer <token>"
+      if (authHeader.startsWith("Bearer ")) {
+        token = authHeader.split(" ")[1];
+      }
+    }
+
+    if (!token) return res.status(401).json({ message: 'Acesso não autorizado' });
+
+    // Decodifica e valida assinatura
+    const { clienteId, comandaId } = jwtService.verifyTokenState<{ clienteId: string, comandaId: string }>(token);
+
+    const comandaPedido = await comandasService.ComandaPedido(comandaId);
+
+    if (!comandaPedido || comandaPedido.clienteId.toString() !== clienteId) {
+      return res.status(403).json({ message: 'Acesso inválido à comanda' });
+    }
+console.log({ tokenClienteId: clienteId, comandaId, comandaPedidoClienteId: comandaPedido?.clienteId });
+    return res.json(comandaPedido);
+
+  } catch (error) {
+    console.error("Erro no showClient:", error);
+    return res.status(400).json({ message: 'Erro ao buscar pedidos' });
+  }
+}
+,
+
+
     showPayed:async(req:Request,res:Response)=>{
         try {
             const payed=await comandasService.comandaAtiva()
