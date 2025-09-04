@@ -110,33 +110,45 @@ const {userId}=req.body
 const { qrCodeDataURL } = await userService.reset2fa(userId.toString());
 return res.json({ qrCodeDataURL, message: "Novo QR gerado" });
 },
-verifyState: async (req: AuthenticatedRequest1, res: Response) => {
+verifyState: async (req: Request, res: Response) => {
   const { comandaId } = req.params;
-  const { state } = req.query;  
-  const clienteId = req.user?.clienteId;
+  const { state } = req.query;
 
   if (!state) return res.json({ valid: false });
 
   try {
+    // Decodifica o token state da query
     const decoded = jwtService.verifyTokenState<DecodedToken>(state as string);
+
+    // Busca a comanda no banco
     const comanda = await Comandas.findByPk(comandaId);
 
-    if (!comanda || decoded.comandaId !== comandaId ) {
+    // Valida se a comanda existe e corresponde ao token
+    if (!comanda || decoded.comandaId !== comandaId) {
       return res.json({ valid: false });
     }
 
-const sessionToken = jwtService.signToken({
-  clienteId: decoded.clienteId,
-  comandaId: decoded.comandaId
-}, '4h'); // expira em 4h
+    // Cria o token de sessão com clienteId e comandaId
+    const sessionToken = jwtService.signToken({
+      clienteId: decoded.clienteId,
+      comandaId: decoded.comandaId
+    }, '4h'); // expira em 4h
 
-res.cookie('clientes-token', sessionToken, {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: 'lax', // "lax" funciona para chamadas do mesmo site
-  maxAge: 1000 * 60 * 60 * 4,
-   domain: process.env.NODE_ENV === 'production' ? '.esadev.com.br' : undefined,
-});
+    // Log correto usando o clienteId do decoded
+    console.log({
+      tokenClienteId: decoded.clienteId,
+      comandaId: decoded.comandaId,
+    });
+
+    // Seta o cookie de sessão
+    res.cookie('clientes-token', sessionToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 1000 * 60 * 60 * 4,
+      domain: process.env.NODE_ENV === 'production' ? '.esadev.com.br' : undefined,
+    });
+
     return res.json({ valid: true });
 
   } catch (err) {
@@ -144,6 +156,7 @@ res.cookie('clientes-token', sessionToken, {
     return res.json({ valid: false });
   }
 },
+
 
           autoLogin: async (req: Request, res: Response) => {
               const { email} = req.body;
