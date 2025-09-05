@@ -53,7 +53,7 @@ router.get('/api/comandas/pagas',ensureAuth,comandaController.showPayed)
 router.post('/api/clientComanda',ensureAuth,comandaController.registerClientComanda)
 router.post('/api/comandas',ensureAuth,comandaController.save)
 router.get('/api/comandasCliente',ensureAuth,comandaController.showClient)
-router.get('/api/comandas/:id',ensureAuth,comandaController.show)
+router.get('/api/comandas/:id',ensureAuth,validateClientAccess,comandaController.show)
 router.put('/api/comandas/:id',ensureAuth,comandaController.update)
 router.delete('/api/comandas/:id',ensureAuth,comandaController.delete)
 
@@ -81,7 +81,7 @@ router.delete('/api/pedidosProdutos/:id',ensureAuth,pedidosProdutosController.de
 
 router.get('/api/pagamentos',ensureAuth,pagamentoController.index)
 router.get('/api/pagamentos/total',ensureAuth,pagamentoController.total)
-router.post('/api/pagamentos',ensureAuth,pagamentoController.create)
+router.post('/api/pagamentos',ensureAuth,validateClientAccess,pagamentoController.create)
 router.get('/api/pagamentos/:id',ensureAuth,pagamentoController.show)
 router.put('/api/pagamentos/:id',ensureAuth,pagamentoController.update)
 router.delete('/api/pagamentos/:id',ensureAuth,pagamentoController.delete)
