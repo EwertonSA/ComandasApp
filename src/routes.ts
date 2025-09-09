@@ -13,6 +13,7 @@ import { authController } from './controllers/authController.js'
 import { OauthController } from './controllers/OauthController.js'
 import ensureAuth from './middlewares/auth.js'
 import validateClientAccess from './middlewares/verifyState.js'
+import ensureAuth2 from './middlewares/auth2.js'
 
 
 
@@ -67,7 +68,7 @@ router.delete('/api/pedidos/:id',ensureAuth,pedidosController.delete)
 
 router.get('/api/produtos',ensureAuth,productController.index)
 router.post('/api/produtos',ensureAuth,productController.save)
-router.get('/api/produtos/categoria/:categoria',ensureAuth,productController.getAllGroupedByCategory)
+router.get('/api/produtos/categoria/:categoria',ensureAuth2,productController.getAllGroupedByCategory)
 router.get('/api/produtos/:id',ensureAuth,productController.getById)
 
 

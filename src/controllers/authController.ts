@@ -159,6 +159,7 @@ verifyState: async (req: Request, res: Response) => {
 
 
           autoLogin: async (req: Request, res: Response) => {
+              console.log("Body recebido:", req.body);
               const { email} = req.body;
             const password='123456'
               if (!email) {
@@ -186,13 +187,25 @@ verifyState: async (req: Request, res: Response) => {
                 }
             
                 // Gera token e retorna
-                const payload = { 
-                  clienteId: user.id, 
-                  email: user.email,
-                role:user.role };
-                const token = jwtService.signToken(payload, '7d');
-            
-                return res.json({ authenticated: true, ...payload, token });
+               const payload = { 
+  clienteId: user.id, 
+  email: user.email,
+  role: user.role 
+};
+
+const token = jwtService.signToken(payload, '7d');
+
+// Cria cookie HTTP-only
+res.cookie('clientes-token', token, {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production', // true se estiver em HTTPS
+  sameSite: 'lax', // "none" se for cross-site com https
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dias em ms
+});
+
+// Retorna os dados do usuário (não precisa retornar token, já está no cookie)
+return res.json({ authenticated: true, ...payload });
+
             
               } catch (error) {
                 console.error("Erro no login/cadastro:", error);
@@ -202,7 +215,7 @@ verifyState: async (req: Request, res: Response) => {
             logout:async(req:Request,res:Response)=>{
               try {
                 res.clearCookie(
-                  'comandas-token',{
+                  'clientes-token',{
                      httpOnly: true,
                      secure: true,
                      sameSite: 'lax', 

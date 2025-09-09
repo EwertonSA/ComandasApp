@@ -11,7 +11,7 @@ export interface AuthenticatedRequest extends Request{
 
 // lembre de usar app.use(cookieParser()) no Express
 
-export default function ensureAuth(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+export default function ensureAuth2(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     // 1. tenta pelo header
     let token = null;
     const header = req.headers.authorization;

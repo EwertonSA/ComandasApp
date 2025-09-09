@@ -4,6 +4,7 @@ import { produtoService } from "../services/produtosService.js";
 
 import { Op } from "sequelize";
 import Produtos from "../models/Produtos.js";
+import { jwtService } from "../services/jwtService.js";
 
 export const productController={
     index:async(req:Request,res:Response)=>{
@@ -70,28 +71,32 @@ export const productController={
             }
         }
     },
-    getAllGroupedByCategory: async (req: Request, res: Response) => {
-        try {
-          const categorias = ["Entradas", "Pratos", "Bebidas", "Sobremesas"];
-          const resultado: any = {};
-      
-          for (const categoria of categorias) {
-            const produtos = await Produtos.findAll({
-              where: {
-                categoria: {
-                  [Op.iLike]: categoria
-                }
-              }
-            });
-            resultado[categoria] = produtos;
-          }
-      
-          return res.json(resultado);
-        } catch (error) {
-          console.error(error);
-          return res.status(500).json({ message: "Erro ao buscar produtos" });
-        }
-      } ,  getById:async(req:Request,res:Response)=>{
+getAllGroupedByCategory: async (req: Request, res: Response) => {
+  try {
+    // Prioriza cookie, se não tiver, pega do header
+    const token = req.cookies['clientes-token'] || req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ message: "Não autorizado" });
+
+    // Verifica token
+    const payload = jwtService.verifyTokenState(token);
+
+    const categorias = ["Entradas", "Pratos", "Bebidas", "Sobremesas"];
+    const resultado: any = {};
+
+    for (const categoria of categorias) {
+      const produtos = await Produtos.findAll({
+        where: { categoria: { [Op.iLike]: categoria } }
+      });
+      resultado[categoria] = produtos;
+    }
+
+    return res.json(resultado);
+  } catch (error) {
+    console.error("Erro ao buscar produtos:", error);
+    return res.status(500).json({ message: "Erro ao buscar produtos" });
+  }
+}
+ ,  getById:async(req:Request,res:Response)=>{
         console.log('Entrou em getById');
        const {id}=req.params
        try {

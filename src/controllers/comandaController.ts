@@ -5,6 +5,12 @@ import { AuthenticatedRequest } from "../middlewares/auth.js";
 import Comandas from "../models/Comandas.js";
 import { clienteService } from "../services/clienteService.js";
 import { jwtService } from "../services/jwtService.js";
+type JWTPayload = {
+  clienteId: number;
+  mesaId: number;
+  email: string;
+  role: string;
+};
 
 export const comandaController={
   index: async (req: AuthenticatedRequest, res: Response) => {
@@ -25,15 +31,36 @@ export const comandaController={
     }},
 registerClientComanda: async (req: Request, res: Response) => {
   try {
-    const { clienteId, mesaId } = req.body;
+    const token = req.cookies["clientes-token"]; 
+    if (!token) return res.status(401).json({ error: "Não autenticado" });
+
+    const payload = jwtService.verifyTokenState<JWTPayload>(token);
+    const { clienteId, mesaId } = payload;
+
+    // cria a comanda
     const comanda = await comandasService.create({ clienteId, mesaId });
-    const state = await clienteService.generateClienteState(clienteId, comanda.id.toString());
-    return res.status(201).json({ id: comanda.id, state });
+
+    // monta um novo payload com comandaId
+    const newPayload = { ...payload, comandaId: comanda.id };
+
+    // assina um novo token
+    const newToken = jwtService.signToken(newPayload, "7d");
+
+    // sobrescreve o cookie com o token atualizado
+    res.cookie("clientes-token", newToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+console.log("tokenComandaID:",newPayload.comandaId)
+    return res.status(201).json({ id: comanda.id });
   } catch (error) {
     console.error("Erro ao registrar comanda:", error);
     return res.status(500).json({ error: "Erro interno do servidor" });
   }
 },
+
 
     show:async(req:Request,res:Response)=>{
         const {id}=req.params
