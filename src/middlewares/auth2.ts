@@ -19,10 +19,10 @@ export default function ensureAuth2(req: AuthenticatedRequest, res: Response, ne
         token = header.replace("Bearer ", "");
     }
 
-    // 2. se não tiver header, tenta pelo cookie
-    if (!token && req.cookies.token) {
-        token = req.cookies.token;
-    }
+   if (!token && req.cookies['clientes-token']) {
+    token = req.cookies['clientes-token'];
+}
+
 
     if (!token) {
         return res.status(401).json({ message: "Não autorizado" });

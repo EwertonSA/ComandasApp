@@ -23,7 +23,7 @@ app.use(session({
   }
 }));
 app.use(cors({
-  origin: 'http://localhost:3000',  // endereço do seu frontend
+  origin: 'http://esadev.com.br',  // endereço do seu frontend
   credentials: true
 }));
 app.use(cookieParser())
