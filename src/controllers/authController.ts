@@ -158,60 +158,60 @@ verifyState: async (req: Request, res: Response) => {
 },
 
 
-          autoLogin: async (req: Request, res: Response) => {
-              console.log("Body recebido:", req.body);
-              const { email} = req.body;
-            const password='123456'
-              if (!email) {
-                return res.status(400).json({ message: 'Email e senha são obrigatórios' });
-              }
-            
-              try {
-                let user = await userService.findByEmail(email);
-            
-                if (!user) {
-                  // Usuário não existe: cria automaticamente
-                  user = await userService.create({ email, password ,role:'cliente'});
-                } else {
-                  // Usuário já existe: verifica a senha
-                  const isSame = await new Promise<boolean>((resolve, reject) => {
-                    user!.checkPassword(password, (err: any, result: boolean) => {
-                      if (err) return reject(err);
-                      resolve(result);
-                    });
-                  });
-            
-                  if (!isSame) {
-                    return res.status(401).json({ message: 'Senha incorreta!' });
-                  }
-                }
-            
-                // Gera token e retorna
-               const payload = { 
-  clienteId: user.id, 
-  email: user.email,
-  role: user.role 
-};
+         autoLogin: async (req: Request, res: Response) => {
+  console.log("Body recebido:", req.body);
+  const { email } = req.body;
+  const password = '123456';
 
-const token = jwtService.signToken(payload, '7d');
+  if (!email) {
+    return res.status(400).json({ message: 'Email e senha são obrigatórios' });
+  }
 
-// Cria cookie HTTP-only
-res.cookie('clientes-token', token, {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === 'production', // true se estiver em HTTPS
-  sameSite: 'lax', // "none" se for cross-site com https
-  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dias em ms
-});
+  try {
+    let user = await userService.findByEmail(email);
 
-// Retorna os dados do usuário (não precisa retornar token, já está no cookie)
-return res.json({ authenticated: true, ...payload });
+    if (!user) {
+      // cria usuário novo
+      user = await userService.create({ email, password, role: 'cliente' });
+    } else {
+      // valida senha
+      const isSame = await new Promise<boolean>((resolve, reject) => {
+        user!.checkPassword(password, (err: any, result: boolean) => {
+          if (err) return reject(err);
+          resolve(result);
+        });
+      });
 
-            
-              } catch (error) {
-                console.error("Erro no login/cadastro:", error);
-                return res.status(500).json({ message: 'Erro interno do servidor' });
-              }
-            },
+      if (!isSame) {
+        return res.status(401).json({ message: 'Senha incorreta!' });
+      }
+    }
+
+    // cria payload do token
+    const payload = { 
+      clienteId: user.id, 
+      email: user.email,
+      role: user.role 
+    };
+
+    const token = jwtService.signToken(payload, '7d');
+
+    // seta cookie HTTP-only cross-site
+    res.cookie('clientes-token', token, {
+      httpOnly: true,
+      secure: true,        // precisa ser HTTPS
+      sameSite: 'none',    // permite cross-site
+      maxAge: 7 * 24 * 60 * 60 * 1000, 
+    });
+
+    return res.json({ authenticated: true, ...payload });
+
+  } catch (error) {
+    console.error("Erro no login/cadastro:", error);
+    return res.status(500).json({ message: 'Erro interno do servidor' });
+  }
+},
+
             logout:async(req:Request,res:Response)=>{
               try {
                 res.clearCookie(

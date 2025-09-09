@@ -49,18 +49,20 @@ registerClientComanda: async (req: Request, res: Response) => {
     // sobrescreve o cookie com o token atualizado
     res.cookie("clientes-token", newToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      secure: true,        // 🔹 precisa ser true
+      sameSite: "none",    // 🔹 precisa ser none para cross-site
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-console.log("tokenComandaID:",newPayload.comandaId)
+
+    console.log("tokenComandaID:", newPayload.comandaId);
     return res.status(201).json({ id: comanda.id });
+
   } catch (error) {
     console.error("Erro ao registrar comanda:", error);
     return res.status(500).json({ error: "Erro interno do servidor" });
   }
-},
-
+}
+,
 
     show:async(req:Request,res:Response)=>{
         const {id}=req.params
