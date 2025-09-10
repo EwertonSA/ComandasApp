@@ -158,61 +158,30 @@ verifyState: async (req: Request, res: Response) => {
 },
 
 
-         autoLogin: async (req: Request, res: Response) => {
-  console.log("Body recebido:", req.body);
-  const { email } = req.body;
-  const password = '123456';
+// POST /api/auth/autoLogin
+// 1️⃣ AutoLogin
+autoLogin: async (req: Request, res: Response) => {
+  const { email, nome, mesaId } = req.body;
+  const password = "123456"; // senha fixa demo
 
-  if (!email) {
-    return res.status(400).json({ message: 'Email e senha são obrigatórios' });
-  }
+  if (!email) return res.status(400).json({ message: "Email obrigatório" });
 
   try {
     let user = await userService.findByEmail(email);
-
     if (!user) {
-      // cria usuário novo
-      user = await userService.create({ email, password, role: 'cliente' });
-    } else {
-      // valida senha
-      const isSame = await new Promise<boolean>((resolve, reject) => {
-        user!.checkPassword(password, (err: any, result: boolean) => {
-          if (err) return reject(err);
-          resolve(result);
-        });
-      });
-
-      if (!isSame) {
-        return res.status(401).json({ message: 'Senha incorreta!' });
-      }
+      user = await userService.create({ email, password, role: "cliente" });
     }
 
-    // cria payload do token
-    const payload = { 
-      clienteId: user.id, 
-      email: user.email,
-      role: user.role 
-    };
+    const payload = { clienteId: user.id, email: user.email, role: user.role, mesaId };
+    const token = jwtService.signToken(payload, "7d");
 
-    const token = jwtService.signToken(payload, '7d');
-
-    // seta cookie HTTP-only cross-site
-    res.cookie('clientes-token', token, {
-      httpOnly: true,
-      secure: true,        // precisa ser HTTPS
-      sameSite: 'none',    // permite cross-site
-      maxAge: 7 * 24 * 60 * 60 * 1000, 
-    });
-
-    return res.json({ authenticated: true, ...payload });
-
-  } catch (error) {
-    console.error("Erro no login/cadastro:", error);
-    return res.status(500).json({ message: 'Erro interno do servidor' });
+    return res.json({ authenticated: true, token, ...payload });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Erro interno do servidor" });
   }
-},
-
-            logout:async(req:Request,res:Response)=>{
+}
+ ,           logout:async(req:Request,res:Response)=>{
               try {
                 res.clearCookie(
                   'clientes-token',{

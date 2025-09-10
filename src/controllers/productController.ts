@@ -71,31 +71,24 @@ export const productController={
             }
         }
     },
-getAllGroupedByCategory: async (req: Request, res: Response) => {
+// controller
+getByCategory: async (req: Request, res: Response) => {
   try {
-    // Prioriza cookie, se não tiver, pega do header
-    const token = req.cookies['clientes-token'] || req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ message: "Não autorizado" });
+    // payload já está validado pelo authMiddleware
+    const user = (req as any).user;
 
-    // Verifica token
-    const payload = jwtService.verifyTokenState(token);
+    const { categoria } = req.params;
+    const produtos = await Produtos.findAll({
+      where: { categoria: { [Op.iLike]: categoria } }
+    });
 
-    const categorias = ["Entradas", "Pratos", "Bebidas", "Sobremesas"];
-    const resultado: any = {};
-
-    for (const categoria of categorias) {
-      const produtos = await Produtos.findAll({
-        where: { categoria: { [Op.iLike]: categoria } }
-      });
-      resultado[categoria] = produtos;
-    }
-
-    return res.json(resultado);
-  } catch (error) {
-    console.error("Erro ao buscar produtos:", error);
+    return res.json(produtos);
+  } catch (err) {
+    console.error(err);
     return res.status(500).json({ message: "Erro ao buscar produtos" });
   }
 }
+
  ,  getById:async(req:Request,res:Response)=>{
         console.log('Entrou em getById');
        const {id}=req.params

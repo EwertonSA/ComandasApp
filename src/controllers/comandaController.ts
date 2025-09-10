@@ -10,6 +10,8 @@ type JWTPayload = {
   mesaId: number;
   email: string;
   role: string;
+  exp?:string
+  iat?:string
 };
 
 export const comandaController={
@@ -29,39 +31,28 @@ export const comandaController={
             return res.status(400).json({ message: error.message });
         }
     }},
+// POST /api/clientComanda
 registerClientComanda: async (req: Request, res: Response) => {
   try {
-    const token = req.cookies["clientes-token"]; 
-    if (!token) return res.status(401).json({ error: "Não autenticado" });
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) return res.status(401).json({ message: "Não autenticado" });
 
+    const token = authHeader.split(' ')[1];
     const payload = jwtService.verifyTokenState<JWTPayload>(token);
-    const { clienteId, mesaId } = payload;
+    const { clienteId, mesaId, exp, iat, ...rest } = payload; // remove exp e iat
 
-    // cria a comanda
     const comanda = await comandasService.create({ clienteId, mesaId });
 
-    // monta um novo payload com comandaId
-    const newPayload = { ...payload, comandaId: comanda.id };
+    const newPayload = { ...rest, clienteId, mesaId, comandaId: comanda.id };
+    const newToken = jwtService.signToken(newPayload, "7d"); // agora sem conflito
 
-    // assina um novo token
-    const newToken = jwtService.signToken(newPayload, "7d");
-
-    // sobrescreve o cookie com o token atualizado
-    res.cookie("clientes-token", newToken, {
-      httpOnly: true,
-      secure: true,        // 🔹 precisa ser true
-      sameSite: "none",    // 🔹 precisa ser none para cross-site
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-
-    console.log("tokenComandaID:", newPayload.comandaId);
-    return res.status(201).json({ id: comanda.id });
-
+    return res.status(201).json({ id: comanda.id, token: newToken });
   } catch (error) {
-    console.error("Erro ao registrar comanda:", error);
-    return res.status(500).json({ error: "Erro interno do servidor" });
+    console.error(error);
+    return res.status(500).json({ message: "Erro interno do servidor" });
   }
 }
+
 ,
 
     show:async(req:Request,res:Response)=>{

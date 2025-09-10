@@ -44,6 +44,7 @@ router.delete('/api/mesas/:id',mesasController.delete)
 router.get('/api/clientes',ensureAuth,clientesController.index1)
 router.get('/api/clienteCompleto',ensureAuth,clientesController.index)
 router.post('/api/clientes',ensureAuth,clientesController.registro)
+router.post('/api/cliente',ensureAuth,clientesController.register)
 router.get('/api/users',ensureAuth,clientesController.showUser)
 router.put('/api/clientes/:id',ensureAuth,clientesController.update)
 router.get('/api/clientes/:id',ensureAuth,clientesController.show)
@@ -68,7 +69,7 @@ router.delete('/api/pedidos/:id',ensureAuth,pedidosController.delete)
 
 router.get('/api/produtos',ensureAuth,productController.index)
 router.post('/api/produtos',ensureAuth,productController.save)
-router.get('/api/produtos/categoria/:categoria',authMiddleware,productController.getAllGroupedByCategory)
+router.get('/api/produtos/categoria/:categoria',authMiddleware,productController.getByCategory)
 router.get('/api/produtos/:id',ensureAuth,productController.getById)
 
 

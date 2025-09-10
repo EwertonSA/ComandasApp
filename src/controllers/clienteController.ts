@@ -3,6 +3,8 @@ import { getPaginationParams } from "../helpers/getPaginationParams.js";
 import { clienteService } from "../services/clienteService.js";
 import { userService } from "../services/userService.js";
 import Comandas from "../models/Comandas.js";
+import { jwtService } from "../services/jwtService.js";
+import { JwtPayload } from "jsonwebtoken";
 
 
 
@@ -71,6 +73,34 @@ if (isNaN(mesaIdNumber)) {
             } 
         }
     },
+register: async (req: Request, res: Response) => {
+  const { nome, mesaId } = req.body;
+  const mesaIdNumber = Number(mesaId);
+  if (isNaN(mesaIdNumber)) return res.status(400).json({ message: "mesaId inválido" });
+
+  try {
+    const cliente = await clienteService.create({ nome, mesaId: mesaIdNumber });
+
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) return res.status(401).json({ message: "Não autenticado" });
+
+    const token = authHeader.split(' ')[1];
+    const payload = jwtService.verifyTokenState<JwtPayload>(token);
+
+    // Remove exp e iat para poder gerar novo token
+    const { exp, iat, ...cleanPayload } = payload;
+
+    const newPayload = { ...cleanPayload, clienteId: cliente.id, mesaId: mesaIdNumber };
+    const newToken = jwtService.signToken(newPayload, "7d");
+
+    return res.status(201).json({ cliente, token: newToken });
+  } catch (error) {
+    return res.status(400).json({ message: error instanceof Error ? error.message : "Erro" });
+  }
+}
+
+,
+
     update:async(req:Request,res:Response)=>{
         const id=req.params.id
         const {nome,telefone,mesaId}=req.body
