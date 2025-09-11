@@ -50,7 +50,23 @@ export const pedidosController={
             return res.status(400).json({message:error.message})
         }
     }
-   },update:async(req:Request,res:Response)=>{
+   },
+   saveForClient:async(req:Request,res:Response)=>{
+const {total}=req.body
+const {comandaId}=(req as any).user
+try {
+        const pedido=await pedidosService.create({
+            comandaId,total, status: "pendente",
+        })
+        return res.status(200).json(pedido)
+    } catch (error) {
+        if(error instanceof Error){
+            return res.status(400).json({message:error.message})
+        }
+    }
+   },
+   
+   update:async(req:Request,res:Response)=>{
     const {id}=req.params
     const {comandaId,total,status}=req.body
     try {

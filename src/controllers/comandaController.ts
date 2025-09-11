@@ -68,42 +68,36 @@ registerClientComanda: async (req: Request, res: Response) => {
     },
 showClient: async (req: Request, res: Response) => {
   try {
-    // Pega o token do cookie ou do header
-    let token = req.cookies['clientes-token'];
-    if (!token && req.headers.authorization) {
-      const authHeader = req.headers.authorization;
-      if (authHeader.startsWith("Bearer ")) {
-        token = authHeader.split(" ")[1];
-      }
+    // ✅ Pega os dados direto do middleware
+    const { clienteId, comandaId } = (req as any).user;
+
+    if (!clienteId || !comandaId) {
+      return res.status(401).json({ message: 'Token inválido' });
     }
 
-    if (!token) return res.status(401).json({ message: 'Acesso não autorizado' });
-
-    // Decodifica o token de sessão
-    const decoded = jwtService.verifyTokenState<{ clienteId: string, comandaId: string }>(token);
-    const clienteId = decoded.clienteId;
-    const comandaId = decoded.comandaId;
-
-
-
+    // Busca a comanda
     const comandaPedido = await comandasService.ComandaPedido(comandaId);
-console.log("Decoded clienteId:", clienteId);
-console.log("ComandaPedido.clienteId:", comandaPedido?.clienteId);
-    if (!comandaPedido || comandaPedido.clienteId.toString() !== clienteId) {
+
+    if (!comandaPedido) {
+      return res.status(404).json({ message: 'Comanda não encontrada' });
+    }
+
+    // Verifica se o cliente é dono da comanda
+    if (comandaPedido.clienteId.toString() !== clienteId.toString()) {
       return res.status(403).json({ message: 'Acesso inválido à comanda' });
     }
 
-    // Retorna o objeto incluindo o comandaId explicitamente
     return res.json({
       ...comandaPedido.toJSON(),
-      comandaId: comandaPedido.id
+      comandaId: comandaPedido.id,
     });
-
+    
   } catch (error) {
     console.error("Erro no showClient:", error);
-    return res.status(400).json({ message: 'Erro ao buscar pedidos' });
+    return res.status(500).json({ message: 'Erro ao buscar pedidos' });
   }
 }
+
 ,
 
 

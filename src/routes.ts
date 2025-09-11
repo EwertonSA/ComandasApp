@@ -54,7 +54,7 @@ router.get('/api/comandas',ensureAuth,validateClientAccess,comandaController.ind
 router.get('/api/comandas/pagas',ensureAuth,comandaController.showPayed)
 router.post('/api/clientComanda',ensureAuth,comandaController.registerClientComanda)
 router.post('/api/comandas',ensureAuth,comandaController.save)
-router.get('/api/comandasCliente',ensureAuth,comandaController.showClient)
+router.get('/api/comandasCliente',authMiddleware,comandaController.showClient)
 router.get('/api/comandas/:id',ensureAuth,comandaController.show)
 router.put('/api/comandas/:id',ensureAuth,comandaController.update)
 router.delete('/api/comandas/:id',ensureAuth,comandaController.delete)
@@ -64,13 +64,15 @@ router.get('/api/pedidoCompleto',ensureAuth,pedidosController.index)
 router.get('/api/pedidos/search',ensureAuth,productController.findByName)
 router.get('/api/pedidos/:id',ensureAuth,pedidosController.show)
 router.put('/api/pedidos/:id',ensureAuth,pedidosController.update)
-router.post('/api/pedidos',ensureAuth,pedidosController.save)
+router.post('/api/pedidos',authMiddleware,pedidosController.save)
+router.post('/api/pedidosCliente',authMiddleware,pedidosController.saveForClient)
 router.delete('/api/pedidos/:id',ensureAuth,pedidosController.delete)
 
 router.get('/api/produtos',ensureAuth,productController.index)
 router.post('/api/produtos',ensureAuth,productController.save)
 router.get('/api/produtos/categoria/:categoria',authMiddleware,productController.getByCategory)
 router.get('/api/produtos/:id',ensureAuth,productController.getById)
+
 
 
 
