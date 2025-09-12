@@ -88,6 +88,7 @@ router.delete('/api/pedidosProdutos/:id',ensureAuth,pedidosProdutosController.de
 
 router.get('/api/pagamentos',ensureAuth,pagamentoController.index)
 router.get('/api/pagamentos/total',ensureAuth,pagamentoController.total)
+router.post('/api/pagamento',authMiddleware,pagamentoController.paymentForClient)
 router.post('/api/pagamentos',ensureAuth,pagamentoController.create)
 router.get('/api/pagamentos/:id',ensureAuth,pagamentoController.show)
 router.put('/api/pagamentos/:id',ensureAuth,pagamentoController.update)

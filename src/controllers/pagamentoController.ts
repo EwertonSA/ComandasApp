@@ -27,7 +27,19 @@ export const pagamentoController={
         return res.status(500).json({ message: "Erro interno no servidor." });
       }
     },
-    
+    paymentForClient:async(req:Request,res:Response)=>{
+const {comandaId}=(req as any).user
+const {valor,formaPagamento}=req.body;
+try {
+    const payment=await pagamentoService.criarPagamento(comandaId,valor,formaPagamento)
+    return res.status(201).json(payment)
+} catch (error) {
+     if (error instanceof Error) {
+          return res.status(400).json({ message: error.message });
+        }
+        return res.status(500).json({ message: "Erro interno no servidor." });
+}
+    },
     
     show:async(req:Request,res:Response)=>{
         const {id}=req.params
