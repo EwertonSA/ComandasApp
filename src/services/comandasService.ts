@@ -28,9 +28,21 @@ findAllPaginated:async(userId:number,page:number,perPage:number)=>{
                 attributes:['id',['comanda_id','comandaId'],'total','status']
             }
         })
+        console.log("DEBUG buscando comandaId no banco:", id);
+
         return comandaPedido
     },
+ComandaPedidos: async (comandaId: string, clienteId: number) => {
+  const comandaPedido = await Comandas.findByPk(comandaId, {
+    include: { association: 'pedidos' }
+  });
 
+  if (!comandaPedido) throw new Error("Comanda não existe");
+  if (comandaPedido.clienteId !== clienteId) 
+    throw new Error("Acesso negado à comanda");
+
+  return comandaPedido;
+},
 
 comandaAtiva: async () => {
   try {

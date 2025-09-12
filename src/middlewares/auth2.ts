@@ -19,7 +19,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
     // 4️⃣ Valida o token
     const payload = jwtService.verifyTokenState(token);
     (req as any).user = payload; // injeta user no req
-
+console.log("Decoded JWT payload:", payload);
     next();
   } catch (err) {
     return res.status(401).json({ message: "Token inválido" });

@@ -66,8 +66,26 @@ registerClientComanda: async (req: Request, res: Response) => {
             }
         }
     },
-showClient: async (req: Request, res: Response) => {
+orders: async (req: Request, res: Response) => {
+  const { comandaId, clienteId } = (req as any).user;
+
+  if (!comandaId || !clienteId) 
+    return res.status(400).json({ message: "Comanda ou cliente não encontrados no token" });
+
+  console.log("DEBUG -> clienteIdd:", clienteId, "comandaIdd:", comandaId);
+
   try {
+    const comandaPedido = await comandasService.ComandaPedidos(comandaId, clienteId);
+
+    return res.json(comandaPedido);
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(400).json({ message: error.message });
+    }
+  }
+},
+showClient: async (req: Request, res: Response) => {
+  try { 
     // ✅ Pega os dados direto do middleware
     const { clienteId, comandaId } = (req as any).user;
 

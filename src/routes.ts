@@ -12,7 +12,7 @@ import { authController } from './controllers/authController.js'
 
 import { OauthController } from './controllers/OauthController.js'
 import ensureAuth from './middlewares/auth.js'
-import validateClientAccess from './middlewares/verifyState.js'
+
 import { authMiddleware } from './middlewares/auth2.js'
 
 
@@ -48,14 +48,17 @@ router.post('/api/cliente',ensureAuth,clientesController.register)
 router.get('/api/users',ensureAuth,clientesController.showUser)
 router.put('/api/clientes/:id',ensureAuth,clientesController.update)
 router.get('/api/clientes/:id',ensureAuth,clientesController.show)
+
 router.delete('/api/clientes/:id/:mesaId',ensureAuth,clientesController.delete)
 
-router.get('/api/comandas',ensureAuth,validateClientAccess,comandaController.index)
+router.get('/api/comandas',ensureAuth,comandaController.index)
 router.get('/api/comandas/pagas',ensureAuth,comandaController.showPayed)
 router.post('/api/clientComanda',ensureAuth,comandaController.registerClientComanda)
 router.post('/api/comandas',ensureAuth,comandaController.save)
 router.get('/api/comandasCliente',authMiddleware,comandaController.showClient)
-router.get('/api/comandas/:id',ensureAuth,comandaController.show)
+router.get('/api/comandas',authMiddleware,comandaController.orders)
+router.get('/api/comandas/:id',authMiddleware,comandaController.show)
+router.get('/api/comanda',authMiddleware,comandaController.orders)
 router.put('/api/comandas/:id',ensureAuth,comandaController.update)
 router.delete('/api/comandas/:id',ensureAuth,comandaController.delete)
 
