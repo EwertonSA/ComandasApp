@@ -66,11 +66,19 @@ const {code,state}=req.query as {code:string,state:string}
   if (!code || !state)
     return res.status(400).send("Código ou state ausente");
   try {
+      console.log("Callback LinkedIn iniciado");
+  console.log("code:", code, "state:", state);
     await linkedinService.verifystate(state);
+     console.log("✅ State verificado");
     const access_token=await linkedinService.exchangeLinkedinCodeForCode(code)
+    console.log("✅ Access token:", access_token);
     const {email,name}=await linkedinService.getUserProfile(access_token)
+    console.log("✅ Perfil LinkedIn:", { email, name });
     const user=await linkedinService.findOrCreateUser(email,name)
+    console.log("✅ Usuário no sistema:", user);
+
     const userJwt=await linkedinService.generateAppToken(user)
+      console.log("✅ Token gerado:", userJwt);
     
     res.cookie("comandas-token", userJwt, {
       httpOnly: true,

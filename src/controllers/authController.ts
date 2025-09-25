@@ -5,6 +5,7 @@ import { UserModel } from "../models/User.js";
 import validateRecaptcha from "../services/recaptcha.js";
 import { AuthenticatedRequest } from "../middlewares/auth.js";
 import Comandas from "../models/Comandas.js";
+import bcrypt from 'bcrypt'
 export interface AuthenticatedRequest1 extends Request {
   user?: { clienteId: string; email: string; role: string };
   comanda?: InstanceType<typeof Comandas>; // agora o TS aceita req.comanda
@@ -91,14 +92,21 @@ verify2FA: async (req: Request, res: Response) => {
 
     // 3. Gera JWT apenas após 2FA válido
     const jwt = jwtService.signToken(
-      { id: user.id, email: user.email },
-      "7d"
+      { id: user.id, email: user.email ,role: user.role},
+      "1d"
     );
+    
+    res.cookie("comandas-token", jwt, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 24 * 60 * 60 * 1000,
+      sameSite: "lax",
+      path: "/",
+    });
 
     return res.json({
       authenticated: true,
-      token: jwt,
-      user: { id: user.id, email: user.email } // opcional
+      user: { id: user.id, email: user.email,role: user.role } // opcional
     });
 
   } catch (err: any) {

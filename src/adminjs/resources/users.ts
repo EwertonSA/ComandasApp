@@ -17,13 +17,15 @@ const UserResourceOptions:ResourceOptions={
                 edit: true,
             }
         },
-        role:{
-            type:'string',
-            availableValues:[
-                {value:'user',label:'Usuário'},
-                {value:'cliente',label:'Cliente'}
-            ]
-        },
+     role: {
+  type: 'string',
+  availableValues: [
+    { value: 'user', label: 'Usuário' },
+    { value: 'cliente', label: 'Cliente' },
+    { value: 'admin', label: 'Administrador' } // 👈 faltava aqui
+  ]
+},
+
         
     },
 }

@@ -9,7 +9,7 @@ export interface User {
   phone?: string;
   email: string;
   password: string;
-  role: "user" | "cliente";
+  role: "user" | "cliente" |"admin";
   instagramId?:string
   linkedinId?:string,
   two_factor_enabled?:boolean,
@@ -63,7 +63,7 @@ export const UserModel = sequelize.define<UserInstance, User>(
       allowNull: false,
       type: DataTypes.STRING,
       validate: {
-        isIn: [["user", "cliente"]],
+        isIn: [["user", "cliente","admin"]],
       },
     },
     instagramId:{
