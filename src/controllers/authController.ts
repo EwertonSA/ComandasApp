@@ -51,7 +51,7 @@ export const authController={
       },
       
   login: async (req: Request, res: Response) => {
-     const { email, password,recaptchaToken } = req.body;
+     const { email, password,recaptchaToken,role } = req.body;
       const recaptchaResult = await validateRecaptcha(recaptchaToken);
   if (!recaptchaResult.success) {
     return res.status(400).json({ message: "Falha na verificação do reCAPTCHA" });
@@ -63,7 +63,10 @@ export const authController={
   user.checkPassword(password, async (err, isSame) => {
     if (err) return res.status(400).json({ message: err.message });
     if (!isSame) return res.status(401).json({ message: "Senha incorreta!" });
-
+ if (role !== user.role) {
+      return res.status(403).json({ message: "Tipo de login incorreto para este usuário" });
+    }
+   
     if (!user.two_factor_enabled) {
       const { qrCodeDataURL } = await userService.setup2fa(user.id.toString());
       return res.json({ twoFARequired: true, qrCodeDataURL, userId: user.id });
@@ -103,7 +106,10 @@ verify2FA: async (req: Request, res: Response) => {
       sameSite: "lax",
       path: "/",
     });
-
+ let redirectTo = "/login";
+    if (user.role === "admin") redirectTo = "/admin";
+    if (user.role === "user") redirectTo = "/employeeApp";
+    if (user.role === "cliente") redirectTo = "/clientApp";
     return res.json({
       authenticated: true,
       user: { id: user.id, email: user.email,role: user.role } // opcional
