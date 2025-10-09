@@ -6,7 +6,7 @@ import { where } from "sequelize";
 export const userService={
 findByEmail:(email:string)=>{
     const user=UserModel.findOne({
-        attributes:['id','name','phone','email','password','two_factor_enabled','two_factor_secret'],
+        attributes:['id','name','phone','email','password','role','two_factor_enabled','two_factor_secret'],
         where:{
             email
         },
@@ -65,69 +65,99 @@ if (!secret.otpauth_url) {
     // Retornar os dados para o controller
     return { qrCodeDataURL, secret: secret.base32 };
   },
- verify2fa: async (token: string, id: string) => {
-    const user = await UserModel.findByPk(id);
+verify2fa: async (token: string, id: string) => {
+  console.log("Verificando 2FA para ID:", id, "Token:", token);
 
-    if (!user) throw new Error("Usuário não encontrado");
-    if (!user.two_factor_secret) throw new Error("2FA não configurado");
-
-    const verified = speakeasy.totp.verify({
-      secret: user.two_factor_secret,
-      encoding: "base32",
-      token,
-      window: 1
-    });
-
-    if (!verified) throw new Error("Código inválido");
-
-    // Ativar 2FA caso ainda não esteja
-    if (!user.two_factor_enabled) {
-      user.two_factor_enabled = true;
-      await user.save();
-    }
-
-    return true; // retorna algo para indicar sucesso
-  }
-,
-reset2fa: async (id: string) => {
   const user = await UserModel.findByPk(id);
   if (!user) throw new Error("Usuário não encontrado");
+  if (!user.two_factor_secret) throw new Error("2FA não configurado");
 
-  // 🔹 Diferente do setup2fa, aqui a gente não bloqueia mesmo que já tenha 2FA
-  const secret = speakeasy.generateSecret({
-    name: `MeuPainelAdmin (${user.email})`
+  console.log("Secret carregado:", user.two_factor_secret);
+
+  const verified = speakeasy.totp.verify({
+    secret: user.two_factor_secret,
+    encoding: "base32",
+    token,
+    window: 2
   });
 
-  await UserModel.update(
-    { two_factor_secret: secret.base32, two_factor_enabled: false }, // força reset
-    { where: { id: user.id } }
-  );
+  console.log("Resultado verificação:", verified);
 
-  if (!secret.otpauth_url) {
-    throw new Error("Falha ao gerar a URL do Authenticator");
+  if (!verified) throw new Error("Código inválido");
+
+  if (!user.two_factor_enabled) {
+    user.two_factor_enabled = true;
+    await user.save();
   }
 
-  const qrCodeDataURL = await qrcode.toDataURL(secret.otpauth_url);
-
-  return { qrCodeDataURL, secret: secret.base32 };
+  return true;
 }
 ,
-get2faQRCode:async(userId: string) =>{
+  reset2fa: async (id: string) => {
+    const user = await UserModel.findByPk(id);
+    if (!user) throw new Error("Usuário não encontrado");
+
+    // Usa o mesmo formato em todas as funções
+    const secret = speakeasy.generateSecret({
+      name: `MeuApp (${user.email})`, // mesmo "issuer" e label
+    });
+
+    // Atualiza o secret no banco e desativa temporariamente o 2FA
+    await UserModel.update(
+      {
+        two_factor_secret: secret.base32,
+        two_factor_enabled: false,
+      },
+      { where: { id: user.id } }
+    );
+
+    if (!secret.otpauth_url) {
+      throw new Error("Falha ao gerar a URL do Authenticator");
+    }
+
+    // Gera o QR Code a partir do otpauth_url oficial do Speakeasy
+    const qrCodeDataURL = await qrcode.toDataURL(secret.otpauth_url);
+
+    return {
+      message: "2FA resetado com sucesso. Escaneie o novo QR Code.",
+      qrCodeDataURL,
+      secret: secret.base32,
+    };
+  },
+
+  // 🔹 Função para gerar ou retornar o QR Code do 2FA
+  get2faQRCode: async (userId: string) => {
     const user = await UserModel.findByPk(userId);
     if (!user) throw new Error("Usuário não encontrado");
 
-    let secret = user.two_factor_secret;
+    // Se o usuário ainda não tem um secret, gera um novo no mesmo padrão
+    if (!user.two_factor_secret) {
+      const secret = speakeasy.generateSecret({
+        name: `MeuApp (${user.email})`, // mesmo formato do reset2fa
+      });
 
-    if (!secret) {
-      secret = speakeasy.generateSecret({ length: 20 }).base32;
-      user.two_factor_secret = secret;
+      user.two_factor_secret = secret.base32;
       await user.save();
+
+      const qrCodeDataURL = await qrcode.toDataURL(secret.otpauth_url!);
+
+      return {
+        message: "QR Code de 2FA gerado com sucesso.",
+        qrCodeDataURL,
+        secret: secret.base32,
+      };
     }
 
-    const otpauth = `otpauth://totp/MeuApp:${user.email}?secret=${secret}&issuer=MeuApp`;
-    const qrCodeDataURL = await qrcode.toDataURL(otpauth);
+    // Caso o usuário já tenha um secret, gera o QR Code correspondente
+    const existingSecret = user.two_factor_secret;
+    const otpauthUrl = `otpauth://totp/MeuApp (${user.email})?secret=${existingSecret}&issuer=MeuApp`;
+    const qrCodeDataURL = await qrcode.toDataURL(otpauthUrl);
 
-    return { qrCodeDataURL };
-  }
+    return {
+      message: "QR Code de 2FA existente retornado.",
+      qrCodeDataURL,
+      secret: existingSecret,
+    };
+  },
 
 }

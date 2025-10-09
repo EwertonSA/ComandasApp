@@ -75,11 +75,35 @@ export const authController={
     return res.json({ twoFARequired: true, message: "Informe o código do Authenticator", userId: user.id });
   });
 },
+  loginTest: async (req: Request, res: Response) => {
+     const { email, password,role } = req.body;
+
+ 
+  const user = await userService.findByEmail(email);
+  console.log('role:',role)
+  if (!user) return res.status(404).json({ message: "E-mail não registrado" });
+
+  user.checkPassword(password, async (err, isSame) => {
+    if (err) return res.status(400).json({ message: err.message });
+    if (!isSame) return res.status(401).json({ message: "Senha incorreta!" });
+    console.log("userRole:",user.role)
+ if (role !== user.role) {
+      return res.status(403).json({ message: "Tipo de login incorreto para este usuário" });
+    }
+   
+    if (!user.two_factor_enabled) {
+      const { qrCodeDataURL } = await userService.setup2fa(user.id.toString());
+      return res.json({ twoFARequired: true, qrCodeDataURL, userId: user.id });
+    }
+
+    return res.json({ twoFARequired: true, message: "Informe o código do Authenticator", userId: user.id });
+  });
+},
 
 // verify 2FA
 verify2FA: async (req: Request, res: Response) => {
   const { token, userId } = req.body;
-
+console.log("Recebido no backend verify2FA:", req.body);
   try {
     // 1. Verifica o 2FA
     const isValid = await userService.verify2fa(token, userId.toString());
@@ -106,13 +130,12 @@ verify2FA: async (req: Request, res: Response) => {
       sameSite: "lax",
       path: "/",
     });
- let redirectTo = "/login";
-    if (user.role === "admin") redirectTo = "/admin";
-    if (user.role === "user") redirectTo = "/employeeApp";
-    if (user.role === "cliente") redirectTo = "/clientApp";
-    return res.json({
+
+    return res.status(200).json({
       authenticated: true,
-      user: { id: user.id, email: user.email,role: user.role } // opcional
+      user: { id: user.id, email: user.email,role: user.role },
+    
+     
     });
 
   } catch (err: any) {
