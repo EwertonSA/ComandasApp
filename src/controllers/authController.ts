@@ -103,7 +103,8 @@ export const authController={
 // verify 2FA
 verify2FA: async (req: Request, res: Response) => {
   const { token, userId } = req.body;
-console.log("Recebido no backend verify2FA:", req.body);
+  console.log("Recebido no backend verify2FA:", req.body);
+
   try {
     // 1. Verifica o 2FA
     const isValid = await userService.verify2fa(token, userId.toString());
@@ -119,23 +120,25 @@ console.log("Recebido no backend verify2FA:", req.body);
 
     // 3. Gera JWT apenas após 2FA válido
     const jwt = jwtService.signToken(
-      { id: user.id, email: user.email ,role: user.role},
+      { id: user.id, email: user.email, role: user.role },
       "1d"
     );
+
+    // 🔹 Configuração híbrida de cookie
+    const isProd = process.env.NODE_ENV === "production";
     
     res.cookie("comandas-token", jwt, {
       httpOnly: true,
-      secure: true,
+      secure: isProd, // 🔥 HTTPS só em produção
+      sameSite: isProd ? "lax" : "none", // para localhost funcionar em dev
       maxAge: 24 * 60 * 60 * 1000,
-      sameSite: "lax",
       path: "/",
+       domain: isProd ? ".esadev.com.br" : undefined 
     });
 
     return res.status(200).json({
       authenticated: true,
-      user: { id: user.id, email: user.email,role: user.role },
-    
-     
+      user: { id: user.id, email: user.email, role: user.role },
     });
 
   } catch (err: any) {
