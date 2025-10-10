@@ -127,14 +127,13 @@ verify2FA: async (req: Request, res: Response) => {
     // 🔹 Configuração híbrida de cookie
     const isProd = process.env.NODE_ENV === "production";
     
-    res.cookie("comandas-token", jwt, {
-      httpOnly: true,
-      secure: isProd, // 🔥 HTTPS só em produção
-      sameSite: isProd ? "lax" : "none", // para localhost funcionar em dev
-      maxAge: 24 * 60 * 60 * 1000,
-      path: "/",
-       domain: isProd ? ".esadev.com.br" : undefined 
-    });
+ res.cookie("comandas-token", jwt, {
+  httpOnly: true,
+  secure: true,             // HTTPS obrigatório
+  sameSite: "lax",          // ou "none" se forem subdomínios diferentes
+  path: "/",
+  maxAge: 24*60*60*1000,
+});
 
     return res.status(200).json({
       authenticated: true,
