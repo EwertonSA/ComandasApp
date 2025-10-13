@@ -130,7 +130,7 @@ verify2FA: async (req: Request, res: Response) => {
     res.cookie("comandas-token", jwt, {
       httpOnly: true,
       secure: true, // 🔥 HTTPS só em produção
-      sameSite:  "lax" , // para localhost funcionar em dev
+      sameSite:  "strict" , // para localhost funcionar em dev
       maxAge: 24 * 60 * 60 * 1000,
       path: "/",
      
