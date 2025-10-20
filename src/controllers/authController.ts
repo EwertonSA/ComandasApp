@@ -139,6 +139,7 @@ verify2FA: async (req: Request, res: Response) => {
     return res.status(200).json({
       authenticated: true,
       user: { id: user.id, email: user.email, role: user.role },
+      headers:{'comandas-token':jwt}
     });
 
   } catch (err: any) {
