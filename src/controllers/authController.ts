@@ -125,16 +125,16 @@ verify2FA: async (req: Request, res: Response) => {
     );
 
     // 🔹 Configuração híbrida de cookie
-    const isProd = process.env.NODE_ENV === "production";
-    
-    res.cookie("comandas-token", jwt, {
-      httpOnly: true,
-      secure: true, // 🔥 HTTPS só em produção
-      sameSite:  "strict" , // para localhost funcionar em dev
-      maxAge: 24 * 60 * 60 * 1000,
-      path: "/",
-     
-    });
+ const isProd = process.env.NODE_ENV === "production";
+
+res.cookie("comandas-token", jwt, {
+  httpOnly: true,
+  secure: isProd, // ✅ só HTTPS em produção
+  sameSite: isProd ? "none" : "lax", // 🔹 none permite cross-site (necessário p/ dev local)
+  maxAge: 24 * 60 * 60 * 1000,
+  path: "/",
+});
+
  console.log("Cookies recebidos na requisição:", req.cookies);
     return res.status(200).json({
       authenticated: true,
