@@ -56,9 +56,9 @@ export const clientesController={
        }
     },
     registro:async(req:Request,res:Response)=>{
-        const {nome,telefone,mesaId}=req.body
+        const {nome,mesaId}=req.body
         const mesaIdNumber = Number(mesaId); // Converte para número
-
+console.log('resdo Body:',req.body)
 if (isNaN(mesaIdNumber)) {
     return res.status(400).json({ message: "mesaId deve ser um número válido" });
 }
@@ -66,6 +66,7 @@ if (isNaN(mesaIdNumber)) {
             const cliente= await clienteService.create({
                 nome,mesaId:mesaIdNumber
             })
+            console.log(cliente)
             return res.status(201).json(cliente)
         } catch (error) {
             if(error instanceof Error){

@@ -4,7 +4,9 @@ import { jwtService } from "../services/jwtService.js";
 export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   try {
     // 1️⃣ Tenta pegar do cookie
-    let token = req.cookies['clientes-token'];
+   let token=
+  
+      req.cookies['comandas-token'];
 
     // 2️⃣ Se não achar no cookie, tenta no header Authorization
     if (!token && req.headers.authorization) {

@@ -135,7 +135,6 @@ res.cookie("comandas-token", jwt, {
   path: "/",
 });
 
- console.log("Cookies recebidos na requisição:", req.cookies);
     return res.status(200).json({
       authenticated: true,
       user: { id: user.id, email: user.email, role: user.role },
