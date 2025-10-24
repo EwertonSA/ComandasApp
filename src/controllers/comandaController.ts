@@ -136,6 +136,7 @@ showClient: async (req: Request, res: Response) => {
             const comanda= await comandasService.create({
                 mesaId,clienteId
             })
+            console.log('Comanda no backend',comanda)
             return res.status(200).json(comanda)
         } catch (error) {
             if(error instanceof Error){

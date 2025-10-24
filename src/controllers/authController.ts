@@ -130,7 +130,7 @@ verify2FA: async (req: Request, res: Response) => {
 res.cookie("comandas-token", jwt, {
   httpOnly: true,
   secure: isProd, // ✅ só HTTPS em produção
-  sameSite: isProd ? "none" : "lax", // 🔹 none permite cross-site (necessário p/ dev local)
+  sameSite:'lax', // 🔹 none permite cross-site (necessário p/ dev local)
   maxAge: 24 * 60 * 60 * 1000,
   path: "/",
 });
