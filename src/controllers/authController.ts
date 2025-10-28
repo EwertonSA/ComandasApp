@@ -129,7 +129,7 @@ verify2FA: async (req: Request, res: Response) => {
 
 res.cookie("comandas-token", jwt, {
   httpOnly: true,
-  secure: false, 
+  secure: true, 
   sameSite:'lax', 
    domain: '.esadev.com.br',
   maxAge: 24 * 60 * 60 * 1000,
