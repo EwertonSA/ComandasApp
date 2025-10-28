@@ -7,12 +7,13 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
    let token=
   
       req.cookies['comandas-token'];
+    console.log("Comandas-token",token)
 
     // 2️⃣ Se não achar no cookie, tenta no header Authorization
     if (!token && req.headers.authorization) {
       token = req.headers.authorization.split(' ')[1];
     }
-
+  
     // 3️⃣ Se não achou em nenhum lugar, bloqueia
     if (!token) {
       return res.status(401).json({ message: "Token não encontrado" });

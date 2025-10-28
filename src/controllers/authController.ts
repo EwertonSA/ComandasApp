@@ -129,16 +129,17 @@ verify2FA: async (req: Request, res: Response) => {
 
 res.cookie("comandas-token", jwt, {
   httpOnly: true,
-  secure: isProd, // ✅ só HTTPS em produção
-  sameSite:'lax', // 🔹 none permite cross-site (necessário p/ dev local)
+  secure: false, 
+  sameSite:'lax', 
+   domain: '.esadev.com.br',
   maxAge: 24 * 60 * 60 * 1000,
   path: "/",
 });
 
     return res.status(200).json({
       authenticated: true,
-      user: { id: user.id, email: user.email, role: user.role },
-      headers:{'comandas-token':jwt}
+      user: { id: user.id, email: user.email, role: user.role },  
+     
     });
 
   } catch (err: any) {

@@ -57,6 +57,8 @@ export const clientesController={
     },
     registro:async(req:Request,res:Response)=>{
         const {nome,mesaId}=req.body
+        const token=req.cookies
+        console.log('Token do backend:',token)
         const mesaIdNumber = Number(mesaId); // Converte para número
 console.log('resdo Body:',req.body)
 if (isNaN(mesaIdNumber)) {
