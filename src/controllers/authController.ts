@@ -131,7 +131,7 @@ res.cookie("comandas-token", jwt, {
   httpOnly: true,
   secure: isProd? true:false, 
   sameSite:isProd?'strict':'lax', 
-   domain: isProd? 'esadev.com.br': undefined,
+   domain: isProd? '.esadev.com.br': undefined,
   maxAge: 24 * 60 * 60 * 1000,
   path: "/",
 });
