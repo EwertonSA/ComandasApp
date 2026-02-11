@@ -1,6 +1,6 @@
 import './config/load-env.js';
 import express from "express";
-import { sequelize, connectDatabase } from "./database/index.js"; // conectando com retry
+import { sequelize } from "./database/index.js";
 import { adminJs, adminJsRouter } from './adminjs/index.js';
 import router from "./routes.js";
 import cors from 'cors';
@@ -10,43 +10,29 @@ import { adminFrontendMiddleware } from './middlewares/adminAuth.js';
 const app = express();
 
 // === CORS ===
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://esadev.com.br",
-  "https://www.esadev.com.br",
-];
+const allowedOrigins = ["http://localhost:3000", "https://esadev.com.br", "https://www.esadev.com.br"];
+app.use(cors({ origin: (origin, cb) => (!origin || allowedOrigins.includes(origin)) ? cb(null, true) : cb(null, false), credentials: true }));
 
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    return callback(null, false);
-  },
-  credentials: true,
-}));
-
-// === Middlewares ===
 app.use(express.json());
 app.use(cookieParser());
-
-// === Static files e AdminJS ===
 app.use(express.static('public'));
 app.use(adminJs.options.rootPath, adminFrontendMiddleware, adminJsRouter);
-
-// === Rotas da API ===
 app.use(router);
 
-// === Inicialização do servidor ===
-async function startServer() {
-  try {
-    await connectDatabase(); // retry automático
-    const PORT = process.env.PORT || 3001;
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-    });
-  } catch (err) {
-    console.error("❌ Não foi possível iniciar o servidor:", err);
-    process.exit(1); // força PM2 a reiniciar depois
+// === Conexão com retry ===
+async function startServer(retries = 5, delay = 3000) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      await sequelize.authenticate();
+      console.log("✅ Conectado ao PostgreSQL com sucesso!");
+      const PORT = process.env.PORT || 3001;
+      app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+      return;
+    } catch (err:any) {
+      console.error(`❌ Falha ao conectar (tentativa ${i + 1}):`, err.message);
+      if (i < retries - 1) await new Promise(res => setTimeout(res, delay));
+      else process.exit(1); // força PM2 a reiniciar só depois de várias tentativas
+    }
   }
 }
 
