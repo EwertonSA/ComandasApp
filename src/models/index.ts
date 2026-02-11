@@ -1,9 +1,13 @@
 import {  Clientes } from "./Cliente.js";
 import { Comandas } from "./Comandas.js";
+import { Ingredients } from "./ingredients_temp.js";
+
 import { Mesas } from "./Mesas.js";
 import Pagamentos from "./Pagamentos.js";
 import Pedidos from "./Pedidos.js";
 import PedidosProdutos from "./pedidosProdutos.js";
+import { PedidosProdutosIngredients } from "./PedidosProdutosIngredients.js";
+import { ProductsIngredients } from "./ProductsIngredients.js";
 import Produtos from "./Produtos.js";
 import { UserModel } from "./User.js";
 
@@ -32,6 +36,9 @@ Pedidos.belongsToMany(Produtos, {
   });
 Produtos.belongsToMany(Pedidos, { through: PedidosProdutos,as:'pedidos', foreignKey: 'produtoId' });
 
+//Relação Ingredientes/Produtos - N:M
+Produtos.belongsToMany(Ingredients,{through:ProductsIngredients,as:'ingredients',foreignKey:'productId'})
+Ingredients.belongsToMany(Produtos,{through:ProductsIngredients,as:'produtos',foreignKey:'ingredientId'})
 // Relação PedidoProdutos - Pedido (1:N)
 PedidosProdutos.belongsTo(Pedidos, { foreignKey: 'pedidoId', as:'pedido'});
 Pedidos.hasMany(PedidosProdutos, { foreignKey: 'pedidoId', as:'pedidosProdutos'});
@@ -40,10 +47,27 @@ Pedidos.hasMany(PedidosProdutos, { foreignKey: 'pedidoId', as:'pedidosProdutos'}
 PedidosProdutos.belongsTo(Produtos, { foreignKey: 'produtoId', as:'produto' });
 Produtos.hasMany(PedidosProdutos, { foreignKey: 'produtoId',as:'produtos' });
 
+
+
+
+//pedidosProdutosIngredients - pedidosProduto (N:M)
+PedidosProdutosIngredients.belongsTo(PedidosProdutos, {
+  as: 'pedidoProduto',
+  foreignKey: 'pedidoProdutoId'
+});
+PedidosProdutos.hasMany(PedidosProdutosIngredients, {
+  as: 'pedidosProdutosIngredients',
+  foreignKey: 'pedidoProdutoId'
+});
+
+PedidosProdutosIngredients.belongsTo(Ingredients, {
+  as: 'ingredient',
+  foreignKey: 'ingredientId'
+});
+
 // Relação comanda - Pagamento (1:1)
 Comandas.hasOne(Pagamentos, { foreignKey: 'comandaId' });
 Pagamentos.belongsTo(Comandas, { foreignKey: 'comandaId' });
-
 // Exporte os modelos para que eles possam ser usados em outros arquivos
 export {
     Clientes,
@@ -53,5 +77,8 @@ export {
     Pedidos,
     PedidosProdutos,
     Produtos,
-    UserModel
+    UserModel,
+    Ingredients,
+    ProductsIngredients,
+    PedidosProdutosIngredients
 };

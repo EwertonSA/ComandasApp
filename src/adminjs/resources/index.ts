@@ -16,6 +16,12 @@ import Produtos from "../../models/Produtos.js";
 import PedidosProdutos from "../../models/pedidosProdutos.js";
 import Pagamentos from "../../models/Pagamentos.js";
 import { UserModel } from "../../models/User.js";
+import { Ingredients } from "../../models/ingredients_temp.js";
+import IngredientsResourceOptions from "./Ingredients.js";
+import { ProductsIngredients } from "../../models/ProductsIngredients.js";
+import ProductsIngredientsResourceOptions from "./ProductsIngredients.js";
+import { PedidosProdutosIngredients } from "../../models/PedidosProdutosIngredients.js";
+import { PedidosProdutosIngredientsResourceOptions } from "./pedidosProdutosIngredients.js";
 
 
 export const adminJsResources: ResourceWithOptions[]=[{
@@ -46,5 +52,15 @@ export const adminJsResources: ResourceWithOptions[]=[{
 {
     resource:UserModel,
     options:UserResourceOptions
+},
+{
+    resource:Ingredients,
+    options:IngredientsResourceOptions
+},
+{resource:ProductsIngredients,
+    options:ProductsIngredientsResourceOptions
+},{
+resource:PedidosProdutosIngredients,
+options:PedidosProdutosIngredientsResourceOptions
 }
 ]

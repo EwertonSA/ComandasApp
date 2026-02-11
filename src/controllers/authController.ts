@@ -3,14 +3,21 @@ import { userService } from "../services/userService.js"
 import { jwtService } from "../services/jwtService.js"
 import { UserModel } from "../models/User.js";
 import validateRecaptcha from "../services/recaptcha.js";
-import { AuthenticatedRequest } from "../middlewares/auth.js";
 import Comandas from "../models/Comandas.js";
 import bcrypt from 'bcrypt'
+import { clienteService } from "../services/clienteService.js";
+import { transporter } from "../config/mailer.js";
 export interface AuthenticatedRequest1 extends Request {
   user?: { clienteId: string; email: string; role: string };
   comanda?: InstanceType<typeof Comandas>; // agora o TS aceita req.comanda
 }
-
+interface AuthRequest extends Request {
+  user?: {
+    id: string | number;
+    email?: string;
+    role?: string;
+  };
+}
 interface DecodedToken {
  comandaId: string;
   clienteId: string;
@@ -50,55 +57,51 @@ export const authController={
         }
       },
       
-  login: async (req: Request, res: Response) => {
-     const { email, password,recaptchaToken,role } = req.body;
-      const recaptchaResult = await validateRecaptcha(recaptchaToken);
-  if (!recaptchaResult.success) {
-    return res.status(400).json({ message: "Falha na verificação do reCAPTCHA" });
+
+loginTest: async (req: Request, res: Response) => {
+  try {
+    const { email, password, role } = req.body;
+
+    const user = await userService.findByEmail(email);
+    console.log("role:", role);
+
+    if (!user) {
+      return res.status(404).json({ message: "E-mail não registrado" });
+    }
+
+    const isSame = await user.checkPassword(password);
+    if (!isSame) {
+      return res.status(401).json({ message: "Senha incorreta!" });
+    }
+
+    console.log("userRole:", user.role);
+
+    if (role !== user.role) {
+      return res
+        .status(403)
+        .json({ message: "Tipo de login incorreto para este usuário" });
+    }
+
+    if (!user.two_factor_enabled) {
+      const { qrCodeDataURL } = await userService.setup2fa(user.id.toString());
+      return res.json({
+        twoFARequired: true,
+        qrCodeDataURL,
+        userId: user.id,
+      });
+    }
+
+    return res.json({
+      twoFARequired: true,
+      message: "Informe o código do Authenticator",
+      userId: user.id,
+    });
+  } catch (error: any) {
+    console.error("Erro no login:", error);
+    return res.status(500).json({ message: "Erro interno no servidor" });
   }
- 
-  const user = await userService.findByEmail(email);
-  if (!user) return res.status(404).json({ message: "E-mail não registrado" });
-
-  user.checkPassword(password, async (err, isSame) => {
-    if (err) return res.status(400).json({ message: err.message });
-    if (!isSame) return res.status(401).json({ message: "Senha incorreta!" });
- if (role !== user.role) {
-      return res.status(403).json({ message: "Tipo de login incorreto para este usuário" });
-    }
-   
-    if (!user.two_factor_enabled) {
-      const { qrCodeDataURL } = await userService.setup2fa(user.id.toString());
-      return res.json({ twoFARequired: true, qrCodeDataURL, userId: user.id });
-    }
-
-    return res.json({ twoFARequired: true, message: "Informe o código do Authenticator", userId: user.id });
-  });
 },
-  loginTest: async (req: Request, res: Response) => {
-     const { email, password,role } = req.body;
 
- 
-  const user = await userService.findByEmail(email);
-  console.log('role:',role)
-  if (!user) return res.status(404).json({ message: "E-mail não registrado" });
-
-  user.checkPassword(password, async (err, isSame) => {
-    if (err) return res.status(400).json({ message: err.message });
-    if (!isSame) return res.status(401).json({ message: "Senha incorreta!" });
-    console.log("userRole:",user.role)
- if (role !== user.role) {
-      return res.status(403).json({ message: "Tipo de login incorreto para este usuário" });
-    }
-   
-    if (!user.two_factor_enabled) {
-      const { qrCodeDataURL } = await userService.setup2fa(user.id.toString());
-      return res.json({ twoFARequired: true, qrCodeDataURL, userId: user.id });
-    }
-
-    return res.json({ twoFARequired: true, message: "Informe o código do Authenticator", userId: user.id });
-  });
-},
 
 // verify 2FA
 verify2FA: async (req: Request, res: Response) => {
@@ -137,7 +140,7 @@ res.cookie("comandas-token", jwt, {
 });
 
     return res.status(200).json({
-      authenticated: true,
+      authenticated: true,jwt,
       user: { id: user.id, email: user.email, role: user.role },  
      
     });
@@ -237,7 +240,69 @@ autoLogin: async (req: Request, res: Response) => {
                 console.error("Erro ao realizar o logout")
                  return res.status(500).json({ error: "Erro no logout" });
               }
-            }
-            
-      
+            },
+        forgotPassword : async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body; // <- destrutura o email corretamente
+
+    if (!email) {
+      return res.status(400).json({ error: "E-mail é obrigatório." });
+    }
+
+    const user = await UserModel.findOne({ where: { email } });
+    if (!user) {
+      return res.status(404).json({ error: "Usuário não encontrado." });
+    }
+
+    // 🔹 Cria token válido por 1 hora
+    const token = jwtService.signToken({ id: user.id, email }, "1h");
+
+    // 🔹 Monta link de redefinição
+    const resetLink = `http://localhost:3000/login/updatepassword?token=${token}`;
+
+    // 🔹 Envia e-mail
+    await transporter.sendMail({
+      from: `"ComandasApp" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "Redefinição de senha - ComandasApp",
+      html: `
+        <h3>Olá ${user.name || "usuário"},</h3>
+        <p>Você solicitou a redefinição da sua senha.</p>
+        <p>Clique no link abaixo para criar uma nova senha. O link expira em 1 hora:</p>
+        <a href="${resetLink}" style="background:#007bff;color:#fff;padding:10px 20px;text-decoration:none;border-radius:5px;">
+          Redefinir senha
+        </a>
+        <br/><br/>
+        <p>Se você não solicitou esta alteração, ignore este e-mail.</p>
+      `,
+    });
+
+    console.log(`🔗 Link de redefinição enviado para ${email}`);
+
+    return res.status(200).json({ message: "E-mail de recuperação enviado com sucesso!" });
+  }catch (error: any) {
+  console.error("Erro ao solicitar redefinição:", error.message, error.stack);
+  return res.status(500).json({ error: error.message || "Erro interno do servidor." });
 }
+},
+    updatePassword: async (req:Request, res:Response) => {
+  const { id } = (req as any).user; // <- já vem do middleware
+  const { newPassword, confirmPassword } = req.body;
+
+  if (!newPassword || !confirmPassword)
+    return res.status(400).json({ error: "Preencha todos os campos." });
+
+  if (newPassword !== confirmPassword)
+    return res.status(400).json({ error: "As senhas não coincidem." });
+
+  const user = await UserModel.findByPk(id);
+  if (!user) return res.status(404).json({ error: "Usuário não encontrado." });
+
+  user.password = newPassword;
+  await user.save();
+
+  return res.status(200).json({ message: "Senha atualizada com sucesso!" });
+}
+
+
+    }

@@ -3,6 +3,8 @@
 import  PedidosProdutos from "../models/pedidosProdutos.js";
 import Pedidos, { PedidoAttributes } from "../models/Pedidos.js"
 import  Produtos  from "../models/Produtos.js";
+import { PedidosProdutosIngredients } from "../models/PedidosProdutosIngredients.js";
+import { Ingredients } from "../models/ingredients_temp.js";
 
 export const pedidosService={
    getPedidos: async (page: number, perPage: number) => {
@@ -10,6 +12,19 @@ export const pedidosService={
 
   const { rows, count } = await Pedidos.findAndCountAll({
     order: [['id', 'DESC']],
+    include:[
+      {association:'pedidosProdutos',
+        attributes:['id'],
+        include:[
+          {association:'produto',attributes:['nome']},
+          {association:'pedidosProdutosIngredients',attributes:['ingredientId'],
+            include:[
+              {association:'ingredient',attributes:['id','name']}
+            ]
+          },
+        ]
+      }
+    ],
     limit: perPage,
     offset,
    
@@ -49,19 +64,27 @@ export const pedidosService={
     const pedido = await Pedidos.findByPk(id, {
       attributes: ["comandaId", "total", "status"],
       include: [
+    {
+      model: PedidosProdutos,
+      as: 'pedidosProdutos',
+      include: [
         {
-          model: PedidosProdutos,
-          as: "pedidosProdutos", // Deve ser o mesmo alias definido na associação!
-          attributes: ["id", "pedidoId", "produtoId", "quantidade"],
+          model: Produtos,
+          as: 'produto',
+        },
+        {
+          model: PedidosProdutosIngredients,
+          as: 'pedidosProdutosIngredients',
           include: [
             {
-              model: Produtos, // Inclui os detalhes do produto também
-              as: "produto",
-              attributes: ["nome", "preco",['thumbnail_url','thumbnailUrl']], // Pegue apenas os atributos necessários
+              model: Ingredients,
+              as: 'ingredient', 
             },
           ],
         },
       ],
+    },
+  ],
     });
   
     return pedido;

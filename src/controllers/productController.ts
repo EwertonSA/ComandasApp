@@ -94,7 +94,7 @@ getByCategory: async (req: Request, res: Response) => {
        const {id}=req.params
        try {
         const produto=await produtoService.show(id)
-        console.log(JSON.stringify(produto, null, 2)) 
+     console.log('ProdutoNoBack',produto)
         return res.json(produto)
        } catch (error) {
         if(error instanceof Error){

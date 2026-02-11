@@ -14,6 +14,19 @@ export const pedidosProdutosController = {
             }
         }
     },
+        getById:async(req:Request,res:Response)=>{
+            const {id}=req.params
+            try {
+                const pedidoProduto=await pedidosProdutosService.getById(id)
+                 if (!pedidoProduto) {
+      return res.status(404).json({ error: "PedidoProduto não encontrado" });
+    }
+                return res.json(pedidoProduto)
+            } catch (error:any) {
+                console.error(error.message)
+                return res.status(500).json({ error: error.message || "Erro interno do servidor." });
+            }
+        },
     save: async (req: Request, res: Response) => {
         try {
             const { pedidoId, produtoId, quantidade } = req.body;

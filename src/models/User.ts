@@ -21,13 +21,11 @@ export interface UserCreationAttributes extends Optional<User, "id"> {}
 
 // Tipagem para a instância do usuário, incluindo o método checkPassword
 export interface UserInstance
-  extends Model<User, UserCreationAttributes>, // Model base com tipagem de atributos e criação
+  extends Model<User, UserCreationAttributes>,
     User {
-  checkPassword(
-    password: string,
-    callbackfn: (err: Error | undefined, isSame: boolean) => void
-  ): void;
+  checkPassword(password: string): Promise<boolean>;
 }
+
 
 // Definição do modelo do Sequelize
 export const UserModel = sequelize.define<UserInstance, User>(
@@ -101,24 +99,17 @@ export const UserModel = sequelize.define<UserInstance, User>(
 ) as ModelStatic<UserInstance> & { prototype: UserInstance & UserInstance };
 
 // Adicionando o método checkPassword corretamente ao protótipo
-UserModel.prototype.checkPassword = function (
-  this: UserInstance,
-  password: string,
-  callbackfn: (err: Error | undefined, isSame: boolean) => void
-) {
-  if(!this.password){
-    return callbackfn(new Error("Senha não cadastrada"),false)
+UserModel.prototype.checkPassword = async function (this: UserInstance, password: string): Promise<boolean> {
+  if (!this.password) {
+    throw new Error("Senha não cadastrada");
   }
-  console.log('Senha digitada:', password);
-  console.log('Senha salva no banco (hash):', this.password);
-  bcrypt.compare(password, this.password!, (err, isSame) => {
-   
-    if (err) {
-      callbackfn(err, false);
-      console.log('Erro ao comparar as senhas:', err); // Log de erro adicional
-    } else {
-      callbackfn(undefined, isSame);
-      console.log('Resultado da comparação (isSame):', isSame);
-    }
-  });
+
+  console.log("Senha digitada:", password);
+  console.log("Senha salva no banco (hash):", this.password);
+
+  const isSame = await bcrypt.compare(password, this.password);
+  console.log("Resultado da comparação (isSame):", isSame);
+
+  return isSame;
 };
+

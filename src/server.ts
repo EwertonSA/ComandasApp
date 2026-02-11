@@ -5,6 +5,7 @@ import { adminJs, adminJsRouter } from './adminjs/index.js';
 import router from "./routes.js";
 import cors from 'cors';
 import cookieParser from "cookie-parser";
+import { adminFrontendMiddleware } from './middlewares/adminAuth.js';
 
 const app = express();
 
@@ -12,15 +13,22 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:3000",
   "https://esadev.com.br",
+  "https://www.esadev.com.br",
 ];
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin) return callback(null, true); // SSR / Postman
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    callback(new Error("Origin não permitido pelo CORS"));
+    // requisições sem origin (SSR, server-to-server, curl)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    // NÃO lança erro → só bloqueia o browser
+    return callback(null, false);
   },
-  credentials: true, // 🔥 necessário para cookies HttpOnly
+  credentials: true,
 }));
 
 // === Middlewares básicos ===
@@ -29,7 +37,8 @@ app.use(cookieParser());
 
 // === Static files e AdminJS ===
 app.use(express.static('public'));
-app.use(adminJs.options.rootPath, adminJsRouter);
+app.use(adminJs.options.rootPath,adminFrontendMiddleware, adminJsRouter);
+
 
 // === Rotas da API ===
 app.use(router);

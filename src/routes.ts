@@ -14,11 +14,17 @@ import { OauthController } from './controllers/OauthController.js'
 import ensureAuth from './middlewares/auth.js'
 
 import { authMiddleware } from './middlewares/auth2.js'
+import { IngredientsController } from './controllers/ingredientController.js'
+import { ProductIngredientsController } from './controllers/productIngredientsController.js'
+import { PedidosProdutosIngredientsController } from './controllers/pedidosProdutosIngredientsController.js'
 
 
 
 const router= express.Router()
 router.post('/api/auth/register',authController.register)
+
+router.put('/api/updatepassword',authMiddleware,authController.updatePassword)
+router.post('/api/forgotpassword',authController.forgotPassword)
 router.post('/api/auth/login',authController.loginTest)
 router.post('/api/auth/verify',authController.verify2FA)
 router.post('/api/auth/reset2fa',authController.reset2fa)
@@ -74,9 +80,14 @@ router.delete('/api/pedidos/:id',ensureAuth,pedidosController.delete)
 router.get('/api/produtos',ensureAuth,productController.index)
 router.post('/api/produtos',ensureAuth,productController.save)
 router.get('/api/produtos/categoria/:categoria',authMiddleware,productController.getByCategory)
-router.get('/api/produtos/:id',ensureAuth,productController.getById)
+router.get('/api/produtos/:id',authMiddleware,productController.getById)
 
+router.get('/api/ingredients',IngredientsController.index)
+router.post('/api/ingredients',IngredientsController.save)
+router.get('/api/ingredients/:id',IngredientsController.showById)
 
+router.get('/api/productIngredients',ProductIngredientsController.index)
+router.post('/api/productIngredients',ProductIngredientsController.create)
 
 
 router.put('/api/produtos/:id',ensureAuth, productController.update)
@@ -85,6 +96,11 @@ router.delete('/api/produtos/:id',ensureAuth,productController.delete)
 router.get('/api/pedidosProdutos',ensureAuth,pedidosProdutosController.index)
 router.post('/api/pedidosProdutos',ensureAuth, pedidosProdutosController.save);
 router.delete('/api/pedidosProdutos/:id',ensureAuth,pedidosProdutosController.delete)
+router.get('/api/pedidosProdutos/:id',pedidosProdutosController.getById)
+
+router.get('/api/pedidosProdutosIngredients',PedidosProdutosIngredientsController.index)
+router.post('/api/pedidosProdutosIngredients',PedidosProdutosIngredientsController.addIngredientsToPedidoProduto)
+router.get('/api/pedidosProdutosIngredients/:id',PedidosProdutosIngredientsController.showById)
 
 router.get('/api/pagamentos',ensureAuth,pagamentoController.index)
 router.get('/api/pagamentos/total',ensureAuth,pagamentoController.total)

@@ -1,4 +1,4 @@
-import jwt, { SignOptions } from 'jsonwebtoken'
+import jwt, { JwtPayload, SignOptions } from 'jsonwebtoken'
 import { JWT_KEY } from '../config/environment.js'
 
 const secret=JWT_KEY
@@ -12,6 +12,13 @@ export const jwtService={
         jwt.verify(token,secret,callbackfn)
       
       },
+      verifyTokens<T extends JwtPayload>(token: string): T | null {
+  try {
+    return jwt.verify(token, JWT_KEY) as T
+  } catch (err) {
+    return null
+  }
+},
       verifyTokenState: <T>(token: string): T => {
   return jwt.verify(token, secret) as T;
 },

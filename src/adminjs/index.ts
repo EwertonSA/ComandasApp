@@ -9,9 +9,11 @@ import { sequelize } from '../database/index.js'
 import { UserModel } from '../models/User.js'
 import AdminJS from 'adminjs'
 import AdminJSSequelize from '@adminjs/sequelize'
+import AdminJSExpress from "@adminjs/express";
 import { dashboardOptions } from './resources/dashboard.js'
 import { componentLoader } from './resources/dashboard.js'
 import { ADMINJS_COOKIE_PASSWORD, DATABASE_URL, JWT_KEY } from '../config/environment.js'
+import { buildRouter } from '@adminjs/express'
 AdminJS.registerAdapter(AdminJSSequelize)
 
 const app = express()
@@ -51,20 +53,4 @@ export const adminJs = new AdminJS({
 // ⚠️ Importação dinâmica de buildAuthenticatedRouter
 const { buildAuthenticatedRouter } = await import('@adminjs/express')
 
-export const adminJsRouter = buildAuthenticatedRouter(adminJs, {
-  authenticate: async (email, password) => {
-    const user = await UserModel.findOne({ where: { email } })
-    if (user && user.role === 'user') {
-      const matched = await bcrypt.compare(password, user.password)
-      if (matched) return user
-    }
-    return false
-  },
-  cookiePassword:ADMINJS_COOKIE_PASSWORD
-}, null,{
-  resave:false
-, 
-saveUninitialized:false,
-store:store,  
-secret:ADMINJS_COOKIE_PASSWORD
-})
+export const adminJsRouter = AdminJSExpress.buildRouter(adminJs);

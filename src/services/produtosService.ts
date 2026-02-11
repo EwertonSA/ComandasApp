@@ -42,6 +42,13 @@ export const produtoService={
     show:async(id:string)=>{
         const produto=await Produtos.findByPk(id,{
             attributes:['nome','descricao','preco','categoria',['thumbnail_url', 'thumbnailUrl']],
+              include: {
+      association: 'ingredients', // <-- nome do alias no relacionamento
+      attributes: ['id', 'name'],
+      through: {
+        attributes: ['optional'] // <-- pega o campo da tabela intermediária
+      }
+    }
         })
         return produto
     },
