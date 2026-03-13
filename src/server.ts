@@ -10,9 +10,20 @@ import { adminFrontendMiddleware } from './middlewares/adminAuth.js';
 const app = express();
 
 // === CORS ===
-const allowedOrigins = ["http://localhost:3000", "https://esadev.com.br", "https://www.esadev.com.br"];
-app.use(cors({ origin: (origin, cb) => (!origin || allowedOrigins.includes(origin)) ? cb(null, true) : cb(null, false), credentials: true }));
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://esadev.com.br",
+  "https://www.esadev.com.br"
+];
 
+app.use(cors({
+  origin: (origin, cb) => {
+    if (!origin) return cb(null, true); // server-side request
+    if (allowedOrigins.includes(origin)) return cb(null, true);
+    return cb(new Error("Not allowed by CORS"));
+  },
+  credentials: true
+}));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static('public'));
