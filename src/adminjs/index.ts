@@ -24,7 +24,7 @@ await store.sync()
 
 export const adminJs = new AdminJS({
   databases: [sequelize],
-  rootPath: '/admin',
+  rootPath: '/',
   dashboard: dashboardOptions, 
   componentLoader,
 
