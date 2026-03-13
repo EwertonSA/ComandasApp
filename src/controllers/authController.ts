@@ -133,7 +133,7 @@ verify2FA: async (req: Request, res: Response) => {
 res.cookie("comandas-token", jwt, {
   httpOnly: true,
   secure: isProd? true:false, 
-  sameSite:isProd?'strict':'lax', 
+  sameSite:isProd?'strict':'none', 
    domain: isProd? '.esadev.com.br': undefined,
   maxAge: 24 * 60 * 60 * 1000,
   path: "/",
@@ -188,7 +188,7 @@ verifyState: async (req: Request, res: Response) => {
     res.cookie('clientes-token', sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: 'none',
       maxAge: 1000 * 60 * 60 * 4,
       domain: process.env.NODE_ENV === 'production' ? '.esadev.com.br' : undefined,
     });

@@ -38,7 +38,7 @@ facebookCallback: async (req: Request, res: Response) => {
       httpOnly: true,
       secure: true,
       maxAge: 30 * 60 * 1000,
-      sameSite: "lax",
+      sameSite: "none",
       path: "/",
     });
 
@@ -84,7 +84,7 @@ const {code,state}=req.query as {code:string,state:string}
       httpOnly: true,
       secure: true,
       maxAge: 30 * 60 * 1000,
-      sameSite: "lax",
+      sameSite: "none",
       path: "/",
     });
 
@@ -134,8 +134,9 @@ googlecallback: async (req: Request, res: Response) => {
       httpOnly: true,
       secure: true,
       maxAge: 30 * 60 * 1000,
-      sameSite: "lax",
+      sameSite: "none",
       path: "/",
+      domain:".esadev.com.br"
     });
 
     const mode = user!.two_factor_secret ? "verify" : "setup";
