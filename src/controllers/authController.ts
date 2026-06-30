@@ -4,7 +4,7 @@ import { jwtService } from "../services/jwtService.js"
 import { UserModel } from "../models/User.js";
 import validateRecaptcha from "../services/recaptcha.js";
 import Comandas from "../models/Comandas.js";
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import { clienteService } from "../services/clienteService.js";
 import { transporter } from "../config/mailer.js";
 export interface AuthenticatedRequest1 extends Request {
