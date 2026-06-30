@@ -11,7 +11,7 @@ const app = express();
 
 
 const allowedOrigins = process.env.ALLOWEDS ? process.env.ALLOWEDS.split(',') : [];
-console.log("Allowed origins:", allowedOrigins);
+
 app.use(cors({
   origin: (origin, cb) => {
     if (!origin) return cb(null, true);

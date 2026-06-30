@@ -24,7 +24,7 @@ await store.sync()
 
 export const adminJs = new AdminJS({
   databases: [sequelize],
-  rootPath: '/',
+  rootPath: '/admin',
   dashboard: dashboardOptions, 
   componentLoader,
 
@@ -50,7 +50,7 @@ export const adminJs = new AdminJS({
   }
 })
 
-// ⚠️ Importação dinâmica de buildAuthenticatedRouter
+
 const { buildAuthenticatedRouter } = await import('@adminjs/express')
 
 export const adminJsRouter = AdminJSExpress.buildRouter(adminJs);
