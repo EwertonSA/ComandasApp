@@ -4,7 +4,7 @@ import session from 'express-session'
 
 import SequelizeStoreFactory from 'connect-session-sequelize'
 
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import { sequelize } from '../database/index.js'
 import { UserModel } from '../models/User.js'
 import AdminJS from 'adminjs'
