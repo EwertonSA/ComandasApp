@@ -9,16 +9,12 @@ import { adminFrontendMiddleware } from './middlewares/adminAuth.js';
 
 const app = express();
 
-// === CORS ===
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://esadev.com.br",
-  "https://www.esadev.com.br"
-];
 
+const allowedOrigins = process.env.ALLOWEDS ? process.env.ALLOWEDS.split(',') : [];
+console.log("Allowed origins:", allowedOrigins);
 app.use(cors({
   origin: (origin, cb) => {
-    if (!origin) return cb(null, true); // server-side request
+    if (!origin) return cb(null, true);
     if (allowedOrigins.includes(origin)) return cb(null, true);
     return cb(new Error("Not allowed by CORS"));
   },
@@ -30,19 +26,18 @@ app.use(express.static('public'));
 app.use(adminJs.options.rootPath, adminFrontendMiddleware, adminJsRouter);
 app.use(router);
 
-// === Conexão com retry ===
 async function startServer(retries = 5, delay = 3000) {
   for (let i = 0; i < retries; i++) {
     try {
       await sequelize.authenticate();
-      console.log("✅ Conectado ao PostgreSQL com sucesso!");
+      console.log("Conectado ao PostgreSQL com sucesso!");
       const PORT = process.env.PORT || 3001;
-      app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+      app.listen(PORT, () => console.log(` Server running on port ${PORT}`));
       return;
     } catch (err:any) {
-      console.error(`❌ Falha ao conectar (tentativa ${i + 1}):`, err.message);
+      console.error(`Falha ao conectar (tentativa ${i + 1}):`, err.message);
       if (i < retries - 1) await new Promise(res => setTimeout(res, delay));
-      else process.exit(1); // força PM2 a reiniciar só depois de várias tentativas
+      else process.exit(1); 
     }
   }
 }
