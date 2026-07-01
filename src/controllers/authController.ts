@@ -109,19 +109,15 @@ verify2FA: async (req: Request, res: Response) => {
   console.log("Recebido no backend verify2FA:", req.body);
 
   try {
-    // 1. Verifica o 2FA
+
     const isValid = await userService.verify2fa(token, userId.toString());
     if (!isValid) {
       return res.status(401).json({ message: "Código 2FA inválido" });
     }
-
-    // 2. Busca usuário
     const user = await UserModel.findByPk(userId);
     if (!user) {
       return res.status(404).json({ message: "Usuário não encontrado" });
     }
-
-    // 3. Gera JWT apenas após 2FA válido
     const jwt = jwtService.signToken(
       { id: user.id, email: user.email, role: user.role },
       "1d"
@@ -133,8 +129,7 @@ verify2FA: async (req: Request, res: Response) => {
 res.cookie("comandas-token", jwt, {
   httpOnly: true,
   secure: isProd? true:false, 
-  sameSite:isProd?'strict':'none', 
-   domain: isProd? '.esadev.com.br': undefined,
+  sameSite:isProd? 'none' : 'lax', 
   maxAge: 24 * 60 * 60 * 1000,
   path: "/",
 });
@@ -225,7 +220,8 @@ autoLogin: async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Erro interno do servidor" });
   }
 }
- ,           logout:async(req:Request,res:Response)=>{
+ ,         
+ logout:async(req:Request,res:Response)=>{
               try {
                 res.clearCookie(
                   'clientes-token',{
