@@ -14,8 +14,10 @@ const allowedOrigins = process.env.ALLOWEDS ? process.env.ALLOWEDS.split(',') : 
 
 app.use(cors({
   origin: (origin, cb) => {
+    console.log("Tentativa de conexão da origem:", origin);
     if (!origin) return cb(null, true);
     if (allowedOrigins.includes(origin)) return cb(null, true);
+    console.error("BLOQUEADO PELA POLÍTICA CORS:", origin);
     return cb(new Error("Not allowed by CORS"));
   },
   credentials: true

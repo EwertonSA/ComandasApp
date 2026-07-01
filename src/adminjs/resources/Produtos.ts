@@ -7,7 +7,7 @@ import Produtos from "../../models/Produtos.js";
 import { FeatureType, ResourceOptions } from "adminjs";
 import uploadFileFeature from "@adminjs/upload";
 
-const uploadDir = path.join(__dirname, "..", "..", "public", "uploads");
+const uploadDir = path.join(process.cwd(), "public");
 
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
@@ -23,7 +23,7 @@ export const ProdutosResourceOption:ResourceOptions={
     properties: {
       uploadThumbnail: {
        
-        type: "mixed", // Pode ser omitido também
+        type: "mixed",
       },
       thumbnailUrl: {
         isVisible: { list: true, filter: true, show: true, edit: false },
