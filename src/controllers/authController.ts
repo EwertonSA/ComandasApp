@@ -134,7 +134,11 @@ res.cookie("comandas-token", jwt, {
   maxAge: 24 * 60 * 60 * 1000,
   path: "/",
 });
-
+console.log("COOKIE CONFIG PROD:", {
+  NODE_ENV: process.env.NODE_ENV,
+  domain: isProd ? ".esadev.com.br" : undefined,
+  sameSite: isProd ? "none" : "lax",
+});
     return res.status(200).json({
       authenticated: true,jwt,
       user: { id: user.id, email: user.email, role: user.role },  
