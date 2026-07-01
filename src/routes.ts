@@ -80,7 +80,9 @@ router.delete('/api/pedidos/:id',ensureAuth,pedidosController.delete)
 router.get('/api/produtos',ensureAuth,productController.index)
 router.post('/api/produtos',ensureAuth,productController.save)
 router.get('/api/produtos/categoria/:categoria',authMiddleware,productController.getByCategory)
+
 router.get('/api/produtos/:id',authMiddleware,productController.getById)
+router.put('/api/produtos/:id',productController.update)
 
 router.get('/api/ingredients',IngredientsController.index)
 router.post('/api/ingredients',IngredientsController.save)
