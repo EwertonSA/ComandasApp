@@ -2,8 +2,6 @@
 
 import path from "path";
 import fs from "fs";
-import uploadFeature from "@adminjs/upload/build/features/upload-file.js";
-import Produtos from "../../models/Produtos.js";
 import { FeatureType, ResourceOptions } from "adminjs";
 import uploadFileFeature from "@adminjs/upload";
 
@@ -36,8 +34,8 @@ export const ProdutosResourceOption:ResourceOptions={
       local:{uploadDir,opts:{}}
     },
      properties: {
-        key: "thumbnailUrl",        // onde o caminho é salvo no banco
-        file: "uploadThumbnail",    // campo usado para upload no AdminJS
+        key: "thumbnailUrl",       
+        file: "uploadThumbnail",  
       },
       uploadPath: (record:any, filename:any) => {
         const id = record?.id || Date.now();
