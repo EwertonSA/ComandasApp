@@ -8,19 +8,16 @@ import cookieParser from "cookie-parser";
 import { adminFrontendMiddleware } from './middlewares/adminAuth.js';
 
 const app = express();
-
-
 const allowedOrigins = process.env.ALLOWEDS ? process.env.ALLOWEDS.split(',') : [];
-
 app.use(cors({
-  origin: (origin, cb) => {
-    console.log("Tentativa de conexão da origem:", origin);
-    if (!origin) return cb(null, true);
-    if (allowedOrigins.includes(origin)) return cb(null, true);
-    console.error("BLOQUEADO PELA POLÍTICA CORS:", origin);
-    return cb(new Error("Not allowed by CORS"));
-  },
-  credentials: true
+origin: (origin, cb) => {
+console.log("Tentativa de conexão da origem:", origin);
+if (!origin) return cb(null, true);
+if (allowedOrigins.includes(origin)) return cb(null, true);
+console.error("BLOQUEADO PELA POLÍTICA CORS:", origin);
+return cb(new Error("Not allowed by CORS"));
+},
+credentials: true
 }));
 app.use(express.json());
 app.use(cookieParser());
@@ -29,19 +26,18 @@ app.use(adminJs.options.rootPath, adminFrontendMiddleware, adminJsRouter);
 app.use(router);
 
 async function startServer(retries = 5, delay = 3000) {
-  for (let i = 0; i < retries; i++) {
-    try {
-      await sequelize.authenticate();
-      console.log("Conectado ao PostgreSQL com sucesso!");
-      const PORT = process.env.PORT || 3001;
-      app.listen(PORT, () => console.log(` Server running on port ${PORT}`));
-      return;
-    } catch (err:any) {
-      console.error(`Falha ao conectar (tentativa ${i + 1}):`, err.message);
-      if (i < retries - 1) await new Promise(res => setTimeout(res, delay));
-      else process.exit(1); 
-    }
-  }
+for (let i = 0; i < retries; i++) {
+try {
+await sequelize.authenticate();
+console.log("Conectado ao PostgreSQL com sucesso!");
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => console.log(` Server running on port ${PORT}`));
+return;
+} catch (err:any) {
+console.error(`Falha ao conectar (tentativa ${i + 1}):`, err.message);
+if (i < retries - 1) await new Promise(res => setTimeout(res, delay));
+else process.exit(1); 
 }
-
+}
+}
 startServer();

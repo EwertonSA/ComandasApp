@@ -12,6 +12,7 @@ import AdminJSSequelize from '@adminjs/sequelize'
 import AdminJSExpress from "@adminjs/express";
 import { dashboardOptions } from './resources/dashboard.js'
 import { componentLoader } from './resources/dashboard.js'
+import { adminJsResources } from './resources/index.js'
 import { ADMINJS_COOKIE_PASSWORD, DATABASE_URL, JWT_KEY } from '../config/environment.js'
 import { buildRouter } from '@adminjs/express'
 AdminJS.registerAdapter(AdminJSSequelize)
@@ -24,6 +25,7 @@ await store.sync()
 
 export const adminJs = new AdminJS({
   databases: [sequelize],
+  resources: adminJsResources,
   rootPath: '/admin',
   dashboard: dashboardOptions, 
   componentLoader,
