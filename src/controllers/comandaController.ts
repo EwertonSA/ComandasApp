@@ -70,10 +70,7 @@ orders: async (req: Request, res: Response) => {
   const { comandaId, clienteId } = (req as any).user;
 
   if (!comandaId || !clienteId) 
-    return res.status(400).json({ message: "Comanda ou cliente não encontrados no token" });
-
-  console.log("DEBUG -> clienteIdd:", clienteId, "comandaIdd:", comandaId);
-
+    return res.status(400).json({ message: "Comanda ou cliente não encontrados no token" })
   try {
     const comandaPedido = await comandasService.ComandaPedidos(comandaId, clienteId);
 

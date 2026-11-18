@@ -2,114 +2,99 @@ import { DataTypes, Model, Optional, ModelStatic } from "sequelize";
 import { sequelize } from  "../database/index.js";
 import bcrypt from "bcryptjs";
 
-// Definição dos tipos do usuário
 export interface User {
-  id: number;
-  name?: string;
-  phone?: string;
-  email: string;
-  password: string;
-  role: "user" | "cliente" |"admin";
-  instagramId?:string
-  linkedinId?:string,
-  two_factor_enabled?:boolean,
-  two_factor_secret?:string
+id: number;
+name?: string;
+phone?: string;
+email: string;
+password: string;
+role: "user" | "cliente" |"admin";
+instagramId?:string
+linkedinId?:string,
+two_factor_enabled?:boolean,
+two_factor_secret?:string
 }
-
-// Tipo para criação de usuário (sem o 'id')
 export interface UserCreationAttributes extends Optional<User, "id"> {}
-
-// Tipagem para a instância do usuário, incluindo o método checkPassword
 export interface UserInstance
-  extends Model<User, UserCreationAttributes>,
-    User {
-  checkPassword(password: string): Promise<boolean>;
+extends Model<User, UserCreationAttributes>,
+User {
+checkPassword(password: string): Promise<boolean>;
 }
-
-
-// Definição do modelo do Sequelize
 export const UserModel = sequelize.define<UserInstance, User>(
-  "users",
-  {
-    id: {
-      allowNull: false,
-      autoIncrement: true,
-      primaryKey: true,
-      type: DataTypes.INTEGER,
-    },
-    name: {
-      allowNull: true,
-      type: DataTypes.STRING,
-    },
-    phone: {
-      allowNull: true,
-      type: DataTypes.STRING,
-    },
-    email: {
-      allowNull: false,
-      unique: true,
-      type: DataTypes.STRING,
-      validate: {
-        isEmail: true,
-      },
-    },
-    password: {
-      allowNull: true,
-      type: DataTypes.STRING,
-    },
-    role: {
-      allowNull: false,
-      type: DataTypes.STRING,
-      validate: {
-        isIn: [["user", "cliente","admin"]],
-      },
-    },
-    instagramId:{
-      allowNull:true,
-      type:DataTypes.STRING,
-       field: 'instagramId',
-    },
-    linkedinId:{
-      allowNull:true,
-      type:DataTypes.STRING,
-      field:'linkedinId'
-    },
-    two_factor_enabled:{
-      type:DataTypes.BOOLEAN,
-      allowNull:true,
-      defaultValue:false
-    },
-    two_factor_secret:{
-      type:DataTypes.STRING,
-      allowNull:true
-    }
-  },
-  {
-    hooks: {
-      beforeSave: async (user, options) => {
-        if (user.isNewRecord || user.changed("password")) {
-          if (user.password) {
-            console.log('Hashing password...');
-            user.password = await bcrypt.hash(user.password.toString(), 10);
-          }
-        }
-      },
-    },
-  }
+"users",
+{
+id: {
+allowNull: false,
+autoIncrement: true,
+primaryKey: true,
+type: DataTypes.INTEGER,
+},
+name: {
+allowNull: true,
+type: DataTypes.STRING,
+},
+phone: {
+allowNull: true,
+type: DataTypes.STRING,
+},
+email: {
+allowNull: false,
+unique: true,
+type: DataTypes.STRING,
+validate: {
+isEmail: true,
+},
+},
+password: {
+allowNull: true,
+type: DataTypes.STRING,
+},
+role: {
+allowNull: false,
+type: DataTypes.STRING,
+validate: {
+isIn: [["user", "cliente","admin"]],
+},
+},
+instagramId:{
+allowNull:true,
+type:DataTypes.STRING,
+field: 'instagramId',
+},
+linkedinId:{
+allowNull:true,
+type:DataTypes.STRING,
+field:'linkedinId'
+},
+two_factor_enabled:{
+type:DataTypes.BOOLEAN,
+allowNull:true,
+defaultValue:false
+},
+two_factor_secret:{
+type:DataTypes.STRING,
+allowNull:true
+}
+},
+{
+hooks: {
+beforeSave: async (user, options) => {
+if (user.isNewRecord || user.changed("password")) {
+if (user.password) {
+
+user.password = await bcrypt.hash(user.password.toString(), 10);
+}
+}
+},
+},
+}
 ) as ModelStatic<UserInstance> & { prototype: UserInstance & UserInstance };
 
-// Adicionando o método checkPassword corretamente ao protótipo
 UserModel.prototype.checkPassword = async function (this: UserInstance, password: string): Promise<boolean> {
-  if (!this.password) {
-    throw new Error("Senha não cadastrada");
-  }
-
-  console.log("Senha digitada:", password);
-  console.log("Senha salva no banco (hash):", this.password);
-
-  const isSame = await bcrypt.compare(password, this.password);
-  console.log("Resultado da comparação (isSame):", isSame);
-
-  return isSame;
+if (!this.password) {
+throw new Error("Senha não cadastrada");
+}
+const isSame = await bcrypt.compare(password, this.password);
+return isSame;
 };
 

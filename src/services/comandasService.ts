@@ -5,90 +5,86 @@ import  Comandas  from "../models/Comandas.js"
 
 export const comandasService={
 findAllPaginated:async(userId:number,page:number,perPage:number)=>{
-    const offset=(page-1)*perPage
-    const {rows,count}=await Comandas.findAndCountAll({
-        where:{clienteId:userId},
-        order:[['id','ASC']],
-        limit:perPage,
-        offset
-    })
-    return {
-        comandas:rows,
-        page,
-        perPage,
-        total:count
-    }
+const offset=(page-1)*perPage
+const {rows,count}=await Comandas.findAndCountAll({
+where:{clienteId:userId},
+order:[['id','ASC']],
+limit:perPage,
+offset
+})
+return {
+comandas:rows,
+page,
+perPage,
+total:count
+}
 },
 
-    ComandaPedido:async(id:string)=>{
-        const comandaPedido=await Comandas.findByPk(id,{
-            attributes:['id', ['mesa_id','mesaId'],['cliente_id','clienteId'],'status'],
-            include:{
-                association:'pedidos',
-                attributes:['id',['comanda_id','comandaId'],'total','status']
-            }
-        })
-        console.log("DEBUG buscando comandaId no banco:", id);
-
-        return comandaPedido
-    },
+ComandaPedido:async(id:string)=>{
+const comandaPedido=await Comandas.findByPk(id,{
+attributes:['id', ['mesa_id','mesaId'],['cliente_id','clienteId'],'status'],
+include:{
+association:'pedidos',
+attributes:['id',['comanda_id','comandaId'],'total','status']
+}
+})
+return comandaPedido
+},
 ComandaPedidos: async (comandaId: string, clienteId: number) => {
-  const comandaPedido = await Comandas.findByPk(comandaId, {
-    include: { association: 'pedidos' }
-  });
-
-  if (!comandaPedido) throw new Error("Comanda não existe");
-  if (comandaPedido.clienteId !== clienteId) 
-    throw new Error("Acesso negado à comanda");
-
-  return comandaPedido;
+const comandaPedido = await Comandas.findByPk(comandaId, {
+include: { association: 'pedidos' }
+})
+if (!comandaPedido) throw new Error("Comanda não existe");
+if (comandaPedido.clienteId !== clienteId) 
+throw new Error("Acesso negado à comanda");
+return comandaPedido;
 },
 
 comandaAtiva: async () => {
-  try {
-    const res = await Comandas.findAll({
-      where: {
-        status: {
-          [Op.ne]: 'pago'
-        }
-      }
-    });
-    return res;
-  } catch (error) {
-    console.error('Erro real ao buscar comandas ativas:', error);
-    throw new Error("Erro ao buscar comandas ativas");
-  }
+try {
+const res = await Comandas.findAll({
+where: {
+status: {
+[Op.ne]: 'pago'
+}
+}
+});
+return res;
+} catch (error) {
+console.error('Erro real ao buscar comandas ativas:', error);
+throw new Error("Erro ao buscar comandas ativas");
+}
 },
 
-    create:async(attibutes:{mesaId:number,clienteId:number})=>{
-        const {mesaId,clienteId}=attibutes
-        const comandaExiste=await Comandas.findOne({where:{clienteId}})
-        if(comandaExiste){
-            throw new Error("Esse cliente já possui comanda aberta.")
-        }
-        const cliente=await Clientes.findByPk(clienteId)
-        if(!cliente){
-            throw new Error("O cliente não existe!")
-        }
+create:async(attibutes:{mesaId:number,clienteId:number})=>{
+const {mesaId,clienteId}=attibutes
+const comandaExiste=await Comandas.findOne({where:{clienteId}})
+if(comandaExiste){
+throw new Error("Esse cliente já possui comanda aberta.")
+}
+const cliente=await Clientes.findByPk(clienteId)
+if(!cliente){
+throw new Error("O cliente não existe!")
+}
 
-        if(cliente.mesaId !== Number(mesaId)){
-            throw new Error("Esse cliente não pertence a essa mesa")
-        }
-        const comanda=await Comandas.create({
-            mesaId,clienteId,status:'pendente'
-        })
-        return comanda
-    },
-    update:async(id:string,attributes:{mesaId:number,clienteId:number})=>{
-        const [affected,updated]= await Comandas.update(attributes,{
-            where:{id},
-            returning:true
+if(cliente.mesaId !== Number(mesaId)){
+throw new Error("Esse cliente não pertence a essa mesa")
+}
+const comanda=await Comandas.create({
+mesaId,clienteId,status:'pendente'
+})
+return comanda
+},
+update:async(id:string,attributes:{mesaId:number,clienteId:number})=>{
+const [affected,updated]= await Comandas.update(attributes,{
+where:{id},
+returning:true
 
-        })
-        return updated[0]
-    },
-    delete:async(id:string)=>{
-        const deleted=await Comandas.destroy({where:{id}})
-        return deleted
-    }
+})
+return updated[0]
+},
+delete:async(id:string)=>{
+const deleted=await Comandas.destroy({where:{id}})
+return deleted
+}
 }

@@ -34,11 +34,7 @@ const PagamentosResourceOptions:ResourceOptions={
             0
           );
     
-          const totalRestante = totalPedido - totalPago;
-    
-          console.log(`Total do pedido: ${totalPedido}`);
-          console.log(`Total já pago: ${totalPago}`);
-          console.log(`Total restante: ${totalRestante}`);
+          const totalRestante = totalPedido - totalPago
     
           if (totalRestante <= 0) {
             throw new Error("Este pedido já foi totalmente pago.");
@@ -58,7 +54,6 @@ const PagamentosResourceOptions:ResourceOptions={
               { status: "pago" },
               { where: { id: request.payload.pedidoId } }
             );
-            console.log("Pedido atualizado para 'pago'.");
           }
     
           return request;
